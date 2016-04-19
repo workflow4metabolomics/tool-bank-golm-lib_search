@@ -32,7 +32,7 @@ No interaction with R
 -- 
 
 ## --- Binary dependencies --- ##
-Install folowing binaries :
+Install following binaries :
 --
 
 ## --- Config : --- ##
