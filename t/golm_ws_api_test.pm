@@ -24,10 +24,10 @@ sub connectWSlibrarySearchGolmTest {
 
 
 sub LibrarySearchTest {
-	my ($osoap, $ri, $riWindow, $gcColumn, $mzs, $intensities) = @_ ;
+	my ($osoap, $ri, $riWindow, $gcColumn, $spectrum) = @_ ;
 	my $oBih = lib::golm_ws_api->new() ;
     my ($osoap) = $oBih->connectWSlibrarySearchGolm() ;
-    my ($res) = $oBih->LibrarySearch($osoap, $ri, $riWindow, $gcColumn, $mzs, $intensities) ;
+    my ($res) = $oBih->LibrarySearch($osoap, $ri, $riWindow, $gcColumn, $spectrum) ;
     print Dumper $res ;
     return($res) ;
 }
