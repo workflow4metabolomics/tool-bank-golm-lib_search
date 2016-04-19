@@ -79,16 +79,16 @@ sub connectWSlibrarySearchGolm() {
 =head2 METHOD LibrarySearch
 
 	## Description : Matches a single user submitted GC-EI mass spectrum against the Golm Metabolome Database (GMD).
-	## Input : $osoap, $ri, $riWindow, $gcColumn, $mzs, $intensities
+	## Input : $osoap, $ri, $riWindow, $gcColumn, $spectrum
 	## Ouput : $spectra
-	## Usage : ($spectra) = LibrarySearch($osoap, $ri, $riWindow, $gcColumn, $mzs, $intensities) ;
+	## Usage : ($spectra) = LibrarySearch($osoap, $ri, $riWindow, $gcColumn, $spectrum) ;
 
 =cut
 
 sub LibrarySearch() {
 	## Retrieve Values
     my $self = shift ;
-	my ($osoap, $ri, $riWindow, $gcColumn, $mzs, $intensities) = @_;
+	my ($osoap, $ri, $riWindow, $gcColumn, $spectrum) = @_;
 	
 	# init in case :
 	$ri = 1500 if ( !defined $ri ) ;
@@ -97,29 +97,20 @@ sub LibrarySearch() {
 	
 	my %res = () ;
 	
-	if ( defined $mzs ){
-		my $nb_mzs = scalar (@{$mzs}) ;
-    	
-    	if ( $nb_mzs > 0 ) {
+	if ( defined $spectrum ){
+		    	
+    	if ( $spectrum ne '' ) {
     		
-    		my @data1 = () ;
-    		my @data2 = () ;    		
-    		my @mzs = @{$mzs} ;
-    		my @intensities = @{$intensities} ;
-    		my $i = 0;
+    		my @data = () ; 		
     		
-    		foreach my $mz (@mzs) {
-				push(@data1, SOAP::Data -> name('mzs' => $mz) );
-				push(@data2, SOAP::Data -> name('intensities' => $intensities[$i]) );
-				$i++ ;
-			}
-    		
-    		push(@data2, SOAP::Data -> name('ri' => $ri) ) ;
-			push(@data2, SOAP::Data -> name('riWindow' => $riWindow) ) ;
-			push(@data2, SOAP::Data -> name('gcColumn' => $gcColumn) ) ;
+    		    		
+    		push(@data, SOAP::Data -> name('ri' => $ri) ) ;
+			push(@data, SOAP::Data -> name('riWindow' => $riWindow) ) ;
+			push(@data, SOAP::Data -> name('gcColumn' => $gcColumn) ) ;
+			push(@data, SOAP::Data -> name('spectrum' => $spectrum) ) ;
 			
 			
-    		my $data = SOAP::Data -> value(@data1, @data2);
+    		my $data = SOAP::Data -> value(@data);
 			my $som = $osoap -> searchSpectrum($data);
 			
 			## DETECTING A SOAP FAULT OR NOT
@@ -131,7 +122,6 @@ sub LibrarySearch() {
 					my $res_status = $som->valueof('//LibrarySearchResponse/LibrarySearchResult/Results/Status') ;
 					
 					#get results from xml via XPATH
-					
 					my $spectrumID;
 					my $analyteID;
 					my $ri;
@@ -178,10 +168,10 @@ sub LibrarySearch() {
 		    else {
 		    	carp "The som return (from the LibrarySearch method) isn't defined\n" ; }
     	}
-    	else { carp "Query MZs list is empty, Golm soap will stop\n" ; }
+    	else { carp "The spectrum for query is empty, Golm soap will stop\n" ; }
     }
-    else { carp "Query MZs list is undef, Golm soap will stop\n" ; }
-#	print Dumper @ret ;
+    else { carp "The spectrum for query is undef, Golm soap will stop\n" ; }
+    
     return(\%res) ;
 }
 ### END of SUB
