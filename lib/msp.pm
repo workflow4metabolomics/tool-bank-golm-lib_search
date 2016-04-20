@@ -1,4 +1,4 @@
-package lib::msp ;
+package msp ;
 
 use strict;
 use warnings ;
@@ -11,8 +11,8 @@ use vars qw($VERSION @ISA @EXPORT %EXPORT_TAGS);
 
 our $VERSION = "1.0";
 our @ISA = qw(Exporter);
-our @EXPORT = qw( get_spectrum );
-our %EXPORT_TAGS = ( ALL => [qw( get_spectrum )] );
+our @EXPORT = qw( get_spectra );
+our %EXPORT_TAGS = ( ALL => [qw( get_spectra )] );
 
 =head1 NAME
 
@@ -51,16 +51,16 @@ sub new {
 }
 ### END of SUB
 
-=head2 METHOD get_spectrum
+=head2 METHOD get_spectra
 
 	## Description : parse the msp file and generate the spectrum string formatted for the WS query (html) 
 	## Input : $msp_file
 	## Output : $msp_spectra
-	## Usage : my ( $msp_spectra ) = get_spectrum( $msp_file ) ;
+	## Usage : my ( $msp_spectra ) = get_spectra( $msp_file ) ;
 	
 =cut
 ## START of SUB
-sub get_spectrum {
+sub get_spectra {
 	## Retrieve Values
     my $self = shift ;
     my ( $msp_file ) = @_ ;
@@ -76,7 +76,7 @@ sub get_spectrum {
     # Extract spectrum
     while(<$msp_file>) {
     	chomp ;
-    	#Detect spectra
+    	#Detect when line is part of spectrum
     	if (/^\s(.+)/) { 
     		@ions = split /;/ , $1 ;
     		foreach my $ion (@ions) {
@@ -84,6 +84,7 @@ sub get_spectrum {
     				$mz = $1 ;
     				$intensity = $2 ;
     			}
+    			# Create the spectra string for query, formatted for url
     			$spectrum = $mz . "%20" . $intensity  ;
     			$spectrumTot .= $spectrum . "%20" ;
     		}
@@ -115,7 +116,7 @@ You can find documentation for this module with the perldoc command.
 
 =over 4
 
-=item :ALL is get_spectrum
+=item :ALL is get_spectra
 
 =back
 
