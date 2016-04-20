@@ -13,18 +13,18 @@ our @ISA = qw(Exporter);
 our @EXPORT = qw( connectWSlibrarySearchGolmTest LibrarySearchTest );
 our %EXPORT_TAGS = ( ALL => [qw( connectWSlibrarySearchGolmTest LibrarySearchTest )] );
 
+#use lib '/media/gcretin/donnees1/lab_local/tool-bank-golm-lib_search/lib/golm_ws_api' ;
 use lib::golm_ws_api qw( :ALL ) ;
-
 
 sub connectWSlibrarySearchGolmTest {
     my $oBih = lib::golm_ws_api->new() ;
-    my ($osoap) = $oBih->connectWSlibrarySearchGolm() ;
-    return ($osoap) ;
+    my ($soap) = $oBih->connectWSlibrarySearchGolm() ;
+    return ($soap) ;
 }
 
 
 sub LibrarySearchTest {
-	my ($osoap, $ri, $riWindow, $gcColumn, $spectrum) = @_ ;
+	my ($ri, $riWindow, $gcColumn, $spectrum) = @_ ;
 	my $oBih = lib::golm_ws_api->new() ;
     my ($osoap) = $oBih->connectWSlibrarySearchGolm() ;
     my ($res) = $oBih->LibrarySearch($osoap, $ri, $riWindow, $gcColumn, $spectrum) ;
