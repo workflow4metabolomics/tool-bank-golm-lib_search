@@ -12,7 +12,8 @@ use Carp ;
 use lib $FindBin::Bin ;
 my $binPath = $FindBin::Bin ;
 
-use lib::golm_ws_api_test qw( :ALL ) ;
+#use lib '/media/gcretin/donnees1/lab_local/tool-bank-golm-lib_search/t' ;
+use golm_ws_api_test qw( :ALL ) ;
 
 
 ## To launch the right sequence : API, MSP...
