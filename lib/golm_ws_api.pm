@@ -65,7 +65,7 @@ sub connectWSlibrarySearchGolm() {
     my $self = shift ;
 	my $osoap = SOAP::Lite 
 		-> uri('gmd.mpimp-golm.mpg.de')
-		-> proxy('http://gmd.mpimp-golm.mpg.de/webservices/wsLibrarySearch.asmx/', timeout => 100 )
+		-> proxy('http://gmd.mpimp-golm.mpg.de/webservices/wsLibrarySearch.asmx/' )
 		-> on_fault(sub { my($soap, $res) = @_; 
          eval { die ref $res ? $res->faultstring : $soap->transport->status, "\n"};
          return ref $res ? $res : new SOAP::SOM ;
@@ -95,7 +95,8 @@ sub LibrarySearch() {
 	$riWindow = 3000 if ( !defined $riWindow ) ;
 	$gcColumn = 'VAR5' if ( !defined $gcColumn ) ;
 	
-	my %res = () ;
+	my %val = () ;
+	my @res ; # @ret = [ %val1, %val2,... ]
 	
 	if ( defined $spectrum ){
 		    	
@@ -111,12 +112,12 @@ sub LibrarySearch() {
 			
 			
     		my $data = SOAP::Data -> value(@data);
-			my $som = $osoap -> searchSpectrum($data);
+			my $som = $osoap -> LibrarySearch($data);
 			
 			## DETECTING A SOAP FAULT OR NOT
 		    if ( $som ) {
 		    	if ($som->fault) {
-					$res{'fault'} = $som->faultstring ;
+					push (@res, $som->faultstring) ;
 				}
 				else {
 					my $res_status = $som->valueof('//LibrarySearchResponse/LibrarySearchResult/Results/Status') ;
@@ -136,43 +137,33 @@ sub LibrarySearch() {
 					
 					if ($res_status eq 'success') {
 						for my $res ($som->valueof('//LibrarySearchResponse/LibrarySearchResult/Results')) {
-						      $spectrumID = $res->{spectrumID} ;
-						      $analyteID = $res->{analyteID} ;
-						      $ri = $res->{ri} ;
-						      $riDiscrepancy = $res->{riDiscrepancy} ;
-						      $DotproductDistance = $res->{DotproductDistance} ;
-						      $EuclideanDistance = $res->{EuclideanDistance} ;
-						      $HammingDistance = $res->{HammingDistance} ;
-						      $JaccardDistance = $res->{JaccardDistance} ;
-						      $s12GowerLegendreDistance = $res->{s12GowerLegendreDistance} ;
-						      $spectrumName = $res->{spectrumName} ;
-						      $metaboliteID = $res->{metaboliteID} ;
+						      
+						      %val = ('analyteName', $res->{analyteName}, 'ri', $res->{ri}, 'spectrumID', $res->{spectrumID}, 'analyteID', $res->{analyteID}, 'riDiscrepancy', $res->{riDiscrepancy},
+					      			'DotproductDistance', $res->{DotproductDistance}, 'EuclideanDistance', $res->{EuclideanDistance}, 'HammingDistance', $res->{HammingDistance},
+					      			'JaccardDistance', $res->{JaccardDistance}, 's12GowerLegendreDistance', $res->{s12GowerLegendreDistance}, 'spectrumName', $res->{spectrumName},
+					      			'metaboliteID', $res->{metaboliteID}) ;
+					      	  push ( @res , { %val } ) ;
 						}
-						
-					    %res = ('spectrumID', $spectrumID, 'analyteID', $analyteID, 'ri', $ri, 'riDiscrepancy', $riDiscrepancy,
-					      			'DotproductDistance', $DotproductDistance, 'EuclideanDistance', $EuclideanDistance, 'HammingDistance', $HammingDistance,
-					      			'JaccardDistance', $JaccardDistance, 's12GowerLegendreDistance', $s12GowerLegendreDistance, 'spectrumName', $spectrumName,
-					      			'metaboliteID', $metaboliteID) ;
+					    
 					    
 					}
 					## if query didn't go as planned
 					else {
-						%res = ('spectrumID', undef, 'analyteID', undef, 'ri', undef, 'riDiscrepancy', undef,
-					      			'DotproductDistance', undef, 'EuclideanDistance', undef, 'HammingDistance', undef,
-					      			'JaccardDistance', undef, 's12GowerLegendreDistance', undef, 'spectrumName', undef,
-					      			'metaboliteID', undef) ;
-						
+						%val = ('spectrumID', undef, 'analyteID', undef, 'ri', undef, 'riDiscrepancy', undef,
+					      		'DotproductDistance', undef, 'EuclideanDistance', undef, 'HammingDistance', undef,
+					      		'JaccardDistance', undef, 's12GowerLegendreDistance', undef, 'spectrumName', undef,
+					      		'metaboliteID', undef) ;
+						push ( @res , { %val } ) ;
 					}
 	    		}
 		    }
-		    else {
-		    	carp "The som return (from the LibrarySearch method) isn't defined\n" ; }
+		    else { carp "The som return (from the LibrarySearch method) isn't defined\n" ; }
     	}
     	else { carp "The spectrum for query is empty, Golm soap will stop\n" ; }
     }
     else { carp "The spectrum for query is undef, Golm soap will stop\n" ; }
     
-    return(\%res) ;
+    return(\@res) ;
 }
 ### END of SUB
 
@@ -206,7 +197,7 @@ This program is free software; you can redistribute it and/or modify it under th
 
 =head1 VERSION
 
-version 1 : xx / xx / 201x
+version 1 : xx / xx / xx
 
 version 2 : ??
 
