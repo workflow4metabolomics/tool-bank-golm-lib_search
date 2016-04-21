@@ -1,4 +1,4 @@
-package lib::golm_ws_api ;
+package golm_ws_api ;
 
 use strict;
 use warnings ;
@@ -6,7 +6,7 @@ use Exporter ;
 use Carp ;
 
 use Data::Dumper ;
-use SOAP::Lite ;
+#use SOAP::Lite ;
 use SOAP::Lite +trace => [qw (debug)];
 
 
@@ -66,7 +66,7 @@ sub new {
 sub connectWSlibrarySearchGolm() {
 	## Retrieve Values
     my $self = shift ;
-	my $osoap = SOAP::Lite 
+	my $osoap = SOAP::Lite
 		-> soapversion('1.2')
 		-> envprefix('soap12')
 		-> readable(1)
@@ -102,33 +102,32 @@ sub LibrarySearch() {
 	$gcColumn = 'VAR5' if ( !defined $gcColumn ) ;
 	
 	my %val = () ;
+	my $res_status ;
 	my @res ; # @ret = [ %val1, %val2,... ]
 	
 	if ( defined $spectrum ){
 		    	
     	if ( $spectrum ne '' ) {
     		
-    		my @data = () ; 		
-    		
-    		    		
-    		push(@data, SOAP::Data -> name('ri' => $ri) ) ;
-			push(@data, SOAP::Data -> name('riWindow' => $riWindow) ) ;
-			push(@data, SOAP::Data -> name('gcColumn' => $gcColumn) ) ;
-			push(@data, SOAP::Data -> name('spectrum' => $spectrum) ) ;
-			
-			
-    		my $data = SOAP::Data -> value(@data);
-			my $som = $osoap -> LibrarySearch($data);
+    		my $ri = SOAP::Data -> name('ri' => $ri) ;
+    		my $riWindow = SOAP::Data -> name('riWindow' => $riWindow) ;
+    		my $gcColumn = SOAP::Data -> name('AlkaneRetentionIndexGcColumnComposition' => $gcColumn) ;
+    		my $spectrum = SOAP::Data -> name('spectrum' => $spectrum) ;
+    								
+			my $som = $osoap -> LibrarySearch($ri, $riWindow, $gcColumn, $spectrum);
 			
 			## DETECTING A SOAP FAULT OR NOT
 		    if ( $som ) {
+		    	
 		    	if ($som->fault) {
 					push (@res, $som->faultstring) ;
 				}
+				
 				else {
-					my $res_status = $som->valueof('//LibrarySearchResponse/LibrarySearchResult/Results/Status') ;
+	
+					$res_status = $som->valueof('//ResultOfAnnotatedMatch/Status') ;
 					
-					#get results from xml via XPATH
+					
 					my $spectrumID;
 					my $analyteID;
 					my $ri;
@@ -141,8 +140,9 @@ sub LibrarySearch() {
 					my $spectrumName;
 					my $metaboliteID;
 					
+					#check if query successed and get results from xml via XPATH
 					if ($res_status eq 'success') {
-						for my $res ($som->valueof('//LibrarySearchResponse/LibrarySearchResult/Results')) {
+						for my $res ($som->valueof('//ResultOfAnnotatedMatch/Status')) {
 						      
 						      %val = ('analyteName', $res->{analyteName}, 'ri', $res->{ri}, 'spectrumID', $res->{spectrumID}, 'analyteID', $res->{analyteID}, 'riDiscrepancy', $res->{riDiscrepancy},
 					      			'DotproductDistance', $res->{DotproductDistance}, 'EuclideanDistance', $res->{EuclideanDistance}, 'HammingDistance', $res->{HammingDistance},
