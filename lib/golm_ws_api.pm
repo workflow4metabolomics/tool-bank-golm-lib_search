@@ -7,6 +7,9 @@ use Carp ;
 
 use Data::Dumper ;
 use SOAP::Lite ;
+use SOAP::Lite +trace => [qw (debug)];
+
+
 use vars qw($VERSION @ISA @EXPORT %EXPORT_TAGS);
 
 our $VERSION = "1.0";
@@ -64,6 +67,9 @@ sub connectWSlibrarySearchGolm() {
 	## Retrieve Values
     my $self = shift ;
 	my $osoap = SOAP::Lite 
+		-> soapversion('1.2')
+		-> envprefix('soap12')
+		-> readable(1)
 		-> uri('gmd.mpimp-golm.mpg.de')
 		-> proxy('http://gmd.mpimp-golm.mpg.de/webservices/wsLibrarySearch.asmx/' )
 		-> on_fault(sub { my($soap, $res) = @_; 
