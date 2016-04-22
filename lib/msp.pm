@@ -67,32 +67,35 @@ sub get_spectra {
     
     my @msp_spectra ;
     my @ions ;
-    my $spectrum ;
-    my $spectrumTot = "";
+    my $spectrum = "" ;
+    my $spectrumTot = "" ;
     my $bool = 0;
-    my $mz ;
-    my $intensity ;
+    my $mz = "" ;
+    my $intensity = "" ;
     
-    # Extract spectrum
-    while(<$msp_file>) {
+    open (MSP , "<" , $msp_file) or die $! ;
+    
+     # Extract spectrum
+    while(<MSP>) {
     	chomp ;
     	#Detect when line is part of spectrum
-    	if (/^\s(.+)/) { 
+    	if (/^\s(.+);/) {
     		@ions = split /;/ , $1 ;
+    		
     		foreach my $ion (@ions) {
-    			if ($ion =~ /^\s+(\d+)\s+(\d+\.?\d*)$/) {
+    			if ($ion =~ /^\s*(\d+)\s+(\d+\.?\d*)$/) {
     				$mz = $1 ;
     				$intensity = $2 ;
     			}
     			# Create the spectra string for query, formatted for url
-    			$spectrum = $mz . "%20" . $intensity  ;
-    			$spectrumTot .= $spectrum . "%20" ;
+    			$spectrum .= $mz . "%20" . $intensity ."%20"  ;
     		}
-    		$bool = 1 ;
+    		
     	}
-    	elsif(/^$/ && $bool == 1) {
-    		push (@msp_spectra , $spectrumTot) ;
-    		$bool = 0;
+    	if(/^$/) {
+    		$spectrum = substr($spectrum, 0, -3);
+    		push (@msp_spectra , $spectrum) ;
+    		$spectrum = "" ;
     	}
     }
     return(\@msp_spectra) ;
