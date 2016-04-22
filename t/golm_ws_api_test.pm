@@ -10,8 +10,8 @@ use Data::Dumper ;
 
 our $VERSION = "1.0";
 our @ISA = qw(Exporter);
-our @EXPORT = qw( connectWSlibrarySearchGolmTest LibrarySearchTest get_spectraTest );
-our %EXPORT_TAGS = ( ALL => [qw( connectWSlibrarySearchGolmTest LibrarySearchTest get_spectraTest )] );
+our @EXPORT = qw( connectWSlibrarySearchGolmTest LibrarySearchTest get_spectraTest get_mzsTest);
+our %EXPORT_TAGS = ( ALL => [qw( connectWSlibrarySearchGolmTest LibrarySearchTest get_spectraTest get_mzsTest)] );
 
 use lib '/media/gcretin/donnees1/lab_local/tool-bank-golm-lib_search/lib' ;
 use golm_ws_api qw( :ALL ) ;
@@ -25,13 +25,24 @@ sub connectWSlibrarySearchGolmTest {
 }
 
 
+sub get_mzsTest {
+	my ($msp_file) = @_;
+	my $omsp = msp->new();
+	my $mzs = $omsp->get_mzs ($msp_file) ;
+	print Dumper \$mzs ;
+    return($mzs) ;
+}
+
+
 sub get_spectraTest {
 	my ($msp_file) = @_;
 	my $omsp = msp->new();
 	my $spectra = $omsp->get_spectra ($msp_file) ;
-	print "coucou".Dumper \$spectra ;
+	print Dumper \$spectra ;
     return($spectra) ;
 }
+
+
 
 
 
