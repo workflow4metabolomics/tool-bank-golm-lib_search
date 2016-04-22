@@ -51,11 +51,60 @@ sub new {
 }
 ### END of SUB
 
+
+
+=head2 METHOD get_mzs
+
+	## Description : parse msp file and get mzs
+	## Input : $msp_file
+	## Output : \@total_spectra_mzs 
+	## Usage : my ( $mzs ) = get_mzs( $msp_file ) ;
+	## Structure of res: [ $arr_ref1 , $arr_ref2 ... $arr_refN ]
+=cut
+## START of SUB
+sub get_mzs {
+	## Retrieve Values
+    my $self = shift ;
+    my ( $msp_file ) = @_ ;
+  
+  	my @ions ;
+  	my $mz ;
+  	my @mzs ;
+  	my @total_spectra_mzs ; 
+  	my $i = 0 ;
+  	
+    open (MSP , "<" , $msp_file) or die $! ;
+    
+     # Extract spectrum
+    while(<MSP>) {
+    	chomp ;
+    	#Detect spectrum
+    	if (/^\s(.+);/) {
+    		@ions = split /;/ , $1 ;
+    		# retrieve mz of a spectrum
+    		foreach my $ion (@ions) {
+    			if ($ion =~ /^\s*(\d+)\s+(\d+\.?\d*)$/) {
+    				push @mzs , $1 ;
+    			}
+    		}
+    	}
+    	if(/^$/) {
+    		@{ $total_spectra_mzs[$i] } = @mzs ;
+    		@mzs = () ;
+    		$i++ ;
+    	}
+    }
+    return(\@total_spectra_mzs) ;
+}
+## END of SUB
+
+
+
 =head2 METHOD get_spectra
 
 	## Description : parse the msp file and generate the spectrum string formatted for the WS query (html) 
 	## Input : $msp_file
-	## Output : $msp_spectra
+	## Output : \@msp_spectra
 	## Usage : my ( $msp_spectra ) = get_spectra( $msp_file ) ;
 	
 =cut
