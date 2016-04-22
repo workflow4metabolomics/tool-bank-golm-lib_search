@@ -15,9 +15,8 @@ my $binPath = $FindBin::Bin ;
 #use lib '/media/gcretin/donnees1/lab_local/tool-bank-golm-lib_search/t' ;
 use golm_ws_api_test qw( :ALL ) ;
 
-
 ## To launch the right sequence : API, MSP...
-my $sequence = 'API' ; 
+my $sequence = 'MSP' ; 
 my $current_test = 1 ;
 
 
@@ -46,7 +45,7 @@ isa_ok( connectWSlibrarySearchGolmTest(), 'SOAP::Lite' );
 
 ##		- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 # ARGS : $ri, $riWindow, $gcColumn, $spectrum
-# Structure of res : @ret = [ %val1, %val2,... ]
+# Structure of res : @ret = [ %val1, %val2, ... %valN ]
 print "\n** Test $current_test LibrarySearch with a list of mzs, intensities and real search parameters **\n" ; $current_test++;
 is_deeply( LibrarySearchTest(
 		1500,
@@ -75,7 +74,62 @@ is_deeply( LibrarySearchTest(
 print "\n- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -\n" ;
 
 }
+
+
+#### #### ##### ###### ################################################ ###### ##### ##### ###### ######
+
+								## START of MSP SEQUENCE ## 
+							
+#### #### ##### ###### ################################################ ###### ##### ##### ###### ######
+
+
+if ($sequence eq "MSP") {
+	
+	## testing msp module of golm wrapper.
+	## 		- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+	print "\n\t\t\t  * * * * * * \n" ;
+	print "\t  * * * - - - Test MSP parsing module - - - * * * \n\n" ;
+
+	##		- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+
+
+##		- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+# ARGS : $msp_file
+# Structure of res : [ $spectrum1 , $spectrum2 ... $spectrumN ]
+print "\n** Test $current_test get_spectra from a .msp file **\n" ; $current_test++;
+is_deeply( get_spectraTest(
+		'/home/gcretin/Téléchargements/tool-ext-dbsearch_golm/peakspectra.msp'
+	),
+	[
+		"73%204908673%20147%205025522%20273%205942964%20274%203752779%20347%203843372%20375%203656316",
+		"73%205764652%20147%205244020%20157%203561241%20160%203454586%20205%204437872%20217%203601276%20272%2030900.41%20319%205352581%20320%203587208",
+		"73%205551756%20129%203361335%20147%205231997%20157%203641748%20160%203947240%20205%204374348%20217%203683153%20319%205377373%20320%203621938"
+	], 
+"Method \'get_spectra\' return a list of query formatted spectra from a msp file");
+
+print "\n- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -\n" ;
+
+
+
+
+}
 else {
 	croak "Can\'t launch any test : no sequence clearly defined !!!!\n" ;
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
