@@ -102,7 +102,6 @@ is_deeply( get_spectraTest(
 		'/home/gcretin/Téléchargements/tool-ext-dbsearch_golm/peakspectra.msp'
 	),
 	[
-		"73%204908673%20147%205025522%20273%205942964%20274%203752779%20347%203843372%20375%203656316",
 		"73%205764652%20147%205244020%20157%203561241%20160%203454586%20205%204437872%20217%203601276%20272%2030900.41%20319%205352581%20320%203587208",
 		"73%205551756%20129%203361335%20147%205231997%20157%203641748%20160%203947240%20205%204374348%20217%203683153%20319%205377373%20320%203621938"
 	], 
@@ -111,6 +110,22 @@ is_deeply( get_spectraTest(
 print "\n- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -\n" ;
 
 
+
+
+##		- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+# ARGS : $msp_file
+# Structure of res: [ $arr_ref1 , $arr_ref2 ... $arr_refN ]
+print "\n** Test $current_test get_mzs from a .msp file **\n" ; $current_test++;
+is_deeply( get_mzsTest(
+		'/home/gcretin/Téléchargements/tool-ext-dbsearch_golm/peakspectra.msp'
+	),
+	[
+		[73,147,157,160,205,217,272,319,320],
+		[73,129,147,157,160,205,217,319,320]
+	], 
+"Method \'get_mzs\' return an array of arrays refs containing mzs of all the spectra from a msp file");
+
+print "\n- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -\n" ;
 
 
 }
