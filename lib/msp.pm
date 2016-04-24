@@ -11,8 +11,8 @@ use vars qw($VERSION @ISA @EXPORT %EXPORT_TAGS);
 
 our $VERSION = "1.0";
 our @ISA = qw(Exporter);
-our @EXPORT = qw( get_spectra );
-our %EXPORT_TAGS = ( ALL => [qw( get_spectra )] );
+our @EXPORT = qw( get_mzs get_intensities encode_spectrum_for_query);
+our %EXPORT_TAGS = ( ALL => [qw( get_mzs get_intensities encode_spectrum_for_query)] );
 
 =head1 NAME
 
@@ -68,7 +68,6 @@ sub get_mzs {
     my ( $msp_file ) = @_ ;
   
   	my @ions ;
-  	my $mz ;
   	my @mzs ;
   	my @total_spectra_mzs ; 
   	my $i = 0 ;
@@ -100,54 +99,94 @@ sub get_mzs {
 
 
 
-=head2 METHOD get_spectra
 
-	## Description : parse the msp file and generate the spectrum string formatted for the WS query (html) 
+=head2 METHOD get_intensities
+
+	## Description : parse msp file and get intensities
 	## Input : $msp_file
-	## Output : \@msp_spectra
-	## Usage : my ( $msp_spectra ) = get_spectra( $msp_file ) ;
-	
+	## Output : \@total_spectra_intensities 
+	## Usage : my ( $intensities ) = get_mzs( $msp_file ) ;
+	## Structure of res: [ $arr_ref1 , $arr_ref2 ... $arr_refN ]
 =cut
 ## START of SUB
-sub get_spectra {
+sub get_intensities {
 	## Retrieve Values
     my $self = shift ;
     my ( $msp_file ) = @_ ;
-    
-    my @msp_spectra ;
-    my @ions ;
-    my $spectrum = "" ;
-    my $spectrumTot = "" ;
-    my $bool = 0;
-    my $mz = "" ;
-    my $intensity = "" ;
-    
+  
+  	my @ions ;
+  	my @intensities ;
+  	my @total_spectra_intensities ; 
+  	my $i = 0 ;
+  	
     open (MSP , "<" , $msp_file) or die $! ;
     
      # Extract spectrum
     while(<MSP>) {
     	chomp ;
-    	#Detect when line is part of spectrum
+    	#Detect spectrum
     	if (/^\s(.+);/) {
     		@ions = split /;/ , $1 ;
-    		
+    		# retrieve intensity of a spectrum
     		foreach my $ion (@ions) {
     			if ($ion =~ /^\s*(\d+)\s+(\d+\.?\d*)$/) {
-    				$mz = $1 ;
-    				$intensity = $2 ;
+    				push @intensities , $2 ;
     			}
-    			# Create the spectra string for query, formatted for url
-    			$spectrum .= $mz . "%20" . $intensity ."%20"  ;
     		}
-    		
     	}
     	if(/^$/) {
-    		$spectrum = substr($spectrum, 0, -3);
-    		push (@msp_spectra , $spectrum) ;
-    		$spectrum = "" ;
+    		@{ $total_spectra_intensities[$i] } = @intensities ;
+    		@intensities = () ;
+    		$i++ ;
     	}
     }
-    return(\@msp_spectra) ;
+    return(\@total_spectra_intensities) ;
+}
+## END of SUB
+
+
+
+
+
+
+
+
+
+
+
+=head2 METHOD encode_spectrum_for_query
+
+	## Description : get mzs and intensities values and generate the spectra strings formatted for the WS query (html) 
+	## Input : $mzs, $intensities
+	## Output : \@encoded_spectra
+	## Usage : my ( $encoded_spectra ) = get_spectra( $mzs, $intensities ) ;
+	
+=cut
+## START of SUB
+sub encode_spectrum_for_query {
+	## Retrieve Values
+    my $self = shift ;
+    my ( $mzs, $intensities ) = @_ ;
+    
+    my @encoded_spectra ;
+    my $spectrum = "" ;
+    my $k = 0 ;
+    
+    #print "Coucou". @{@$mzs[0]} ;
+    
+    for (my $i=0 ; $i< @$mzs ; $i++) {
+    	
+    	for ( my $j=0 ; $j<scalar @{@$mzs[$i]} ; $j++ ) {
+    		
+    		$spectrum = $spectrum . $$mzs[$i][$j] . "%20" . $$intensities[$i][$j] . "%20";
+    	}
+    	$spectrum = substr($spectrum,0,-3);
+    	$encoded_spectra[$k] = $spectrum ;
+    	$k++ ;
+    	$spectrum = '' ;
+    }
+    
+    return \@encoded_spectra ;
 }
 ## END of SUB
 
