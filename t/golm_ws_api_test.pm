@@ -10,20 +10,34 @@ use Data::Dumper ;
 
 our $VERSION = "1.0";
 our @ISA = qw(Exporter);
-our @EXPORT = qw( connectWSlibrarySearchGolmTest LibrarySearchTest get_spectraTest get_mzsTest);
-our %EXPORT_TAGS = ( ALL => [qw( connectWSlibrarySearchGolmTest LibrarySearchTest get_spectraTest get_mzsTest)] );
+our @EXPORT = qw( connectWSlibrarySearchGolmTest LibrarySearchTest encode_spectrum_for_queryTest get_mzsTest get_intensitiesTest);
+our %EXPORT_TAGS = ( ALL => [qw( connectWSlibrarySearchGolmTest LibrarySearchTest encode_spectrum_for_queryTest get_mzsTest get_intensitiesTest)] );
 
-use lib '/media/gcretin/donnees1/lab_local/tool-bank-golm-lib_search/lib' ;
+use lib '/home/gabriel/lab/tool-bank-golm-lib_search/lib' ;
+#use lib '/media/gcretin/donnees1/lab_local/tool-bank-golm-lib_search/lib' ;
 use golm_ws_api qw( :ALL ) ;
 use msp qw( :ALL ) ;
 
+### Test API module ###
 
 sub connectWSlibrarySearchGolmTest {
     my $oBih = golm_ws_api->new() ;
     my ($soap) = $oBih->connectWSlibrarySearchGolm() ;
+    #print Dumper $soap ;
     return ($soap) ;
 }
 
+
+sub LibrarySearchTest {
+	my ($ri, $riWindow, $gcColumn, $spectrum) = @_ ;
+	my $oBih = golm_ws_api->new() ;
+    my $res =$oBih->LibrarySearch($ri, $riWindow, $gcColumn, $spectrum) ;
+    #print Dumper @$res ;
+    return ($res) ;
+}
+
+
+### Test MSP module ###
 
 sub get_mzsTest {
 	my ($msp_file) = @_;
@@ -34,26 +48,21 @@ sub get_mzsTest {
 }
 
 
-sub get_spectraTest {
+sub get_intensitiesTest {
 	my ($msp_file) = @_;
 	my $omsp = msp->new();
-	my $spectra = $omsp->get_spectra ($msp_file) ;
-	print Dumper \$spectra ;
-    return($spectra) ;
+	my $intensities = $omsp->get_intensities($msp_file) ;
+	print Dumper \$intensities ;
+    return($intensities) ;
 }
 
 
-
-
-
-sub LibrarySearchTest {
-	my ($ri, $riWindow, $gcColumn, $spectrum) = @_ ;
-	my $oBih = golm_ws_api->new() ;
-    my ($osoap) = $oBih->connectWSlibrarySearchGolm() ;
-    my ($res) = $oBih->LibrarySearch($osoap, $ri, $riWindow, $gcColumn, $spectrum) ;
-    print Dumper $res ;
-    return($res) ;
+sub encode_spectrum_for_queryTest {
+	my ($mzs, $intensities) = @_;
+	my $omsp = msp->new();
+	my $encoded_spectra = $omsp->encode_spectrum_for_query($mzs, $intensities) ;
+	print Dumper $encoded_spectra ;
+	return ($encoded_spectra) ;
 }
-
 
 1 ;
