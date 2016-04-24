@@ -6,16 +6,14 @@ use Exporter ;
 use Carp ;
 
 use Data::Dumper ;
-#use SOAP::Lite ;
 use SOAP::Lite +trace => [qw (debug)];
-
 
 use vars qw($VERSION @ISA @EXPORT %EXPORT_TAGS);
 
 our $VERSION = "1.0";
 our @ISA = qw(Exporter);
-our @EXPORT = qw( connectWSlibrarySearchGolm LibrarySearch );
-our %EXPORT_TAGS = ( ALL => [qw( connectWSlibrarySearchGolm LibrarySearch )] );
+our @EXPORT = qw( connectWSlibrarySearchGolm LibrarySearch parseResult);
+our %EXPORT_TAGS = ( ALL => [qw( connectWSlibrarySearchGolm LibrarySearch parseResult)] );
 
 =head1 NAME
 
@@ -86,92 +84,71 @@ sub connectWSlibrarySearchGolm() {
 
 	## Description : Matches a single user submitted GC-EI mass spectrum against the Golm Metabolome Database (GMD).
 	## Input : $osoap, $ri, $riWindow, $gcColumn, $spectrum
-	## Ouput : $spectra
-	## Usage : ($spectra) = LibrarySearch($osoap, $ri, $riWindow, $gcColumn, $spectrum) ;
+	## Ouput : \@results
+	## Usage : (\@results) = LibrarySearch($osoap, $ri, $riWindow, $gcColumn, $spectrum) ;
 
 =cut
 
 sub LibrarySearch() {
 	## Retrieve Values
-    my $self = shift ;
-	my ($osoap, $ri, $riWindow, $gcColumn, $spectrum) = @_;
-	
-	# init in case :
+	my $self = shift ;
+	my ($ri, $riWindow, $gcColumn, $spectrum) = @_ ;
+
+	#init in case :
 	$ri = 1500 if ( !defined $ri ) ;
 	$riWindow = 3000 if ( !defined $riWindow ) ;
 	$gcColumn = 'VAR5' if ( !defined $gcColumn ) ;
 	
-	my %val = () ;
-	my $res_status ;
-	my @res ; # @ret = [ %val1, %val2,... ]
-	
+	my $result ;
+		
 	if ( defined $spectrum ){
 		    	
     	if ( $spectrum ne '' ) {
     		
-    		my $ri = SOAP::Data -> name('ri' => $ri) ;
-    		my $riWindow = SOAP::Data -> name('riWindow' => $riWindow) ;
-    		my $gcColumn = SOAP::Data -> name('AlkaneRetentionIndexGcColumnComposition' => $gcColumn) ;
-    		my $spectrum = SOAP::Data -> name('spectrum' => $spectrum) ;
-    								
-			my $som = $osoap -> LibrarySearch($ri, $riWindow, $gcColumn, $spectrum);
+		   my $soap = SOAP::Lite
+              -> uri('http://gmd.mpimp-golm.mpg.de')
+              -> on_action( sub { join '/', 'http://gmd.mpimp-golm.mpg.de/webservices/wsLibrarySearch.asmx', $_[1] } )
+              -> proxy('http://gmd.mpimp-golm.mpg.de/webservices/wsLibrarySearch.asmx');
+               
+           # Setting Content-Type myself
+           my $http_request = $soap
+              ->{'_transport'}
+              ->{'_proxy'}
+              ->{'_http_request'};
+           $http_request->content_type("text/xml; charset=utf-8");
+           
+            my $method = SOAP::Data->name('LibrarySearch')
+                ->attr({xmlns => 'http://gmd.mpimp-golm.mpg.de/webservices/wsLibrarySearch.asmx/'});
+           
+            my @params = (
+                           SOAP::Data->name('ri' => $ri),
+                           SOAP::Data->name('riWindow' => $riWindow),
+                           SOAP::Data->name('AlkaneRetentionIndexGcColumnComposition' => $gcColumn),
+                           SOAP::Data->name('spectrum' => $spectrum) ) ;
 			
-			## DETECTING A SOAP FAULT OR NOT
-		    if ( $som ) {
-		    	
-		    	if ($som->fault) {
-					push (@res, $som->faultstring) ;
-				}
+			my $som = $soap->call($method => @params);
+			die $som->faultstring if ($som->fault);
+			
+			## Get the hits + status of the query
+			my $results = $som->result->{Results} ;
+			my $status = $som->result->{Status} ;
+                   
+            my @results = @$results ;
+
+			if(@results && $status eq 'success' ) {
 				
-				else {
-	
-					$res_status = $som->valueof('//ResultOfAnnotatedMatch/Status') ;
-					
-					
-					my $spectrumID;
-					my $analyteID;
-					my $ri;
-					my $riDiscrepancy;
-					my $DotproductDistance;
-					my $EuclideanDistance;
-					my $HammingDistance;
-					my $JaccardDistance;
-					my $s12GowerLegendreDistance;
-					my $spectrumName;
-					my $metaboliteID;
-					
-					#check if query successed and get results from xml via XPATH
-					if ($res_status eq 'success') {
-						for my $res ($som->valueof('//ResultOfAnnotatedMatch/Status')) {
-						      
-						      %val = ('analyteName', $res->{analyteName}, 'ri', $res->{ri}, 'spectrumID', $res->{spectrumID}, 'analyteID', $res->{analyteID}, 'riDiscrepancy', $res->{riDiscrepancy},
-					      			'DotproductDistance', $res->{DotproductDistance}, 'EuclideanDistance', $res->{EuclideanDistance}, 'HammingDistance', $res->{HammingDistance},
-					      			'JaccardDistance', $res->{JaccardDistance}, 's12GowerLegendreDistance', $res->{s12GowerLegendreDistance}, 'spectrumName', $res->{spectrumName},
-					      			'metaboliteID', $res->{metaboliteID}) ;
-					      	  push ( @res , { %val } ) ;
-						}
-					    
-					    
-					}
-					## if query didn't go as planned
-					else {
-						%val = ('spectrumID', undef, 'analyteID', undef, 'ri', undef, 'riDiscrepancy', undef,
-					      		'DotproductDistance', undef, 'EuclideanDistance', undef, 'HammingDistance', undef,
-					      		'JaccardDistance', undef, 's12GowerLegendreDistance', undef, 'spectrumName', undef,
-					      		'metaboliteID', undef) ;
-						push ( @res , { %val } ) ;
-					}
-	    		}
-		    }
-		    else { carp "The som return (from the LibrarySearch method) isn't defined\n" ; }
-    	}
-    	else { carp "The spectrum for query is empty, Golm soap will stop\n" ; }
+				return \@results ;
+			}
+			else { carp "No match returned from Golm for the query.\n" }
+        }
+    	else { croak "The spectrum for query is empty, Golm soap will stop.\n" ; }
     }
-    else { carp "The spectrum for query is undef, Golm soap will stop\n" ; }
-    
-    return(\@res) ;
+    else { croak "The spectrum for query is undef, Golm soap will stop.\n" ; }
+
 }
 ### END of SUB
+
+
 
 1 ;
 
