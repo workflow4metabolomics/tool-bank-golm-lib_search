@@ -145,11 +145,39 @@ sub get_intensities {
 ## END of SUB
 
 
+=head2 METHOD get_intensities_and_mzs_from_string
 
-
-
-
-
+	## Description : parse a spectrum string and get mzs and intensities
+	## Input : $spectrum_string
+	## Output : \@spectrum_intensities_mzs 
+	## Usage : my ( $spectrum_intensities_mzs ) = get_intensities_and_mzs_from_string( $spectrum_string ) ;
+=cut
+## START of SUB
+sub get_intensities_and_mzs_from_string {
+	## Retrieve Values
+    my $self = shift ;
+    my ( $spectrum_string ) = @_ ;
+    
+    my @intensities = () ;
+    my @mzs = () ;
+        
+    if (defined $spectrum_string) {
+    	
+    	if ($spectrum_string ne '') {
+    		
+    		my @val = split (/ / , $spectrum_string) ;
+    		for (my $i=0 ; $i<@val ; $i++) {
+    			if ($i%2 == 0) { push @mzs,$val[$i] ; }
+    			else { push @intensities,$val[$i] ; }
+    		}
+    		my @spectrum_intensities_mzs = (\@mzs , \@intensities) ;
+    		return \@spectrum_intensities_mzs ;
+    	}
+    	else { croak "Spectrum is empty, the service will stop\n" } ;
+    }
+    else { croak "Spectrum is not defined, service will stop\n" } ;
+}
+## END of SUB
 
 
 
