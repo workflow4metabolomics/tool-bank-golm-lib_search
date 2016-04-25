@@ -83,7 +83,7 @@ sub get_mzs {
     		# retrieve mz of a spectrum
     		foreach my $ion (@ions) {
     			if ($ion =~ /^\s*(\d+)\s+(\d+\.?\d*)$/) {
-    				push @mzs , $1 ;
+    					push @mzs , int($1) ;
     			}
     		}
     	}
