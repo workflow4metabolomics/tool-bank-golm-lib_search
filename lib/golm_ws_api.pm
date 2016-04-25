@@ -7,6 +7,7 @@ use Carp ;
 
 use Data::Dumper ;
 use SOAP::Lite +trace => [qw (debug)];
+use Cpanel::JSON::XS qw(encode_json decode_json);
 
 use vars qw($VERSION @ISA @EXPORT %EXPORT_TAGS);
 
@@ -130,9 +131,11 @@ sub LibrarySearch() {
 			die $som->faultstring if ($som->fault);
 			
 			## Get the hits + status of the query
-			my $results = $som->result->{Results} ;
+			my $results = $som->result ;
 			my $status = $som->result->{Status} ;
                    
+            my $res_json = encode_json $results ;
+            print "Coucou".Dumper $res_json ;
             my @results = @$results ;
 
 			if(@results && $status eq 'success' ) {
