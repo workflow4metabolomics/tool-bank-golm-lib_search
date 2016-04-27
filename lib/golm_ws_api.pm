@@ -138,18 +138,19 @@ sub LibrarySearch() {
             #print "Coucou".Dumper $res_json ;
             my @results = @$results ;
             
-            ## Limitate number of hits returned according to $maxHit
-#            my @limited_hits ;
-#            if ($maxHits == 0 && $status eq 'success') {
-#            	return \@results ;
-#            }
-#            elsif ($status eq 'success'){
-#            	for (my $i=0 ; $i<$maxHits ; $i++) {
-#	            	push @limited_hits , $results[$i] ;
-#            	}
-#            }
-			return \@results ;
-			#else { carp "No match returned from Golm for the query.\n" }
+            ## Limitate number of hits returned according to user's $maxHit
+            my @limited_hits = ();
+            if ($maxHits == 0 && $status eq 'success') {
+            	return \@results ;
+            }
+            elsif ($maxHits > 0 && $status eq 'success'){
+            	for (my $i=0 ; $i<$maxHits ; $i++) {
+	            	push (@limited_hits , @$results[$i]) ;
+            	}
+            }
+            else { carp "No match returned from Golm for the query.\n" }
+            
+			return \@limited_hits ;
         }
     	else { croak "The spectrum for query is empty, Golm soap will stop.\n" ; }
     }
