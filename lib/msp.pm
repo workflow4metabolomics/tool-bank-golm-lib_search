@@ -182,6 +182,36 @@ sub get_intensities_and_mzs_from_string {
 
 
 
+=head2 METHOD sorting_descending_intensities
+
+	## Description : parse a spectrum string and get mzs and intensities
+	## Input : $spectrum_string
+	## Output : \@spectrum_intensities_mzs 
+	## Usage : my ( $spectrum_intensities_mzs ) = sorting_descending_intensities( $spectrum_string ) ;
+=cut
+## START of SUB
+sub sorting_descending_intensities {
+	## Retrieve Values
+    my $self = shift ;
+    my ( $ref_mzs_res, $ref_ints_res ) = @_ ;
+    
+    my @mzs_res = @$ref_mzs_res ;
+	my @ints_res = @$ref_ints_res ;
+	
+	## Sorting ions by decreasing intensity values
+	for (my $i=0 ; $i<@ints_res ; $i++) {
+		my @sorted_indices = sort { @{$ints_res[$i]}[$b] <=> @{$ints_res[$i]}[$a] } 0..$#{$ints_res[$i]};
+		@$_ = @{$_}[@sorted_indices] for \(@{$ints_res[$i]},@{$mzs_res[$i]});
+	
+	return (\@mzs_res, \@ints_res) ;
+	}
+}
+## END of SUB
+
+
+
+
+
 =head2 METHOD encode_spectrum_for_query
 
 	## Description : get mzs and intensities values and generate the spectra strings formatted for the WS query (html) 
