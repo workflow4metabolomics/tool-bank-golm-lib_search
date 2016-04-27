@@ -93,7 +93,7 @@ sub connectWSlibrarySearchGolm() {
 sub LibrarySearch() {
 	## Retrieve Values
 	my $self = shift ;
-	my ($ri, $riWindow, $gcColumn, $spectrum) = @_ ;
+	my ($ri, $riWindow, $gcColumn, $spectrum, $maxHits) = @_ ;
 
 	#init in case :
 	$ri = 1500 if ( !defined $ri ) ;
@@ -131,18 +131,25 @@ sub LibrarySearch() {
 			die $som->faultstring if ($som->fault);
 			
 			## Get the hits + status of the query
-			my $results = $som->result ;
+			my $results = $som->result->{Results} ;
 			my $status = $som->result->{Status} ;
                    
-            my $res_json = encode_json $results ;
-            print "Coucou".Dumper $res_json ;
+            #my $res_json = encode_json $results ;
+            #print "Coucou".Dumper $res_json ;
             my @results = @$results ;
-
-			if(@results && $status eq 'success' ) {
-				
-				return \@results ;
-			}
-			else { carp "No match returned from Golm for the query.\n" }
+            
+            ## Limitate number of hits returned according to $maxHit
+#            my @limited_hits ;
+#            if ($maxHits == 0 && $status eq 'success') {
+#            	return \@results ;
+#            }
+#            elsif ($status eq 'success'){
+#            	for (my $i=0 ; $i<$maxHits ; $i++) {
+#	            	push @limited_hits , $results[$i] ;
+#            	}
+#            }
+			return \@results ;
+			#else { carp "No match returned from Golm for the query.\n" }
         }
     	else { croak "The spectrum for query is empty, Golm soap will stop.\n" ; }
     }

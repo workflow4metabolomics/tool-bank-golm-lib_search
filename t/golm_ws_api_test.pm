@@ -13,8 +13,8 @@ our @ISA = qw(Exporter);
 our @EXPORT = qw( connectWSlibrarySearchGolmTest LibrarySearchTest encode_spectrum_for_queryTest get_mzsTest get_intensitiesTest);
 our %EXPORT_TAGS = ( ALL => [qw( connectWSlibrarySearchGolmTest LibrarySearchTest encode_spectrum_for_queryTest get_mzsTest get_intensitiesTest)] );
 
-use lib '/home/gabriel/lab/tool-bank-golm-lib_search/lib' ;
-#use lib '/media/gcretin/donnees1/lab_local/tool-bank-golm-lib_search/lib' ;
+#use lib '/home/gabriel/lab/tool-bank-golm-lib_search/lib' ;
+use lib '/media/gcretin/donnees1/lab_local/tool-bank-golm-lib_search/lib' ;
 use golm_ws_api qw( :ALL ) ;
 use msp qw( :ALL ) ;
 

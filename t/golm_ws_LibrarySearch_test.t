@@ -16,7 +16,7 @@ my $binPath = $FindBin::Bin ;
 use golm_ws_api_test qw( :ALL ) ;
 
 ## To launch the right sequence : API, MSP...
-my $sequence = 'MSP' ; 
+my $sequence = 'API' ; 
 my $current_test = 1 ;
 
 
@@ -1495,7 +1495,8 @@ if ($sequence eq "MSP") {
 # Structure of res: [ $arr_ref1 , $arr_ref2 ... $arr_refN ]
 print "\n** Test $current_test get_mzs from a .msp file **\n" ; $current_test++;
 is_deeply( get_mzsTest(
-		'/home/gabriel/Téléchargements/téléchargement_FILES/peakspectra.msp'
+		#'/home/gabriel/Téléchargements/téléchargement_FILES/peakspectra.msp'
+		'./peakspectra.msp'
 	),
 	[
 		[73,147,157,160,205,217,272,319,320],
@@ -1511,7 +1512,8 @@ print "\n- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -\n" ;
 # ARGS : $msp_file
 # Structure of res: [ $arr_ref1 , $arr_ref2 ... $arr_refN ]
 print "\n** Test $current_test get_intensities from a .msp file **\n" ; $current_test++;
-is_deeply(get_intensitiesTest('/home/gabriel/Téléchargements/téléchargement_FILES/peakspectra.msp'),
+is_deeply(get_intensitiesTest(#'/home/gabriel/Téléchargements/téléchargement_FILES/peakspectra.msp'
+								'./peakspectra.msp'																	),
 	[
 			[
               '5764652',
