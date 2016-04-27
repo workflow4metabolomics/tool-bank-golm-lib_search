@@ -84,6 +84,11 @@ sub get_mzs {
     		foreach my $ion (@ions) {
     			if ($ion =~ /^\s*(\d+)\s+(\d+\.?\d*)$/) {
     					push @mzs , int($1) ;
+    				}
+    				else { 
+    					$1 = substr ($1 , 0 , -$mzRes) ;
+    					push @mzs , $1 ;    					
+    				}
     			}
     		}
     	}
