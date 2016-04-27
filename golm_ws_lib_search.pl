@@ -18,7 +18,7 @@ use lib $FindBin::Bin ;
 
 ## Dedicate Perl Modules PFEM
 #use lib '/home/gabriel/lab/tool-bank-golm-lib_search/lib' ;
-use lib '/media/gcretin/donnees1/lab_local/tool-bank-golm-lib_search/lib' ;
+use lib '/media/gcretin/donnees2/lab_local/tool-bank-golm-lib_search/lib' ;
 use golm_ws_api qw( :ALL ) ;
 use msp qw( :ALL ) ;
 
@@ -44,7 +44,7 @@ my $encoded_spectra ;
             ) ;
          
 ## if you put the option -help or -h or even no arguments, function help is started
-if ( defined($OptHelp) or !@ARGV ){ &help ; }
+if ( defined($OptHelp) ){ &help ; }
 
 #=============================================================================
 #                                MAIN SCRIPT
@@ -76,7 +76,7 @@ else {
 		
 	## Encode spectra
 	$encoded_spectra = $omsp->encode_spectrum_for_query($mzs_res, $ints_res) ;
-	#print Dumper $encoded_spectra ;
+	
 }
 
 
@@ -85,13 +85,12 @@ else {
 
 my $oapi = golm_ws_api->new() ;
 
-#for (my $i=0 ; $i<@$encoded_spectra ; $i++) {
 	foreach my $spectrum (@$encoded_spectra){
-	my $results = $oapi->LibrarySearch ($ri, $riWindow, $gcColumn, $spectrum, $maxHits) ;
-	push @hits , $results ;
+		my $results = $oapi->LibrarySearch ($ri, $riWindow, $gcColumn, $spectrum, $maxHits) ;
+		push (@hits , $results) ;
 }
 
-print Dumper @hits ;
+print Dumper \@hits ;
 
 
 
