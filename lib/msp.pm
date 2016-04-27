@@ -11,8 +11,8 @@ use vars qw($VERSION @ISA @EXPORT %EXPORT_TAGS);
 
 our $VERSION = "1.0";
 our @ISA = qw(Exporter);
-our @EXPORT = qw( get_mzs get_intensities encode_spectrum_for_query);
-our %EXPORT_TAGS = ( ALL => [qw( get_mzs get_intensities encode_spectrum_for_query)] );
+our @EXPORT = qw( get_mzs get_intensities get_intensities_and_mzs_from_string encode_spectrum_for_query sorting_descending_intensities);
+our %EXPORT_TAGS = ( ALL => [qw( get_mzs get_intensities get_intensities_and_mzs_from_string encode_spectrum_for_query sorting_descending_intensities)] );
 
 =head1 NAME
 
@@ -56,22 +56,22 @@ sub new {
 =head2 METHOD get_mzs
 
 	## Description : parse msp file and get mzs
-	## Input : $msp_file
+	## Input : $msp_file, $mzRes
 	## Output : \@total_spectra_mzs 
-	## Usage : my ( $mzs ) = get_mzs( $msp_file ) ;
+	## Usage : my ( $mzs ) = get_mzs( $msp_file , $mzRes) ;
 	## Structure of res: [ $arr_ref1 , $arr_ref2 ... $arr_refN ]
 =cut
 ## START of SUB
 sub get_mzs {
 	## Retrieve Values
     my $self = shift ;
-    my ( $msp_file ) = @_ ;
+    my ( $msp_file, $mzRes ) = @_ ;
   
-  	my @ions ;
-  	my @mzs ;
-  	my @total_spectra_mzs ; 
+  	my @ions = () ;
+  	my @mzs = ();
+  	my @total_spectra_mzs = (); 
   	my $i = 0 ;
-  	
+  	  	
     open (MSP , "<" , $msp_file) or die $! ;
     
      # Extract spectrum
@@ -83,6 +83,8 @@ sub get_mzs {
     		# retrieve mz of a spectrum
     		foreach my $ion (@ions) {
     			if ($ion =~ /^\s*(\d+)\s+(\d+\.?\d*)$/) {
+    				## Truncate mzs depending on $mzRes wanted
+    				if ($mzRes == 0) {
     					push @mzs , int($1) ;
     				}
     				else { 
@@ -94,10 +96,11 @@ sub get_mzs {
     	}
     	if(/^$/) {
     		@{ $total_spectra_mzs[$i] } = @mzs ;
-    		@mzs = () ;
     		$i++ ;
+    		@mzs = () ;
     	}
     }
+    close (MSP) ;
     return(\@total_spectra_mzs) ;
 }
 ## END of SUB
@@ -119,9 +122,9 @@ sub get_intensities {
     my $self = shift ;
     my ( $msp_file ) = @_ ;
   
-  	my @ions ;
-  	my @intensities ;
-  	my @total_spectra_intensities ; 
+  	my @ions = () ;
+  	my @intensities = () ;
+  	my @total_spectra_intensities = (); 
   	my $i = 0 ;
   	
     open (MSP , "<" , $msp_file) or die $! ;
@@ -140,11 +143,12 @@ sub get_intensities {
     		}
     	}
     	if(/^$/) {
-    		@{ $total_spectra_intensities[$i] } = @intensities ;
-    		@intensities = () ;
+    		@{$total_spectra_intensities[$i]} = @intensities ;
     		$i++ ;
+    		@intensities = () ;
     	}
     }
+    close (MSP) ;
     return(\@total_spectra_intensities) ;
 }
 ## END of SUB
@@ -235,15 +239,15 @@ sub encode_spectrum_for_query {
     my $spectrum = "" ;
     my $k = 0 ;
     
-    #print "Coucou". @{@$mzs[0]} ;
+    #print Dumper $mzs ;
     
     for (my $i=0 ; $i< @$mzs ; $i++) {
     	
-    	for ( my $j=0 ; $j<scalar @{@$mzs[$i]} ; $j++ ) {
+    	for ( my $j=0 ; $j< @{ @$mzs[$i] } ; $j++ ) {
     		
     		$spectrum = $spectrum . $$mzs[$i][$j] . "%20" . $$intensities[$i][$j] . "%20";
     	}
-    	$spectrum = substr($spectrum,0,-3);
+    	$spectrum = substr($spectrum,0,-3);#remove the "%20" at the end
     	$encoded_spectra[$k] = $spectrum ;
     	$k++ ;
     	$spectrum = '' ;
