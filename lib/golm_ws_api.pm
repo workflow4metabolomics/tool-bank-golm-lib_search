@@ -1,4 +1,4 @@
-package lib::golm_ws_api ;
+package golm_ws_api ;
 
 use strict;
 use warnings ;
@@ -84,9 +84,9 @@ sub connectWSlibrarySearchGolm() {
 =head2 METHOD LibrarySearch
 
 	## Description : Matches a single user submitted GC-EI mass spectrum against the Golm Metabolome Database (GMD).
-	## Input : $osoap, $ri, $riWindow, $gcColumn, $spectrum, $maxHits
-	## Ouput : \@limited_hits, \$res_json
-	## Usage : ($limited_hits, $res_json) = LibrarySearch($osoap, $ri, $riWindow, $gcColumn, $spectrum, $maxHits) ;
+	## Input : $osoap, $ri, $riWindow, $gcColumn, $spectrum
+	## Ouput : \@results
+	## Usage : (\@results) = LibrarySearch($osoap, $ri, $riWindow, $gcColumn, $spectrum) ;
 
 =cut
 
@@ -134,8 +134,8 @@ sub LibrarySearch() {
 			my $results = $som->result->{Results} ;
 			my $status = $som->result->{Status} ;
                    
-            my $res_json = encode_json $results ;
-            
+            #my $res_json = encode_json $results ;
+            #print "Coucou".Dumper $res_json ;
             my @results = @$results ;
             
             ## Limitate number of hits returned according to user's $maxHit
@@ -150,7 +150,7 @@ sub LibrarySearch() {
             }
             else { carp "No match returned from Golm for the query.\n" }
             
-			return \@limited_hits, \$res_json ;
+			return \@limited_hits ;
         }
     	else { croak "The spectrum for query is empty, Golm soap will stop.\n" ; }
     }
