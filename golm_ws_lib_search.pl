@@ -17,14 +17,12 @@ use FindBin ; ## Allows you to locate the directory of original perl script
 use lib $FindBin::Bin ;
 
 ## Dedicate Perl Modules PFEM
-#use lib '/home/gabriel/lab/tool-bank-golm-lib_search/lib' ;
-use lib '/media/gcretin/donnees2/lab_local/tool-bank-golm-lib_search/lib' ;
-use golm_ws_api qw( :ALL ) ;
-use msp qw( :ALL ) ;
+use lib::golm_ws_api qw( :ALL ) ;
+use lib::msp qw( :ALL ) ;
 
 ## Initialized values
-my ($OptHelp,$ri,$riWindow,$gcColumn,$msp_file,$maxHits,$mzRes,$maxIons,$threshold,$spectrum_string) = (undef,undef, undef, undef, undef,undef, undef, undef, undef,undef) ;
-my @hits = () ;
+my ($OptHelp,$ri,$riWindow,$gcColumn,$msp_file,$maxHits,$mzRes,$maxIons,$threshold,$spectrum_string) = (undef,undef,undef,undef,undef,undef,undef,undef,undef,undef) ;
+my (@hits, @ojson) = ( () , () ) ;
 my $encoded_spectra ;
 
 #=============================================================================
@@ -54,11 +52,13 @@ if ( defined($OptHelp) ){ &help ; }
 
 ############# -------------- Parse the .msp file -------------- ############# :
 
-my $omsp = msp->new() ;
+my $omsp = lib::msp->new() ;
+my $ref_mzs_res ;
+my $ref_ints_res ;
 
 ## case when only one spectra is queried
 if (defined $spectrum_string) { 
-	my $omsp = msp->new() ;
+	my $omsp = lib::msp->new() ;
 	my $mzs_res = $omsp->get_intensities_and_mzs_from_string($spectrum_string) ;
 	my @mzs = @$mzs_res[0] ;
 	my @intensities = @$mzs_res[1] ;
@@ -67,30 +67,42 @@ if (defined $spectrum_string) {
 	#print Dumper $encoded_spectra ;
 }
 ## Taking care of the msp file
-else { 
-	my $ref_mzs_res = $omsp->get_mzs($msp_file,$mzRes) ;
-	my $ref_ints_res = $omsp->get_intensities($msp_file) ;
+elsif (defined $mzRes and defined $maxIons and defined $maxHits and $mzRes >= 0 and $maxIons >= 0 and $maxHits >= 0) {
 	
+		unless (-e $msp_file)  { croak "$msp_file does not exist" ; }
+		unless (-f $msp_file)  { croak "$msp_file is not a file" ; }
+		unless (-s $msp_file) 	{ croak "$msp_file is empty" ; }
+		
+		
+		$ref_mzs_res = $omsp->get_mzs($msp_file,$mzRes,$maxIons) ;
+		$ref_ints_res = $omsp->get_intensities($msp_file, $maxIons) ;
+					
+			
+		
 	## Sorting intensities
 	my ($mzs_res, $ints_res) = $omsp->sorting_descending_intensities($ref_mzs_res, $ref_ints_res) ;
 		
 	## Encode spectra
 	$encoded_spectra = $omsp->encode_spectrum_for_query($mzs_res, $ints_res) ;
-	
 }
-
+else { 
+	
+	if (!defined $maxHits or !defined $maxIons or !defined $mzRes) { croak "Parameter mzRes or maxIons or maxHits is undefined\n"; } 
+}
 
 
 ############# -------------- Send queries to Golm -------------- ############# :
 
-my $oapi = golm_ws_api->new() ;
+my $oapi = lib::golm_ws_api->new() ;
 
 	foreach my $spectrum (@$encoded_spectra){
-		my $results = $oapi->LibrarySearch ($ri, $riWindow, $gcColumn, $spectrum, $maxHits) ;
-		push (@hits , $results) ;
+		my ($limited_hits, $res_json) = $oapi->LibrarySearch ($ri, $riWindow, $gcColumn, $spectrum, $maxHits) ;
+		push (@hits , $limited_hits) ;
+		push (@ojson , $res_json) ;
 }
 
 print Dumper \@hits ;
+print Dumper \@ojson ;
 
 
 
