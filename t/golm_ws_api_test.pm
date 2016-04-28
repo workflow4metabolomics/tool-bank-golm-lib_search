@@ -1,4 +1,4 @@
-package golm_ws_api_test ;
+package t::golm_ws_api_test ;
 
 use diagnostics; # this gives you more debugging information
 use warnings;    # this warns you of bad practices
@@ -13,15 +13,14 @@ our @ISA = qw(Exporter);
 our @EXPORT = qw( connectWSlibrarySearchGolmTest LibrarySearchTest encode_spectrum_for_queryTest get_mzsTest get_intensitiesTest);
 our %EXPORT_TAGS = ( ALL => [qw( connectWSlibrarySearchGolmTest LibrarySearchTest encode_spectrum_for_queryTest get_mzsTest get_intensitiesTest)] );
 
-#use lib '/home/gabriel/lab/tool-bank-golm-lib_search/lib' ;
-use lib '/media/gcretin/donnees1/lab_local/tool-bank-golm-lib_search/lib' ;
-use golm_ws_api qw( :ALL ) ;
-use msp qw( :ALL ) ;
+
+use lib::golm_ws_api qw( :ALL ) ;
+use lib::msp qw( :ALL ) ;
 
 ### Test API module ###
 
 sub connectWSlibrarySearchGolmTest {
-    my $oBih = golm_ws_api->new() ;
+    my $oBih = lib::golm_ws_api->new() ;
     my ($soap) = $oBih->connectWSlibrarySearchGolm() ;
     #print Dumper $soap ;
     return ($soap) ;
@@ -30,7 +29,7 @@ sub connectWSlibrarySearchGolmTest {
 
 sub LibrarySearchTest {
 	my ($ri, $riWindow, $gcColumn, $spectrum) = @_ ;
-	my $oBih = golm_ws_api->new() ;
+	my $oBih = lib::golm_ws_api->new() ;
     my $res =$oBih->LibrarySearch($ri, $riWindow, $gcColumn, $spectrum) ;
     #print Dumper @$res ;
     return ($res) ;
@@ -41,7 +40,7 @@ sub LibrarySearchTest {
 
 sub get_mzsTest {
 	my ($msp_file) = @_;
-	my $omsp = msp->new();
+	my $omsp = lib::msp->new();
 	my $mzs = $omsp->get_mzs ($msp_file) ;
 	print Dumper \$mzs ;
     return($mzs) ;
@@ -50,7 +49,7 @@ sub get_mzsTest {
 
 sub get_intensitiesTest {
 	my ($msp_file) = @_;
-	my $omsp = msp->new();
+	my $omsp = lib::msp->new();
 	my $intensities = $omsp->get_intensities($msp_file) ;
 	print Dumper \$intensities ;
     return($intensities) ;
@@ -59,7 +58,7 @@ sub get_intensitiesTest {
 
 sub encode_spectrum_for_queryTest {
 	my ($mzs, $intensities) = @_;
-	my $omsp = msp->new();
+	my $omsp = lib::msp->new();
 	my $encoded_spectra = $omsp->encode_spectrum_for_query($mzs, $intensities) ;
 	print Dumper $encoded_spectra ;
 	return ($encoded_spectra) ;
