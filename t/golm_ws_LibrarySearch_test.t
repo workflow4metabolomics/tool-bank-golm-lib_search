@@ -13,7 +13,7 @@ use lib $FindBin::Bin ;
 my $binPath = $FindBin::Bin ;
 
 
-use golm_ws_api_test qw( :ALL ) ;
+use t::golm_ws_api_test qw( :ALL ) ;
 
 ## To launch the right sequence : API, MSP...
 my $sequence = 'API' ; 
