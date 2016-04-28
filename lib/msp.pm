@@ -1,4 +1,4 @@
-package msp ;
+package lib::msp ;
 
 use strict;
 use warnings ;
@@ -56,50 +56,61 @@ sub new {
 =head2 METHOD get_mzs
 
 	## Description : parse msp file and get mzs
-	## Input : $msp_file, $mzRes
+	## Input : $msp_file, $mzRes, $maxIon
 	## Output : \@total_spectra_mzs 
-	## Usage : my ( $mzs ) = get_mzs( $msp_file , $mzRes) ;
+	## Usage : my ( $mzs ) = get_mzs( $msp_file , $mzRes, $maxIon) ;
 	## Structure of res: [ $arr_ref1 , $arr_ref2 ... $arr_refN ]
 =cut
 ## START of SUB
 sub get_mzs {
 	## Retrieve Values
     my $self = shift ;
-    my ( $msp_file, $mzRes ) = @_ ;
+    my ( $msp_file, $mzRes, $maxIons ) = @_ ;
   
   	my @ions = () ;
   	my @mzs = ();
-  	my @total_spectra_mzs = (); 
+  	my @total_spectra_mzs = ();
+  	my $mz ;
   	my $i = 0 ;
   	  	
     open (MSP , "<" , $msp_file) or die $! ;
     
-     # Extract spectrum
-    while(<MSP>) {
-    	chomp ;
-    	#Detect spectrum
-    	if (/^\s(.+);/) {
-    		@ions = split /;/ , $1 ;
-    		# retrieve mz of a spectrum
-    		foreach my $ion (@ions) {
-    			if ($ion =~ /^\s*(\d+)\s+(\d+\.?\d*)$/) {
-    				## Truncate mzs depending on $mzRes wanted
-    				if ($mzRes == 0) {
-    					push @mzs , int($1) ;
-    				}
-    				else { 
-    					$1 = substr ($1 , 0 , -$mzRes) ;
-    					push @mzs , $1 ;    					
-    				}
-    			}
-    		}
-    	}
-    	if(/^$/) {
-    		@{ $total_spectra_mzs[$i] } = @mzs ;
-    		$i++ ;
-    		@mzs = () ;
-    	}
+	{
+		local $/ = 'Name' ;
+	    my @infos = () ;
+	    # Extract spectrum
+	    while(my $line = <MSP>) {
+	    	chomp $line;
+	    	@infos = split (/\n/ , $line) ;
+	    	#Detect spectrum
+	    	for (my $i=0 ; $i<@infos ; $i++) {
+		    	if ($infos[$i] =~ /(\d+\.?\d*)\s+(\d+\.?\d*)\s*;\s*?/) {
+		    		@ions = split ( /;/ , $infos[$i] ) ;
+		    		# Retrieve mzs according to maxIons value
+		    		foreach my $ion (@ions) {
+		    			if ($ion =~ /^\s*(\d+\.?\d*)\s+(\d+\.?\d*)$/) {
+		    				$mz = $1 ;
+		    				## Truncate mzs depending on $mzRes wanted
+		    				if ($mzRes == 0 && @mzs < $maxIons) {
+		    					$mz = int($mz) ;
+		    					push (@mzs , $mz) ;
+		    				}
+		    				elsif (@mzs < $maxIons) { 
+		    					$mz = substr ($mz , 0 , -$mzRes) ;
+		    					push (@mzs , $mz) ;    					
+		    				}
+		    			}
+		    		}
+		    	}
+	    	}
+	    	if($line ne '') {
+		    	@{ $total_spectra_mzs[$i] } = @mzs ;
+			    $i++ ;
+			    @mzs = () ;	  
+	    	}  	
+	    }
     }
+    #print Dumper \@total_spectra_mzs ;
     close (MSP) ;
     return(\@total_spectra_mzs) ;
 }
@@ -111,16 +122,16 @@ sub get_mzs {
 =head2 METHOD get_intensities
 
 	## Description : parse msp file and get intensities
-	## Input : $msp_file
+	## Input : $msp_file, $maxIons
 	## Output : \@total_spectra_intensities 
-	## Usage : my ( $intensities ) = get_mzs( $msp_file ) ;
+	## Usage : my ( $intensities ) = get_mzs( $msp_file, $maxIons ) ;
 	## Structure of res: [ $arr_ref1 , $arr_ref2 ... $arr_refN ]
 =cut
 ## START of SUB
 sub get_intensities {
 	## Retrieve Values
     my $self = shift ;
-    my ( $msp_file ) = @_ ;
+    my ( $msp_file, $maxIons ) = @_ ;
   
   	my @ions = () ;
   	my @intensities = () ;
@@ -129,24 +140,31 @@ sub get_intensities {
   	
     open (MSP , "<" , $msp_file) or die $! ;
     
-     # Extract spectrum
-    while(<MSP>) {
-    	chomp ;
-    	#Detect spectrum
-    	if (/^\s(.+);/) {
-    		@ions = split /;/ , $1 ;
-    		# retrieve intensity of a spectrum
-    		foreach my $ion (@ions) {
-    			if ($ion =~ /^\s*(\d+)\s+(\d+\.?\d*)$/) {
-    				push @intensities , $2 ;
-    			}
-    		}
-    	}
-    	if(/^$/) {
-    		@{$total_spectra_intensities[$i]} = @intensities ;
-    		$i++ ;
-    		@intensities = () ;
-    	}
+    {
+		local $/ = 'Name' ;
+	    my @infos = () ;
+	    # Extract spectrum
+	    while(my $line = <MSP>) {
+	    	chomp $line;
+	    	@infos = split (/\n/ , $line) ;
+	    	#Detect spectrum
+	    	for (my $i=0 ; $i<@infos ; $i++) {
+		    	if ($infos[$i] =~ /(\d+\.?\d*)\s+(\d+\.?\d*)\s*;\s*?/) {
+		    		@ions = split ( /;/ , $infos[$i] ) ;
+		    		# Retrieve intensities
+		    		foreach my $ion (@ions) {
+		    			if ($ion =~ /^\s*(\d+)\s+(\d+\.?\d*)$/ && @intensities < $maxIons) {
+    						push ( @intensities , $2 ) ;
+		    			}
+		    		}
+		    	}
+	    	}
+	    	if($line ne '') {
+		    	@{ $total_spectra_intensities[$i] } = @intensities ;
+			    $i++ ;
+			    @intensities = () ;	  
+	    	}  	
+	    }
     }
     close (MSP) ;
     return(\@total_spectra_intensities) ;
@@ -174,13 +192,18 @@ sub get_intensities_and_mzs_from_string {
     	
     	if ($spectrum_string ne '') {
     		
-    		my @val = split (/ / , $spectrum_string) ;
-    		for (my $i=0 ; $i<@val ; $i++) {
-    			if ($i%2 == 0) { push @mzs,$val[$i] ; }
-    			else { push @intensities,$val[$i] ; }
+    		if ($spectrum_string =~ /\s*(\d+\.?\d*)\s+(\d+\.?\d*)\s*/ ) {
+    		
+	    		my @val = split (/\s+/ , $spectrum_string) ;
+	    		for (my $i=0 ; $i<@val ; $i++) {
+	    			if ($i%2 == 0)  { push @mzs,$val[$i] ; }
+	    			else 			{ push @intensities,$val[$i] ; }
+	    		}
+	    		my @spectrum_intensities_mzs = (\@mzs , \@intensities) ;
+	    		#print Dumper \@spectrum_intensities_mzs ;
+	    		return \@spectrum_intensities_mzs ;
     		}
-    		my @spectrum_intensities_mzs = (\@mzs , \@intensities) ;
-    		return \@spectrum_intensities_mzs ;
+    		else { croak "Wrong format of the spectrum. See help\n" }
     	}
     	else { croak "Spectrum is empty, the service will stop\n" } ;
     }
@@ -247,7 +270,8 @@ sub encode_spectrum_for_query {
     		
     		$spectrum = $spectrum . $$mzs[$i][$j] . "%20" . $$intensities[$i][$j] . "%20";
     	}
-    	$spectrum = substr($spectrum,0,-3);#remove the "%20" at the end
+    	#remove the "%20" at the end
+    	$spectrum = substr($spectrum,0,-3);
     	$encoded_spectra[$k] = $spectrum ;
     	$k++ ;
     	$spectrum = '' ;
