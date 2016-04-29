@@ -11,8 +11,8 @@ use vars qw($VERSION @ISA @EXPORT %EXPORT_TAGS);
 
 our $VERSION = "1.0";
 our @ISA = qw(Exporter);
-our @EXPORT = qw( get_mzs get_intensities get_intensities_and_mzs_from_string encode_spectrum_for_query sorting_descending_intensities);
-our %EXPORT_TAGS = ( ALL => [qw( get_mzs get_intensities get_intensities_and_mzs_from_string encode_spectrum_for_query sorting_descending_intensities)] );
+our @EXPORT = qw( get_mzs get_intensities get_intensities_and_mzs_from_string encode_spectrum_for_query sorting_descending_intensities round_num);
+our %EXPORT_TAGS = ( ALL => [qw( get_mzs get_intensities get_intensities_and_mzs_from_string encode_spectrum_for_query sorting_descending_intensities round_num)] );
 
 =head1 NAME
 
@@ -90,15 +90,18 @@ sub get_mzs {
 		    		foreach my $ion (@ions) {
 		    			if ($ion =~ /^\s*(\d+\.?\d*)\s+(\d+\.?\d*)$/) {
 		    				$mz = $1 ;
-		    				## Truncate mzs depending on $mzRes wanted
+		    				## Truncate/round mzs depending on $mzRes wanted
 		    				if ($mzRes == 0 && @mzs < $maxIons) {
 		    					$mz = int($mz) ;
 		    					push (@mzs , $mz) ;
 		    				}
-		    				elsif (@mzs < $maxIons) { 
-		    					$mz = substr ($mz , 0 , -$mzRes) ;
-		    					push (@mzs , $mz) ;    					
+		    				# check that $mzRes is not greater than the number of digits after comma
+		    				elsif ($mzRes > 0 && $mzRes <= length(( $mz =~ /.+\.(.*)/)[0] ) && @mzs < $maxIons) {  
+		    					my $omsp = lib::msp->new();
+		    					my $mz_rounded = $omsp->round_num($mz,$mzRes) ;
+		    					push (@mzs , $$mz_rounded) ;    					
 		    				}
+		    				elsif ($mzRes > length(( $mz =~ /.+\.(.*)/)[0] )) { croak "mzRes is greater then the actual number of digits after comma\n" ; }
 		    			}
 		    		}
 		    	}
@@ -110,7 +113,7 @@ sub get_mzs {
 	    	}  	
 	    }
     }
-    #print Dumper \@total_spectra_mzs ;
+    print Dumper \@total_spectra_mzs ;
     close (MSP) ;
     return(\@total_spectra_mzs) ;
 }
@@ -280,6 +283,35 @@ sub encode_spectrum_for_query {
     return \@encoded_spectra ;
 }
 ## END of SUB
+
+
+=head2 METHOD round_num
+
+	## Description : round a number by the sended decimal
+	## Input : $number, $decimal
+	## Output : $round_num
+	## Usage : my ( $round_num ) = round_num( $number, $decimal ) ;
+	
+=cut
+## START of SUB 
+sub round_num {
+    ## Retrieve Values
+    my $self = shift ;
+    my ( $number, $decimal ) = @_ ;
+    my $round_num = 0 ;
+    
+	if ( ( defined $decimal ) and ( $decimal > 0 ) and ( defined $number ) and ( $number > 0 ) ) {
+        $round_num = sprintf("%.".$decimal."f", $number);	## a rounding is used : 5.3 -> 5 and 5.5 -> 6
+	}
+	else {
+		croak "Can't round any number : missing value or decimal\n" ;
+	}
+    
+    return(\$round_num) ;
+}
+## END of SUB
+
+
 
 
 
