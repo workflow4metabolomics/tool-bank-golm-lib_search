@@ -1,4 +1,4 @@
-package golm_ws_api ;
+package lib::golm_ws_api ;
 
 use strict;
 use warnings ;
@@ -84,9 +84,9 @@ sub connectWSlibrarySearchGolm() {
 =head2 METHOD LibrarySearch
 
 	## Description : Matches a single user submitted GC-EI mass spectrum against the Golm Metabolome Database (GMD).
-	## Input : $osoap, $ri, $riWindow, $gcColumn, $spectrum
-	## Ouput : \@results
-	## Usage : (\@results) = LibrarySearch($osoap, $ri, $riWindow, $gcColumn, $spectrum) ;
+	## Input : $osoap, $ri, $riWindow, $gcColumn, $spectrum, $maxHits
+	## Ouput : \@limited_hits, \@json_res
+	## Usage : ($limited_hits,$json_res) = LibrarySearch($osoap, $ri, $riWindow, $gcColumn, $spectrum, $maxHits) ;
 
 =cut
 
@@ -101,7 +101,8 @@ sub LibrarySearch() {
 	$gcColumn = 'VAR5' if ( !defined $gcColumn ) ;
 	
 	my $result ;
-		
+	my @limited_hits ;
+	
 	if ( defined $spectrum ){
 		    	
     	if ( $spectrum ne '' ) {
@@ -134,9 +135,10 @@ sub LibrarySearch() {
 			my $results = $som->result->{Results} ;
 			my $status = $som->result->{Status} ;
                    
-            #my $res_json = encode_json $results ;
-            #print "Coucou".Dumper $res_json ;
-            my @results = @$results ;
+            my $res_json = encode_json $results ;
+			my @results = @$results ;
+			
+            my @json_res ;
             
             ## Limitate number of hits returned according to user's $maxHit
             my @limited_hits = ();
@@ -146,16 +148,17 @@ sub LibrarySearch() {
             elsif ($maxHits > 0 && $status eq 'success'){
             	for (my $i=0 ; $i<$maxHits ; $i++) {
 	            	push (@limited_hits , @$results[$i]) ;
+	            	push (@json_res , $res_json) ;
             	}
+            	return \@limited_hits; #, \@json_res;
             }
             else { carp "No match returned from Golm for the query.\n" }
-            
-			return \@limited_hits ;
         }
-    	else { croak "The spectrum for query is empty, Golm soap will stop.\n" ; }
+    	else { carp "The spectrum for query is empty, Golm soap will stop.\n" ; }
     }
-    else { croak "The spectrum for query is undef, Golm soap will stop.\n" ; }
+    else { carp "The spectrum for query is undef, Golm soap will stop.\n" ; }
 
+	return \@limited_hits; #, \@json_res;
 }
 ### END of SUB
 
