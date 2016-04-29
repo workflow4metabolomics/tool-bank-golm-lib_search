@@ -40,6 +40,12 @@ my $encoded_spectra ;
 				"maxIons:i"		=> \$maxIons,
 				"threshold:f"		=> \$threshold, # Optionnal
             ) ;
+            
+            die "maxHits must be >= 0\n" unless ($maxHits >= 0) ;
+            die "mzRes must be >= 0 \n" unless ($mzRes >= 0) ;
+            die "maxIons must be >= 0\n" unless ($maxIons >= 0) ;
+            die "threshold must be > 0\n" unless ($threshold > 0) ;
+            
          
 ## if you put the option -help or -h or even no arguments, function help is started
 if ( defined($OptHelp) ){ &help ; }
@@ -84,6 +90,7 @@ elsif (defined $mzRes and defined $maxIons and defined $maxHits and $mzRes >= 0 
 		
 	## Encode spectra
 	$encoded_spectra = $omsp->encode_spectrum_for_query($mzs_res, $ints_res) ;
+	print Dumper $encoded_spectra ;
 }
 else { 
 	
@@ -133,11 +140,11 @@ USAGE :
 		golm_ws_lib_search.pl 
 			-spectraFile [.msp file]	
 			-spectrumString [masses + intensities of an ion: 'mz1 int1 mz2 int2 mzx intx...']
-			-ri [Rentention Index: float or integer ]
+			-ri [Rentention Index: float or integer]
 			-riWindow [Retention Index Window: 1500 or the value of your choice]
-			-gcColumn [AlkaneRetentionIndexGcColumnComposition: 'VAR5' or 'MDN35' or 'None' ]
-			-maxHits [Maximum hits per queried spectra: integer]
-			-mzRes [Number of digits after the decimal point for m/z values: integer (0 -> 4)]
+			-gcColumn [AlkaneRetentionIndexGcColumnComposition: 'VAR5' or 'MDN35' or 'None']
+			-maxHits [Maximum hits per queried spectra: integer (0 for all)]
+			-mzRes [Number of digits after the decimal point for m/z values: integer (0 if none)]
 			-maxIons [Number of m/z per spectra you want to keep for the queries, default 0 for all detected ions]
 			-threshold [ignore ions which masses are smaller than the threshold value: float]	
 				
