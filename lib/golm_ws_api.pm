@@ -7,14 +7,14 @@ use Carp ;
 
 use Data::Dumper ;
 use SOAP::Lite +trace => [qw (debug)];
-use Cpanel::JSON::XS qw(encode_json decode_json);
+use JSON ;
 
 use vars qw($VERSION @ISA @EXPORT %EXPORT_TAGS);
 
 our $VERSION = "1.0";
 our @ISA = qw(Exporter);
-our @EXPORT = qw( connectWSlibrarySearchGolm LibrarySearch parseResult);
-our %EXPORT_TAGS = ( ALL => [qw( connectWSlibrarySearchGolm LibrarySearch parseResult)] );
+our @EXPORT = qw( connectWSlibrarySearchGolm LibrarySearch parseResult filter_scores_golm_results);
+our %EXPORT_TAGS = ( ALL => [qw( connectWSlibrarySearchGolm LibrarySearch parseResult filter_scores_golm_results)] );
 
 =head1 NAME
 
@@ -83,7 +83,8 @@ sub connectWSlibrarySearchGolm() {
 
 =head2 METHOD LibrarySearch
 
-	## Description : Matches a single user submitted GC-EI mass spectrum against the Golm Metabolome Database (GMD).
+	## Description : Matches a single user submitted GC-EI mass spectrum against the Golm Metabolome Database (GMD). 
+	## 				 A limited amount of hits can be kept according to the maxHits value and after them being filtered by $filter value
 	## Input : $osoap, $ri, $riWindow, $gcColumn, $spectrum, $maxHits
 	## Ouput : \@limited_hits, \@json_res
 	## Usage : ($limited_hits,$json_res) = LibrarySearch($osoap, $ri, $riWindow, $gcColumn, $spectrum, $maxHits) ;
@@ -93,7 +94,7 @@ sub connectWSlibrarySearchGolm() {
 sub LibrarySearch() {
 	## Retrieve Values
 	my $self = shift ;
-	my ($ri, $riWindow, $gcColumn, $spectrum, $maxHits) = @_ ;
+	my ($ri, $riWindow, $gcColumn, $spectrum, $maxHits, $filter, $thresholdHits) = @_ ;
 
 	#init in case :
 	$ri = 1500 if ( !defined $ri ) ;
@@ -102,6 +103,7 @@ sub LibrarySearch() {
 	
 	my $result ;
 	my @limited_hits ;
+	my @json_res ;
 	
 	if ( defined $spectrum ){
 		    	
@@ -135,32 +137,71 @@ sub LibrarySearch() {
 			my $results = $som->result->{Results} ;
 			my $status = $som->result->{Status} ;
                    
-            my $res_json = encode_json $results ;
+            
+            my $res_json = encode_json ($results) ;
 			my @results = @$results ;
-			
-            my @json_res ;
+			my $oapi = lib::golm_ws_api->new() ;
             
             ## Limitate number of hits returned according to user's $maxHit
+            ## and filter hits on specific values ($filter) with a threshold
             my @limited_hits = ();
+            
+            ### Return all hits
             if ($maxHits == 0 && $status eq 'success') {
-            	return \@results ;
+            	my $filtered_res = $oapi->filter_scores_golm_results(\@results,$filter,$thresholdHits) ;
+            	return $filtered_res ;
             }
             elsif ($maxHits > 0 && $status eq 'success'){
             	for (my $i=0 ; $i<$maxHits ; $i++) {
 	            	push (@limited_hits , @$results[$i]) ;
 	            	push (@json_res , $res_json) ;
             	}
-            	return \@limited_hits; #, \@json_res;
+            	my $filtered_res = $oapi->filter_scores_golm_results(\@limited_hits,$filter,$thresholdHits) ;
+            	open(JSON, '>:utf8', "resJSON.txt") or die "Can't create the file resJSON.txt\n" ;
+			    print JSON $json_res[0] ;
+			    close(JSON) ;
+            	return $filtered_res ;
             }
             else { carp "No match returned from Golm for the query.\n" }
         }
     	else { carp "The spectrum for query is empty, Golm soap will stop.\n" ; }
     }
     else { carp "The spectrum for query is undef, Golm soap will stop.\n" ; }
-
-	return \@limited_hits; #, \@json_res;
+	
+	return \@limited_hits ;
 }
 ### END of SUB
+
+
+
+
+=head2 METHOD filter_scores_golm_results
+	## Description : filter golm's hits by a certain score with a specific threshold 
+	## Input : $results,$filter,$threshold
+	## Ouput : \@filtered_res ;
+	## Usage : my ($filtered_res) = filter_scores_golm_results($results,$filter,$threshold) ;
+
+=cut
+
+sub filter_scores_golm_results() {
+	## Retrieve Values
+    my $self = shift ;
+	my ($results,$filter,$threshold) = @_ ;
+		
+	my @filtered_res ;
+	my @results = @$results ;
+
+	foreach my $res (@results) {
+		if ($res->{$filter} > $threshold) {
+			push (@filtered_res, $res) ;
+		}
+	}
+	return \@filtered_res ;
+	
+}
+### END of SUB
+
+
 
 
 
