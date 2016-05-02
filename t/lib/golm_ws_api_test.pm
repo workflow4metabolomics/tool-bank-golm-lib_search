@@ -42,16 +42,16 @@ sub get_mzsTest {
 	my ($msp_file, $mzRes, $maxIons) = @_;
 	my $omsp = lib::msp->new();
 	my $mzs = $omsp->get_mzs ($msp_file, $mzRes, $maxIons) ;
-	print Dumper \$mzs ;
+	#print Dumper \$mzs ;
     return($mzs) ;
 }
 
 
 sub get_intensitiesTest {
-	my ($msp_file) = @_;
+	my ($msp_file,$maxIons) = @_;
 	my $omsp = lib::msp->new();
-	my $intensities = $omsp->get_intensities($msp_file) ;
-	print Dumper \$intensities ;
+	my $intensities = $omsp->get_intensities($msp_file,$maxIons) ;
+	#print Dumper $intensities ;
     return($intensities) ;
 }
 
@@ -60,17 +60,17 @@ sub get_intensities_and_mzs_from_stringTest {
 	my ($spectrum_string) = @_;
 	my $omsp = lib::msp->new();
 	my $spectrum_intensities_mzs = $omsp->get_intensities_and_mzs_from_string($spectrum_string) ;
-	print Dumper \$spectrum_intensities_mzs ;
+	#print Dumper \$spectrum_intensities_mzs ;
     return($spectrum_intensities_mzs) ;
 }
 
 
 sub sorting_descending_intensitiesTest {
-	my ($spectrum_string) = @_;
+	my ($ref_mzs_res, $ref_ints_res) = @_;
 	my $omsp = lib::msp->new();
-	my $spectrum_intensities_mzs = $omsp->sorting_descending_intensities($spectrum_string) ;
-	print Dumper \$spectrum_intensities_mzs ;
-    return($spectrum_intensities_mzs) ;
+	my ($mzs_res, $ints_res) = $omsp->sorting_descending_intensities($ref_mzs_res, $ref_ints_res) ;
+	print Dumper $ints_res ;
+    return($mzs_res, $ints_res) ;
 }
 
 
@@ -78,7 +78,7 @@ sub encode_spectrum_for_queryTest {
 	my ($mzs, $intensities) = @_;
 	my $omsp = lib::msp->new();
 	my $encoded_spectra = $omsp->encode_spectrum_for_query($mzs, $intensities) ;
-	print Dumper $encoded_spectra ;
+	#print Dumper $encoded_spectra ;
 	return ($encoded_spectra) ;
 }
 
