@@ -16,7 +16,7 @@ my $binPath = $FindBin::Bin ;
 use lib::golm_ws_api_test qw( :ALL ) ;
 
 ## To launch the right sequence : API, MSP...
-my $sequence = 'API' ; 
+my $sequence = 'MSP' ; 
 my $current_test = 1 ;
 
 
@@ -44,10 +44,10 @@ isa_ok( connectWSlibrarySearchGolmTest(), 'SOAP::Lite' );
 
 
 ##		- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-# ARGS : $ri, $riWindow, $gcColumn, $spectrum, $maxHits
+# ARGS : $ri, $riWindow, $gcColumn, $spectrum, $maxHits, $filter, $thresholdHits
 # Structure of res : @limited_hits = [ %val1, %val2, ... %valN ], @json_res = [ ojson1, ojson2,... ]
 print "\n** Test $current_test LibrarySearch with a list of mzs, intensities and real search parameters **\n" ; $current_test++;
-is_deeply(LibrarySearchTest(1500,3000,'VAR5','73%205551756%20129%203361335%20147%205231997%20157%203641748%20160%203947240',2),
+is_deeply(LibrarySearchTest(1500,3000,'VAR5','73%205551756%20129%203361335%20147%205231997%20157%203641748%20160%203947240',2,'EuclideanDistance',0.03),
 		
           [
           {
@@ -86,10 +86,10 @@ is_deeply(LibrarySearchTest(1500,3000,'VAR5','73%205551756%20129%203361335%20147
 print "\n- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -\n" ;
 
 ##		- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-# ARGS : $ri, $riWindow, $gcColumn, $spectrum, $maxHits
+# ARGS : $ri, $riWindow, $gcColumn, $spectrum, $maxHits, $filter, $thresholdHits
 # Structure of res : @ret = [ %val1, %val2, ... %valN ]
 print "\n** Test $current_test BUG LibrarySearch with a list of mzs, intensities and empty spectrum **\n" ; $current_test++;
-is_deeply( LibrarySearchTest(1500,3000,'VAR5','',2),
+is_deeply( LibrarySearchTest(1500,3000,'VAR5','',2,'EuclideanDistance',0.8),
 [],
 "Method \'LibrarySearch\' returns a list of hits for a spectrum and parameters given in argument");
 
@@ -153,47 +153,19 @@ print "\n- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -\n" ;
 # Structure of res: [ $arr_ref1 , $arr_ref2 ... $arr_refN ]
 print "\n** Test $current_test get_mzs from a .msp file: too big mzRes **\n" ; $current_test++;
 is_deeply( get_mzsTest('./data/peakspectra_test.msp',10,5),
-	[
-		[73.65435,147.65435,157.65435,160.65435,205.65435],
-		[73.65435,129.65435,147.65435,157.65435,160.65435]
-	], 
+	undef, 
 "Method \'get_mzs\' return an array of arrays refs containing mzs of all the spectra from a msp file ");
 
 print "\n- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -\n" ;
 
 
-###		- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-## ARGS : $msp_file, $mzRes, $maxIons
-## Structure of res: [ $arr_ref1 , $arr_ref2 ... $arr_refN ]
-#print "\n** Test $current_test get_mzs from a .msp file: negative mzRes **\n" ; $current_test++;
-#is_deeply( get_mzsTest('./data/peakspectra_test.msp',-1,5),
-#	, 
-#"Method \'get_mzs\' return an array of arrays refs containing mzs of all the spectra from a msp file ");
-#
-#print "\n- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -\n" ;
-
-
-
-###		- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-## ARGS : $msp_file, $mzRes, $maxIons
-## Structure of res: [ $arr_ref1 , $arr_ref2 ... $arr_refN ]
-#print "\n** Test $current_test get_mzs from a .msp file: negative maxIons **\n" ; $current_test++;
-#is_deeply( get_mzsTest('./data/peakspectra_test.msp',0,-1),
-#	, 
-#"Method \'get_mzs\' return an array of arrays refs containing mzs of all the spectra from a msp file ");
-#
-#print "\n- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -\n" ;
-
-
-
-
 
 
 ##		- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-# ARGS : $msp_file
+# ARGS : $msp_file,$maxIons
 # Structure of res: [ $arr_ref1 , $arr_ref2 ... $arr_refN ]
 print "\n** Test $current_test get_intensities from a .msp file **\n" ; $current_test++;
-is_deeply(get_intensitiesTest('./data/peakspectra_test.msp'),
+is_deeply(get_intensitiesTest('./data/peakspectra_test.msp',9),
 	[
 			[
               '5764652.563',
@@ -223,9 +195,6 @@ is_deeply(get_intensitiesTest('./data/peakspectra_test.msp'),
 
 
 
-
-
-
 ##		- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 # ARGS : $msp_file
 # Structure of res: [ $arr_ref1 , $arr_ref2 ... $arr_refN ]
@@ -247,6 +216,53 @@ is_deeply(encode_spectrum_for_queryTest($mzs,$intensities),
 	'73%205551756%20129%203361335%20147%205231997%20157%203641748%20160%203947240%20205%204374348%20217%203683153%20319%205377373%20320%203621938',
 ],
 "Method \'encode_spectrum_for_query\' return an array containing WS formatted spectrum strings");
+
+
+
+
+##		- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+# ARGS : $msp_file
+# Structure of res: [ $arr_ref1 , $arr_ref2 ... $arr_refN ]
+print "\n** Test $current_test encode_spectrum_for_query from empty mzs and intensities arrays **\n" ; $current_test++;
+
+$mzs = [] ;
+
+$intensities = [];
+
+is_deeply(encode_spectrum_for_queryTest($mzs,$intensities),
+[],
+"Method \'encode_spectrum_for_query\' return an array containing WS formatted spectrum strings");
+
+
+
+##		- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+# ARGS : $msp_file
+# Structure of res: [ $arr_ref1 , $arr_ref2 ... $arr_refN ]
+print "\n** Test $current_test encode_spectrum_for_query from undef mzs and intensities arrays **\n" ; $current_test++;
+is_deeply(encode_spectrum_for_queryTest(undef,undef),
+[],
+"Method \'encode_spectrum_for_query\' return an array containing WS formatted spectrum strings");
+
+
+
+##		- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+# ARGS : $ref_mzs_res, $ref_ints_res
+# Structure of res: [ mz1,mz2,... ] , [ int1,int2,... ]
+print "\n** Test $current_test sort mzs and intensities arrays by descending intensity values **\n" ; $current_test++;
+$mzs = [
+          [73.654,147.654,157.654,160.654,205.654],
+          [73.654,129.654,147.654,157.654,160.654]
+          ];
+        
+$intensities = [
+		          [5764652.563,5244020.563,3561241.563,3454586.563,4437872.563],
+		          [5551756.563,3361335.563,5231997.563,3641748.563,3947240.563]
+		          ];
+        
+is_deeply(sorting_descending_intensitiesTest($mzs,$intensities),
+[],
+"Method \'sorting_descending_intensities\' return two arrays of mz and ints sorted by descending intensity values");
+
 
 
 
