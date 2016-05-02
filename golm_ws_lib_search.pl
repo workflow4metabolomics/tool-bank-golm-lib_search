@@ -21,7 +21,7 @@ use lib::golm_ws_api qw( :ALL ) ;
 use lib::msp qw( :ALL ) ;
 
 ## Initialized values
-my ($OptHelp,$ri,$riWindow,$gcColumn,$msp_file,$maxHits,$mzRes,$maxIons,$threshold,$spectrum_string) = (undef,undef,undef,undef,undef,undef,undef,undef,undef,undef) ;
+my ($OptHelp,$ri,$riWindow,$gcColumn,$msp_file,$maxHits,$mzRes,$maxIons,$threshold,$spectrum_string,$filter,$thresholdHits) = (undef,undef,undef,undef,undef,undef,undef,undef,undef,undef,undef,undef) ;
 my (@hits, @ojson) = ( () , () ) ;
 my $encoded_spectra ;
 
@@ -38,13 +38,15 @@ my $encoded_spectra ;
 				"maxHits:i"		=> \$maxHits,
 				"mzRes:i"		=> \$mzRes,
 				"maxIons:i"		=> \$maxIons,
+				"filter:s"		=> \$filter,
+				"thresholdHits:s"		=> \$thresholdHits,
 				"threshold:f"		=> \$threshold, # Optionnal
             ) ;
             
             die "maxHits must be >= 0\n" unless ($maxHits >= 0) ;
             die "mzRes must be >= 0 \n" unless ($mzRes >= 0) ;
             die "maxIons must be >= 0\n" unless ($maxIons >= 0) ;
-            die "threshold must be > 0\n" unless ($threshold > 0) ;
+            die "thresholdHits must be > 0\n" unless ($thresholdHits > 0) ;
             
          
 ## if you put the option -help or -h or even no arguments, function help is started
@@ -75,22 +77,19 @@ if (defined $spectrum_string) {
 ## Taking care of the msp file
 elsif (defined $mzRes and defined $maxIons and defined $maxHits and $mzRes >= 0 and $maxIons >= 0 and $maxHits >= 0) {
 	
-		unless (-e $msp_file)  { croak "$msp_file does not exist" ; }
-		unless (-f $msp_file)  { croak "$msp_file is not a file" ; }
-		unless (-s $msp_file) 	{ croak "$msp_file is empty" ; }
-		
-		
-		$ref_mzs_res = $omsp->get_mzs($msp_file,$mzRes,$maxIons) ;
-		$ref_ints_res = $omsp->get_intensities($msp_file, $maxIons) ;
-					
-			
+	unless (-e $msp_file)  { croak "$msp_file does not exist" ; }
+	unless (-f $msp_file)  { croak "$msp_file is not a file" ; }
+	unless (-s $msp_file)  { croak "$msp_file is empty" ; }
+	
+	
+	$ref_mzs_res = $omsp->get_mzs($msp_file,$mzRes,$maxIons) ;
+	$ref_ints_res = $omsp->get_intensities($msp_file, $maxIons) ;
 		
 	## Sorting intensities
 	my ($mzs_res, $ints_res) = $omsp->sorting_descending_intensities($ref_mzs_res, $ref_ints_res) ;
-		
+
 	## Encode spectra
 	$encoded_spectra = $omsp->encode_spectrum_for_query($mzs_res, $ints_res) ;
-	print Dumper $encoded_spectra ;
 }
 else { 
 	
@@ -103,13 +102,13 @@ else {
 my $oapi = lib::golm_ws_api->new() ;
 
 	foreach my $spectrum (@$encoded_spectra){
-		my ($limited_hits, $res_json) = $oapi->LibrarySearch ($ri, $riWindow, $gcColumn, $spectrum, $maxHits) ;
+		my ($limited_hits, $res_json) = $oapi->LibrarySearch ($ri, $riWindow, $gcColumn, $spectrum, $maxHits, $filter, $thresholdHits) ;
 		push (@hits , $limited_hits) ;
 		push (@ojson , $res_json) ;
 }
 
-print Dumper \@hits ;
-print Dumper \@ojson ;
+print "final".Dumper \@hits ;
+#print Dumper \@ojson ;
 
 
 
@@ -146,6 +145,8 @@ USAGE :
 			-maxHits [Maximum hits per queried spectra: integer (0 for all)]
 			-mzRes [Number of digits after the decimal point for m/z values: integer (0 if none)]
 			-maxIons [Number of m/z per spectra you want to keep for the queries, default 0 for all detected ions]
+			-filter [Value of result to be filtered (EuclideanDistance, HammingDistance...): string]
+			-thresholdHits [ignore ions which masses are smaller than the threshold value: float]
 			-threshold [ignore ions which masses are smaller than the threshold value: float]	
 				
 ";
