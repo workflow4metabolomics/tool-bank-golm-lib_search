@@ -19,6 +19,7 @@ use lib $FindBin::Bin ;
 ## Dedicate Perl Modules PFEM
 use lib::golm_ws_api qw( :ALL ) ;
 use lib::msp qw( :ALL ) ;
+use lib::output qw( :ALL ) ;
 
 ## Initialized values
 my ($OptHelp,$ri,$riWindow,$gcColumn,$msp_file,$maxHits,$mzRes,$maxIons,$threshold,$spectrum_string,$filter,$thresholdHits) = (undef,undef,undef,undef,undef,undef,undef,undef,undef,undef,undef,undef) ;
@@ -107,8 +108,11 @@ my $oapi = lib::golm_ws_api->new() ;
 		push (@ojson , $res_json) ;
 }
 
-print "final".Dumper \@hits ;
-#print Dumper \@ojson ;
+my $o_output = lib::output->new() ;
+my $jsons_output = $o_output->build_json_res_object(\@hits) ;
+
+#print "final".Dumper \@hits ;
+print Dumper $jsons_output ;
 
 
 
