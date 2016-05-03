@@ -157,9 +157,6 @@ sub LibrarySearch() {
 	            	push (@json_res , $res_json) ;
             	}
             	my $filtered_res = $oapi->filter_scores_golm_results(\@limited_hits,$filter,$thresholdHits) ;
-            	open(JSON, '>:utf8', "resJSON.txt") or die "Can't create the file resJSON.txt\n" ;
-			    print JSON $json_res[0] ;
-			    close(JSON) ;
             	return $filtered_res ;
             }
             else { carp "No match returned from Golm for the query.\n" }
