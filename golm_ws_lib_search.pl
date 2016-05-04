@@ -22,7 +22,7 @@ use lib::msp qw( :ALL ) ;
 use lib::output qw( :ALL ) ;
 
 ## Initialized values
-my ($OptHelp,$ri,$riWindow,$gcColumn,$msp_file,$maxHits,$mzRes,$maxIons,$threshold,$spectrum_string,$filter,$thresholdHits) = (undef,undef,undef,undef,undef,undef,undef,undef,undef,undef,undef,undef) ;
+my ($OptHelp,$ri,$riWindow,$gcColumn,$msp_file,$maxHits,$mzRes,$maxIons,$threshold,$spectrum_string,$filter,$thresholdHits,$relative) = (undef,undef,undef,undef,undef,undef,undef,undef,undef,undef,undef,undef,undef) ;
 my (@hits, @ojson) = ( () , () ) ;
 my $encoded_spectra ;
 
@@ -42,6 +42,7 @@ my $encoded_spectra ;
 				"filter:s"		=> \$filter,
 				"thresholdHits:s"		=> \$thresholdHits,
 				"threshold:f"		=> \$threshold, # Optionnal
+				"relative"			=> \$relative
             ) ;
             
             die "maxHits must be >= 0\n" unless ($maxHits >= 0) ;
@@ -65,9 +66,9 @@ my $omsp = lib::msp->new() ;
 my $ref_mzs_res ;
 my $ref_ints_res ;
 
-## case when only one spectra is queried
+## Case when only one spectra is queried
 if (defined $spectrum_string) { 
-	my $omsp = lib::msp->new() ;
+	
 	my $mzs_res = $omsp->get_intensities_and_mzs_from_string($spectrum_string) ;
 	my @mzs = @$mzs_res[0] ;
 	my @intensities = @$mzs_res[1] ;
@@ -76,7 +77,7 @@ if (defined $spectrum_string) {
 	#print Dumper $encoded_spectra ;
 }
 ## Taking care of the msp file
-elsif (defined $mzRes and defined $maxIons and defined $maxHits and $mzRes >= 0 and $maxIons >= 0 and $maxHits >= 0) {
+elsif (defined $msp_file and defined $mzRes and defined $maxIons and defined $maxHits) {
 	
 	unless (-e $msp_file)  { croak "$msp_file does not exist" ; }
 	unless (-f $msp_file)  { croak "$msp_file is not a file" ; }
@@ -88,14 +89,20 @@ elsif (defined $mzRes and defined $maxIons and defined $maxHits and $mzRes >= 0 
 		
 	## Sorting intensities
 	my ($mzs_res, $ints_res) = $omsp->sorting_descending_intensities($ref_mzs_res, $ref_ints_res) ;
-
-	## Encode spectra
-	$encoded_spectra = $omsp->encode_spectrum_for_query($mzs_res, $ints_res) ;
-}
-else { 
 	
-	if (!defined $maxHits or !defined $maxIons or !defined $mzRes) { croak "Parameter mzRes or maxIons or maxHits is undefined\n"; } 
+	## Relative intensity
+	my $relative_ints_res = undef ;
+	if ($relative) {
+		$relative_ints_res = $omsp->apply_relative_intensity($ints_res) ;
+	}
+	
+	## Encode spectra
+	if (defined $relative_ints_res) {
+		$encoded_spectra = $omsp->encode_spectrum_for_query($mzs_res, $relative_ints_res) ;
+	}
+	else { $encoded_spectra = $omsp->encode_spectrum_for_query($mzs_res, $ints_res) ; }
 }
+elsif (!defined $maxHits or !defined $maxIons or !defined $mzRes) { croak "Parameters mzRes or maxIons or maxHits are undefined\n"; } 
 
 
 ############# -------------- Send queries to Golm -------------- ############# :
@@ -149,8 +156,8 @@ USAGE :
 			-maxHits [Maximum hits per queried spectra: integer (0 for all)]
 			-mzRes [Number of digits after the decimal point for m/z values: integer (0 if none)]
 			-maxIons [Number of m/z per spectra you want to keep for the queries, default 0 for all detected ions]
-			-filter [Value of result to be filtered (EuclideanDistance, HammingDistance...): string]
-			-thresholdHits [ignore ions which masses are smaller than the threshold value: float]
+			-filter [Filter the results specifically on certain scores (EuclideanDistance, HammingDistance...): string]
+			-filterThreshold [ignore hits which filter value is higher than threshold: float]
 			-threshold [ignore ions which masses are smaller than the threshold value: float]	
 				
 ";
