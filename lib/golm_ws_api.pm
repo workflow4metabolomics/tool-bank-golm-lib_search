@@ -189,7 +189,7 @@ sub filter_scores_golm_results() {
 	my @results = @$results ;
 
 	foreach my $res (@results) {
-		if ($res->{$filter} > $threshold) {
+		if ($res->{$filter} < $threshold) {
 			push (@filtered_res, $res) ;
 		}
 	}
