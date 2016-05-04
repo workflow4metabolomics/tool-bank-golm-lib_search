@@ -22,7 +22,9 @@ use lib::msp qw( :ALL ) ;
 use lib::output qw( :ALL ) ;
 
 ## Initialized values
-my ($OptHelp,$ri,$riWindow,$gcColumn,$msp_file,$maxHits,$mzRes,$maxIons,$threshold,$spectrum_string,$filter,$thresholdHits,$relative) = (undef,undef,undef,undef,undef,undef,undef,undef,undef,undef,undef,undef,undef) ;
+my ($OptHelp,$ri,$riWindow,$gcColumn,$msp_file,$maxHits,$mzRes,$maxIons,$threshold,$spectrum_string,$relative) = (undef,undef,undef,undef,undef,undef,undef,undef,undef,undef,undef) ;
+my ( $JaccardDistanceThreshold,$s12GowerLegendreDistanceThreshold,$DotproductDistanceThreshold,$HammingDistanceThreshold,$EuclideanDistanceThreshold ) = (undef,undef,undef,undef,undef) ;
+
 my (@hits, @ojson) = ( () , () ) ;
 my $encoded_spectra ;
 
@@ -39,8 +41,11 @@ my $encoded_spectra ;
 				"maxHits:i"		=> \$maxHits,
 				"mzRes:i"		=> \$mzRes,
 				"maxIons:i"		=> \$maxIons,
-				"filter:s"		=> \$filter,
-				"thresholdHits:s"		=> \$thresholdHits,
+				"JaccardDistanceThreshold:f"		=> \$JaccardDistanceThreshold,
+				"s12GowerLegendreDistanceThreshold:f"		=> \$s12GowerLegendreDistanceThreshold,
+				"DotproductDistanceThreshold:f"		=> \$DotproductDistanceThreshold,
+				"HammingDistanceThreshold:f"		=> \$HammingDistanceThreshold,
+				"EuclideanDistanceThreshold:f"		=> \$EuclideanDistanceThreshold,
 				"threshold:f"		=> \$threshold, # Optionnal
 				"relative"			=> \$relative
             ) ;
@@ -48,7 +53,6 @@ my $encoded_spectra ;
             die "maxHits must be >= 0\n" unless ($maxHits >= 0) ;
             die "mzRes must be >= 0 \n" unless ($mzRes >= 0) ;
             die "maxIons must be >= 0\n" unless ($maxIons >= 0) ;
-            die "thresholdHits must be > 0\n" unless ($thresholdHits > 0) ;
             
          
 ## if you put the option -help or -h or even no arguments, function help is started
@@ -86,7 +90,7 @@ elsif (defined $msp_file and defined $mzRes and defined $maxIons and defined $ma
 	
 	$ref_mzs_res = $omsp->get_mzs($msp_file,$mzRes,$maxIons) ;
 	$ref_ints_res = $omsp->get_intensities($msp_file, $maxIons) ;
-		
+	print Dumper $ref_ints_res ;
 	## Sorting intensities
 	my ($mzs_res, $ints_res) = $omsp->sorting_descending_intensities($ref_mzs_res, $ref_ints_res) ;
 	
@@ -109,10 +113,14 @@ elsif (!defined $maxHits or !defined $maxIons or !defined $mzRes) { croak "Param
 
 my $oapi = lib::golm_ws_api->new() ;
 
-	foreach my $spectrum (@$encoded_spectra){
-		my ($limited_hits, $res_json) = $oapi->LibrarySearch ($ri, $riWindow, $gcColumn, $spectrum, $maxHits, $filter, $thresholdHits) ;
-		push (@hits , $limited_hits) ;
-		push (@ojson , $res_json) ;
+foreach my $spectrum (@$encoded_spectra){
+	my ($limited_hits, $res_json) = $oapi->LibrarySearch ($ri, $riWindow, $gcColumn, $spectrum, $maxHits, $JaccardDistanceThreshold,
+																										  $s12GowerLegendreDistanceThreshold,
+																										  $DotproductDistanceThreshold,
+																										  $HammingDistanceThreshold,
+																										  $EuclideanDistanceThreshold) ;
+	push (@hits , $limited_hits) ;
+	push (@ojson , $res_json) ;
 }
 
 my $o_output = lib::output->new() ;
@@ -156,9 +164,8 @@ USAGE :
 			-maxHits [Maximum hits per queried spectra: integer (0 for all)]
 			-mzRes [Number of digits after the decimal point for m/z values: integer (0 if none)]
 			-maxIons [Number of m/z per spectra you want to keep for the queries, default 0 for all detected ions]
-			-filter [Filter the results specifically on certain scores (EuclideanDistance, HammingDistance...): string]
-			-filterThreshold [ignore hits which filter value is higher than threshold: float]
 			-threshold [ignore ions which masses are smaller than the threshold value: float]	
+			-relative [if given in argument, transforms absolute intensities in the msp file into relative intensities: (intensity * 100)/ max(intensitiess)]
 				
 ";
 	exit(1);
