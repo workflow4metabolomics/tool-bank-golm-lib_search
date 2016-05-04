@@ -13,8 +13,8 @@ use vars qw($VERSION @ISA @EXPORT %EXPORT_TAGS);
 
 our $VERSION = "1.0";
 our @ISA = qw(Exporter);
-our @EXPORT = qw( connectWSlibrarySearchGolm LibrarySearch parseResult filter_scores_golm_results);
-our %EXPORT_TAGS = ( ALL => [qw( connectWSlibrarySearchGolm LibrarySearch parseResult filter_scores_golm_results)] );
+our @EXPORT = qw( connectWSlibrarySearchGolm LibrarySearch parseResult _filter_scores_golm_results);
+our %EXPORT_TAGS = ( ALL => [qw( connectWSlibrarySearchGolm LibrarySearch parseResult _filter_scores_golm_results)] );
 
 =head1 NAME
 
@@ -94,7 +94,8 @@ sub connectWSlibrarySearchGolm() {
 sub LibrarySearch() {
 	## Retrieve Values
 	my $self = shift ;
-	my ($ri, $riWindow, $gcColumn, $spectrum, $maxHits, $filter, $thresholdHits) = @_ ;
+	my ($ri, $riWindow, $gcColumn, $spectrum, $maxHits,$JaccardDistanceThreshold,$s12GowerLegendreDistanceThreshold,$DotproductDistanceThreshold,
+		$HammingDistanceThreshold,$EuclideanDistanceThreshold) = @_ ;
 
 	#init in case :
 	$ri = 1500 if ( !defined $ri ) ;
@@ -148,7 +149,8 @@ sub LibrarySearch() {
             
             ### Return all hits
             if ($maxHits == 0 && $status eq 'success') {
-            	my $filtered_res = $oapi->filter_scores_golm_results(\@results,$filter,$thresholdHits) ;
+            	my $filtered_res = $oapi->filter_scores_golm_results(\@results,$JaccardDistanceThreshold,$s12GowerLegendreDistanceThreshold,
+																		$DotproductDistanceThreshold,$HammingDistanceThreshold,$EuclideanDistanceThreshold) ;
             	return $filtered_res ;
             }
             elsif ($maxHits > 0 && $status eq 'success'){
@@ -156,7 +158,8 @@ sub LibrarySearch() {
 	            	push (@limited_hits , @$results[$i]) ;
 	            	push (@json_res , $res_json) ;
             	}
-            	my $filtered_res = $oapi->filter_scores_golm_results(\@limited_hits,$filter,$thresholdHits) ;
+            	my $filtered_res = $oapi->_filter_scores_golm_results(\@limited_hits,$JaccardDistanceThreshold,$s12GowerLegendreDistanceThreshold,
+																		$DotproductDistanceThreshold,$HammingDistanceThreshold,$EuclideanDistanceThreshold) ;
             	return $filtered_res ;
             }
             else { carp "No match returned from Golm for the query.\n" }
@@ -180,28 +183,59 @@ sub LibrarySearch() {
 
 =cut
 
-sub filter_scores_golm_results() {
+sub _filter_scores_golm_results() {
 	## Retrieve Values
     my $self = shift ;
-	my ($results,$filter,$threshold) = @_ ;
+	my ($results,$JaccardDistanceThreshold,$s12GowerLegendreDistanceThreshold,
+		$DotproductDistanceThreshold,$HammingDistanceThreshold,$EuclideanDistanceThreshold) = @_ ;
 		
-	my @filtered_res ;
 	my @results = @$results ;
 
-	foreach my $res (@results) {
-		if ($res->{$filter} < $threshold) {
-			push (@filtered_res, $res) ;
-		}
+	my %filters = ('JaccardDistance' => $JaccardDistanceThreshold,
+				   's12GowerLegendreDistance' => $s12GowerLegendreDistanceThreshold,
+				   'DotproductDistance' => $DotproductDistanceThreshold,
+				   'HammingDistance' => $HammingDistanceThreshold,
+				   'EuclideanDistance' => $EuclideanDistanceThreshold );
+
+	foreach my $filter (keys %filters) {
+		foreach my $res (@results){
+				if ($res->{$filter} < $filters{$filter}) {
+					my ($key,$value) = ($res , 1) ;
+					'$'.$filter.'{'.$key.'}' = $value ;
+				}
+			} 
 	}
-	return \@filtered_res ;
 	
 }
 ### END of SUB
 
+=head2 METHOD _compare_filtered_res
+	## Description : compare
+	## Input : $results,$filter,$threshold
+	## Ouput : \@filtered_res ;
+	## Usage : my ($filtered_res) = filter_scores_golm_results($results,$filter,$threshold) ;
 
+=cut
 
-
-
+#sub _compare_filtered_res() {
+#	my $self = shift ;
+#	my ($filter,$threshold,$results) = @_ ;
+#	
+#	my %jaccard ;
+#	my %euclidean ;
+#	my %s12 ;
+#	my %hamming ;
+#	my %dot ;
+#	
+#	
+#	foreach my $res (@$results){
+#		if ($res->{$filter} < $threshold) {
+#			push (%jaccard , $res) ;
+#		}
+#	} 
+#}
+### END OF SUB
+	
 1 ;
 
 
