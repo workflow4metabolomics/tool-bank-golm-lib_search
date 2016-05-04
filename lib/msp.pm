@@ -68,6 +68,7 @@ sub get_mzs {
     my ( $msp_file, $mzRes, $maxIons ) = @_ ;
   
   	my @ions = () ;
+  	my @temp_mzs = () ;
   	my @mzs = ();
   	my @total_spectra_mzs = ();
   	my $mz ;
@@ -80,34 +81,53 @@ sub get_mzs {
 	    my @infos = () ;
 	    # Extract spectrum
 	    while(my $line = <MSP>) {
+	    	
 	    	chomp $line;
 	    	@infos = split (/\n/ , $line) ;
 	    	#Detect spectrum
 	    	for (my $i=0 ; $i<@infos ; $i++) {
+	    		
 		    	if ($infos[$i] =~ /(\d+\.?\d*)\s+(\d+\.?\d*)\s*;\s*?/) {
+		    		
 		    		@ions = split ( /;/ , $infos[$i] ) ;
 		    		# Retrieve mzs according to maxIons value
 		    		foreach my $ion (@ions) {
+		    			
 		    			if ($ion =~ /^\s*(\d+\.?\d*)\s+(\d+\.?\d*)$/) {
+		    				
 		    				$mz = $1 ;
-		    				## Truncate/round mzs depending on $mzRes wanted
-		    				if ($mzRes == 0 && @mzs < $maxIons) {
+		    				# Truncate/round mzs depending on $mzRes wanted
+		    				if ($mzRes == 0) {
 		    					$mz = int($mz) ;
-		    					push (@mzs , $mz) ;
+		    					push (@temp_mzs , $mz) ;
 		    				}
-		    				# check that $mzRes is not greater than the number of digits after comma
-		    				elsif ($mzRes > 0 && $mzRes <= length(( $mz =~ /.+\.(.*)/)[0] ) && @mzs < $maxIons) {
+		    				# Check that $mzRes is not greater than the number of digits after comma
+		    				elsif ($mzRes > 0 && $mzRes <= length(( $mz =~ /.+\.(.*)/)[0] )) {
 		    					my $mz_rounded = _round_num($mz,$mzRes) ;
-		    					push (@mzs , $$mz_rounded) ;    					
+		    					push (@temp_mzs , $$mz_rounded) ;    					
 		    				}
+		    				# Make sure the control is on masses with digits only
 		    				elsif ($mz =~ /(\d+\.\d+)/ && $mzRes > length(( $mz =~ /.+\.(.*)/)[0] )) { 
 		    					carp "mzRes is greater then the actual number of digits after comma\n" ; 
 		    					return undef ; 
 		    				}
 		    			}
+		    			
+		    			## If user wants all ions to be queried
+		    			if ($maxIons == 0) {
+		    				@mzs = @temp_mzs ;
+		    			}
+		    			## If user wants a specific number of ions to be queried
+		    			elsif ($maxIons > 0) {
+		    				my $j = 0 ;
+		    				while ($j<$maxIons){
+		    					push (@mzs , $temp_mzs[$j++]) ;
+		    				}
+		    			}
 		    		}
 		    	}
 	    	}
+	    	@temp_mzs = () ;
 	    	if($line ne '') {
 		    	@{ $total_spectra_mzs[$i] } = @mzs ;
 			    $i++ ;
@@ -139,6 +159,7 @@ sub get_intensities {
     my ( $msp_file, $maxIons ) = @_ ;
   
   	my @ions = () ;
+  	my @temp_intensities = () ;
   	my @intensities = () ;
   	my @total_spectra_intensities = (); 
   	my $i = 0 ;
@@ -158,13 +179,25 @@ sub get_intensities {
 		    		@ions = split ( /;/ , $infos[$i] ) ;
 		    		# Retrieve intensities
 		    		foreach my $ion (@ions) {
-		    			if ($ion =~ /^\s*(\d+\.?\d*)\s+(\d+\.?\d*)$/ && @intensities < $maxIons) {
+		    			if ($ion =~ /^\s*(\d+\.?\d*)\s+(\d+\.?\d*)$/) {
     						my $intensity = $2 ;
-    						push ( @intensities , $intensity ) ;
+    						push ( @temp_intensities , $intensity ) ;
 		    			}
+		    			## If user wants all ions to be queried
+		    			if ($maxIons == 0) {
+		    				@intensities = @temp_intensities ;
+		    			}
+		    			## If user wants a specific number of ions to be queried
+		    			elsif ($maxIons > 0) {
+		    				my $j = 0 ;
+		    				while ($j<$maxIons){
+		    					push (@intensities , $temp_intensities[$j++]) ;
+		    				}
+		    			} 
 		    		}
 		    	}
 	    	}
+	    	@temp_intensities = () ;
 	    	if($line ne '') {
 		    	@{ $total_spectra_intensities[$i] } = @intensities ;
 			    $i++ ;
