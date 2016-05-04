@@ -100,7 +100,10 @@ sub get_mzs {
 		    					my $mz_rounded = _round_num($mz,$mzRes) ;
 		    					push (@mzs , $$mz_rounded) ;    					
 		    				}
+		    				elsif ($mz =~ /(\d+\.\d+)/ && $mzRes > length(( $mz =~ /.+\.(.*)/)[0] )) { 
 		    					carp "mzRes is greater then the actual number of digits after comma\n" ; 
+		    					return undef ; 
+		    				}
 		    			}
 		    		}
 		    	}
@@ -112,7 +115,7 @@ sub get_mzs {
 	    	}  	
 	    }
     }
-    print Dumper \@total_spectra_mzs ;
+    #print Dumper \@total_spectra_mzs ;
     close (MSP) ;
     return(\@total_spectra_mzs) ;
 }
