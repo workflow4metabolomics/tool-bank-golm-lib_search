@@ -11,8 +11,8 @@ use vars qw($VERSION @ISA @EXPORT %EXPORT_TAGS);
 
 our $VERSION = "1.0";
 our @ISA = qw(Exporter);
-our @EXPORT = qw( get_mzs get_intensities get_intensities_and_mzs_from_string encode_spectrum_for_query sorting_descending_intensities round_num);
-our %EXPORT_TAGS = ( ALL => [qw( get_mzs get_intensities get_intensities_and_mzs_from_string encode_spectrum_for_query sorting_descending_intensities round_num)] );
+our @EXPORT = qw( get_mzs get_intensities get_intensities_and_mzs_from_string encode_spectrum_for_query sorting_descending_intensities round_num apply_relative_intensity);
+our %EXPORT_TAGS = ( ALL => [qw( get_mzs get_intensities get_intensities_and_mzs_from_string encode_spectrum_for_query sorting_descending_intensities round_num apply_relative_intensity)] );
 
 =head1 NAME
 
@@ -327,6 +327,30 @@ sub _round_num {
 
 
 
+=head2 METHOD apply_relative_intensity
+
+	## Description : transform absolute intensities into relative intensities
+	## Input : $intensities
+	## Output : \@intensities
+	## Usage : my ( $intensities ) = apply_relative_intensity( $intensities ) ;
+	
+=cut
+## START of SUB 
+sub apply_relative_intensity {
+	## Retrieve Values
+	my $self = shift ;
+    my ($intensities) = @_ ;
+    
+    my @intensities = @$intensities ;
+    my @relative_intensities ;
+    
+    foreach my $ints (@intensities) {
+    		my @relative_ints = map { ($_ * 100)/@$ints[0] } @$ints ;
+    		push (@relative_intensities , \@relative_ints) ;
+    }
+    return \@relative_intensities ;
+}
+## END of SUB
 
 
 1 ;
