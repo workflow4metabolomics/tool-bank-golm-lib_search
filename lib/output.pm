@@ -103,7 +103,7 @@ sub build_json_res_object {
   	
 	my @json_results ;
 	my @array_results = @$results ;
-	my %hit_infos = () ;
+	
 	my $nb_hits = 0 ;
 	my $i = 0 ;
 	my $spectrumID = 1 ;
@@ -119,6 +119,7 @@ sub build_json_res_object {
 		foreach my $href (@$res) {
 			
 			my %hash_res = %$href ;
+			my %hit_infos = () ;
 			
 			$hit_infos{'metaboliteID'} = $hash_res{'metaboliteID'} ;
 			$hit_infos{'distance_scores'}{'EuclideanDistance'} = $hash_res{'EuclideanDistance'} ;
@@ -133,11 +134,9 @@ sub build_json_res_object {
 			$hit_infos{'spectrum'}{'id'} = $hash_res{'spectrumID'} ;
 			$hit_infos{'spectrum'}{'name'} = $hash_res{'spectrumName'} ;
 			
-			print "coucou".Dumper @{ $json_results[$i]{'searchResults'} } ;
 			push ( @{ $json_results[$i]{'searchResults'} } , \%hit_infos ) ;
 			
 		}
-		#print "yop".Dumper $json_results[$i]{'searchResults'} ;
 		$i++ ;
 	}
     return \@json_results ;
