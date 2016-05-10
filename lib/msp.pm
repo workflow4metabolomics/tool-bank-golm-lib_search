@@ -79,15 +79,15 @@ sub get_mzs {
 	{
 		local $/ = 'Name' ;
 	    my @infos = () ;
-	    # Extract spectrum
+	    # One line is : "Name -> Name" englobing a whole spectrum with all infos
 	    while(my $line = <MSP>) {
 	    	
 	    	chomp $line;
 	    	@infos = split (/\n/ , $line) ;
-	    	#Detect spectrum
+	    	# Loop over all lines of a spectrum
 	    	for (my $i=0 ; $i<@infos ; $i++) {
-	    		
-		    	if ($infos[$i] =~ /(\d+\.?\d*)\s+(\d+\.?\d*)\s*;\s*?/) {
+	    		# Detect spectrum lines only
+		    	if ($infos[$i] =~ /(\d+\.?\d*)\s+(\d+\.?\d*)\s*;\s*/) {
 		    		
 		    		@ions = split ( /;/ , $infos[$i] ) ;
 		    		# Retrieve mzs according to maxIons value
@@ -112,19 +112,18 @@ sub get_mzs {
 		    					return undef ; 
 		    				}
 		    			}
-		    			
-		    			## If user wants all ions to be queried
-		    			if ($maxIons == 0) {
-		    				@mzs = @temp_mzs ;
-		    			}
-		    			## If user wants a specific number of ions to be queried
-		    			elsif ($maxIons > 0) {
-		    				my $j = 0 ;
-		    				while ($j<$maxIons){
-		    					push (@mzs , $temp_mzs[$j++]) ;
-		    				}
-		    			}
 		    		}
+		    		## If user wants all ions to be queried
+	    			if ($maxIons == 0) {
+	    				@mzs = @temp_mzs ;
+	    			}
+	    			## If user wants a specific number of ions to be queried
+	    			elsif ($maxIons > 0) {
+	    				my $j = 0 ;
+	    				while (scalar @mzs < $maxIons && $j < @temp_mzs){
+	    					push (@mzs , $temp_mzs[$j++]) ;
+	    				}
+	    			}
 		    	}
 	    	}
 	    	@temp_mzs = () ;
