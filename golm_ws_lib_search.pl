@@ -71,9 +71,9 @@ my $omsp = lib::msp->new() ;
 
 
 
-############# -------------- Test the Golm web servicee -------------- ############# :
+############# -------------- Test the Golm web service -------------- ############# :
 
-#$oapi->test_query_golm() ;
+$oapi->test_query_golm() ;
 
 ############# -------------- Parse the .msp file -------------- ############# :
 
