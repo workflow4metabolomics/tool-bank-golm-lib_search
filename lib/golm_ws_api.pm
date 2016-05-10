@@ -13,8 +13,8 @@ use vars qw($VERSION @ISA @EXPORT %EXPORT_TAGS);
 
 our $VERSION = "1.0";
 our @ISA = qw(Exporter);
-our @EXPORT = qw( connectWSlibrarySearchGolm LibrarySearch parseResult _filter_scores_golm_results);
-our %EXPORT_TAGS = ( ALL => [qw( connectWSlibrarySearchGolm LibrarySearch parseResult _filter_scores_golm_results)] );
+our @EXPORT = qw( connectWSlibrarySearchGolm LibrarySearch test_query_golm _filter_scores_golm_results);
+our %EXPORT_TAGS = ( ALL => [qw( connectWSlibrarySearchGolm LibrarySearch test_query_golm _filter_scores_golm_results)] );
 
 =head1 NAME
 
@@ -190,7 +190,7 @@ sub LibrarySearch() {
 			my $results = $som->result->{Results} ;
 			my $status = $som->result->{Status} ;
                    
-            
+            #print Dumper $results ;
             my $res_json = encode_json ($results) ;
 			my @results = @$results ;
 			my $oapi = lib::golm_ws_api->new() ;
@@ -228,10 +228,12 @@ sub LibrarySearch() {
 
 
 =head2 METHOD filter_scores_golm_results
-	## Description : filter golm's hits by a certain score with a specific threshold 
-	## Input : $results,$filter,$threshold
+	## Description : filter golm's hits by distance scores 
+	## Input : $results,$JaccardDistanceThreshold,$s12GowerLegendreDistanceThreshold,
+	##		   $DotproductDistanceThreshold,$HammingDistanceThreshold,$EuclideanDistanceThreshold
 	## Ouput : \@filtered_res ;
-	## Usage : my ($filtered_res) = filter_scores_golm_results($results,$filter,$threshold) ;
+	## Usage : my ($filtered_res) = filter_scores_golm_results($results,$JaccardDistanceThreshold,$s12GowerLegendreDistanceThreshold,
+	##															$DotproductDistanceThreshold,$HammingDistanceThreshold,$EuclideanDistanceThreshold) ;
 
 =cut
 
@@ -242,51 +244,20 @@ sub _filter_scores_golm_results() {
 		$DotproductDistanceThreshold,$HammingDistanceThreshold,$EuclideanDistanceThreshold) = @_ ;
 		
 	my @results = @$results ;
-
-	my %filters = ('JaccardDistance' => $JaccardDistanceThreshold,
-				   's12GowerLegendreDistance' => $s12GowerLegendreDistanceThreshold,
-				   'DotproductDistance' => $DotproductDistanceThreshold,
-				   'HammingDistance' => $HammingDistanceThreshold,
-				   'EuclideanDistance' => $EuclideanDistanceThreshold );
-
-	foreach my $filter (keys %filters) {
-		foreach my $res (@results){
-				if ($res->{$filter} < $filters{$filter}) {
-					my ($key,$value) = ($res , 1) ;
-					'$'.$filter.'{'.$key.'}' = $value ;
-				}
-			} 
-	}
+	my @filtered_res = () ;
 	
+	foreach my $res (@results){
+		
+			if ($res->{'JaccardDistance'} <= $JaccardDistanceThreshold && $s12GowerLegendreDistanceThreshold <= $DotproductDistanceThreshold
+				&& $res->{'DotproductDistance' } <= $DotproductDistanceThreshold && $res->{'HammingDistance'} <= $HammingDistanceThreshold && 
+				$res->{'EuclideanDistance' } <= $EuclideanDistanceThreshold) {
+					
+				push (@filtered_res , $res) ;
+			}
+	}
+	return \@filtered_res ;
 }
-### END of SUB
 
-=head2 METHOD _compare_filtered_res
-	## Description : compare
-	## Input : $results,$filter,$threshold
-	## Ouput : \@filtered_res ;
-	## Usage : my ($filtered_res) = filter_scores_golm_results($results,$filter,$threshold) ;
-
-=cut
-
-#sub _compare_filtered_res() {
-#	my $self = shift ;
-#	my ($filter,$threshold,$results) = @_ ;
-#	
-#	my %jaccard ;
-#	my %euclidean ;
-#	my %s12 ;
-#	my %hamming ;
-#	my %dot ;
-#	
-#	
-#	foreach my $res (@$results){
-#		if ($res->{$filter} < $threshold) {
-#			push (%jaccard , $res) ;
-#		}
-#	} 
-#}
-### END OF SUB
 	
 1 ;
 
