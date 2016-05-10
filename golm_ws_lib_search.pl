@@ -28,6 +28,9 @@ my ( $JaccardDistanceThreshold,$s12GowerLegendreDistanceThreshold,$DotproductDis
 my (@hits, @ojson) = ( () , () ) ;
 my $encoded_spectra ;
 
+## if you put no arguments, function help is started
+if (!@ARGV){ &help ; } 
+
 #=============================================================================
 #                                Manage EXCEPTIONS
 #=============================================================================
@@ -46,7 +49,6 @@ my $encoded_spectra ;
 				"DotproductDistanceThreshold:f"		=> \$DotproductDistanceThreshold,
 				"HammingDistanceThreshold:f"		=> \$HammingDistanceThreshold,
 				"EuclideanDistanceThreshold:f"		=> \$EuclideanDistanceThreshold,
-				"threshold:f"		=> \$threshold, # Optionnal
 				"relative"			=> \$relative
             ) ;
             
@@ -55,18 +57,27 @@ my $encoded_spectra ;
             die "maxIons must be >= 0\n" unless ($maxIons >= 0) ;
             
          
-## if you put the option -help or -h or even no arguments, function help is started
-if ( defined($OptHelp) ){ &help ; }
+## if you put the option -help or -h function help is started         
+if(defined($OptHelp)){ &help ; }
 
 #=============================================================================
 #                                MAIN SCRIPT
 #=============================================================================
 
+## Create new module objects ###
 
+my $oapi = lib::golm_ws_api->new() ;
+my $omsp = lib::msp->new() ;
+
+
+
+############# -------------- Test the Golm web servicee -------------- ############# :
+
+#$oapi->test_query_golm() ;
 
 ############# -------------- Parse the .msp file -------------- ############# :
 
-my $omsp = lib::msp->new() ;
+
 my $ref_mzs_res ;
 my $ref_ints_res ;
 
@@ -90,7 +101,7 @@ elsif (defined $msp_file and defined $mzRes and defined $maxIons and defined $ma
 	
 	$ref_mzs_res = $omsp->get_mzs($msp_file,$mzRes,$maxIons) ;
 	$ref_ints_res = $omsp->get_intensities($msp_file, $maxIons) ;
-	print Dumper $ref_ints_res ;
+	
 	## Sorting intensities
 	my ($mzs_res, $ints_res) = $omsp->sorting_descending_intensities($ref_mzs_res, $ref_ints_res) ;
 	
@@ -111,8 +122,6 @@ elsif (!defined $maxHits or !defined $maxIons or !defined $mzRes) { croak "Param
 
 ############# -------------- Send queries to Golm -------------- ############# :
 
-my $oapi = lib::golm_ws_api->new() ;
-
 foreach my $spectrum (@$encoded_spectra){
 	my ($limited_hits, $res_json) = $oapi->LibrarySearch ($ri, $riWindow, $gcColumn, $spectrum, $maxHits, $JaccardDistanceThreshold,
 																										  $s12GowerLegendreDistanceThreshold,
@@ -126,9 +135,11 @@ foreach my $spectrum (@$encoded_spectra){
 my $o_output = lib::output->new() ;
 my $jsons_output = $o_output->build_json_res_object(\@hits) ;
 
-#print "final".Dumper \@hits ;
-print Dumper $jsons_output ;
+$o_output->html_output($jsons_output) ;
 
+
+#print "final".Dumper \@hits ;
+#print Dumper $jsons_output ;
 
 
 
@@ -164,7 +175,11 @@ USAGE :
 			-maxHits [Maximum hits per queried spectra: integer (0 for all)]
 			-mzRes [Number of digits after the decimal point for m/z values: integer (0 if none)]
 			-maxIons [Number of m/z per spectra you want to keep for the queries, default 0 for all detected ions]
-			-threshold [ignore ions which masses are smaller than the threshold value: float]	
+			-JaccardDistanceThreshold...............[
+			-s12GowerLegendreDistanceThreshold......[  Threshold for each score. Hits with greater scores are ignored: 0 (perfect match) < threshlold <= 1 (mismatch) ]
+			-DotproductDistanceThreshold............[
+			-EuclideanDistanceThreshold.............[
+			-HammingDistanceThreshold[Threshold for hamming score. Hits with greater scores are ignored: 0 - perfect match to higher values indicating a mismatch]
 			-relative [if given in argument, transforms absolute intensities in the msp file into relative intensities: (intensity * 100)/ max(intensitiess)]
 				
 ";
