@@ -221,6 +221,7 @@ sub html_output {
 		            'csvHtml5',
 		            'print'
 		        ],
+		        'scrollX': true,
 		        'scrollY': '50vh',
 		    	'responsive': true,
 		    	'paging': false,
@@ -305,7 +306,7 @@ sub html_output {
       <div class='mdl-layout-spacer'></div>
     </div>
   </header>
-  
+  <br/><br/>
   <main class='mdl-layout__content'>
     <div class='mdl-grid'>
 		<div class='mdl-cell mdl-cell--1-col'></div>
