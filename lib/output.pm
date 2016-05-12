@@ -269,7 +269,7 @@ sub html_output {
 		{
 		    return oTableLocal.\$('tr.row_selected');
 		}
-
+		});
 
 	</script>
 
