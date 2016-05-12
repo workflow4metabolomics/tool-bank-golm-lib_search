@@ -180,9 +180,24 @@ sub html_output {
 	<link rel='stylesheet' type='text/css' href='https://cdn.datatables.net/buttons/1.1.2/css/buttons.dataTables.min.css'>
 	<link rel='stylesheet' type='text/css' href='https://cdn.datatables.net/r/dt/jq-2.1.4,jszip-2.5.0,pdfmake-0.1.18,dt-1.10.9,af-2.0.0,b-1.0.3,b-colvis-1.0.3,b-html5-1.0.3,b-print-1.0.3,se-1.0.1/datatables.min.css'/>
 	<link rel='stylesheet' href='https://code.getmdl.io/1.1.3/material.light_green-orange.min.css' /> 
+	<link rel='stylesheet' href='https://fonts.googleapis.com/icon?family=Material+Icons'>
 	<style type='text/css' class='init'>
 		.row_selected{
 			background-color: #b2b2b2 !important;
+		}
+	</style>
+	<style>
+		.card-wide.mdl-card {
+		  width: 900px;
+		  height: 550px;
+		}
+		.card-wide > .mdl-card__menu {
+		  color: #fff;
+		}
+	</style>
+	<style>
+		.list-icon {
+		  width: 800px;
 		}
 	</style>
     <!-- <script type='text/javascript' language='javascript' src='https://cdn.datatables.net/1.10.11/js/dataTables.material.min.js'></script> -->
@@ -197,6 +212,7 @@ sub html_output {
 	<script type='text/javascript' class='init'>
 		\$(document).ready( function () {
 		    var table = \$('#table_id').DataTable( {
+		    	order: [[ 4, 'asc' ],[ 5, 'asc' ],[ 6, 'asc' ],[ 7, 'asc' ],[ 8, 'asc' ]],
 		    	'orderClasses': false,
 		    	'dom': 'Bfrtip',
 		        buttons: [
@@ -234,7 +250,7 @@ sub html_output {
 		    } );
 
 
-		    \$('a.toggle-vis').on( 'click', function (e) {
+		    \$('button.toggle-vis').on( 'click', function (e) {
 		        e.preventDefault();
 		 
 		        // Get the column API object
@@ -291,18 +307,60 @@ sub html_output {
   </header>
   
   <main class='mdl-layout__content'>
-    <div class='page-content'>
+    <div class='mdl-grid'>
+		<div class='mdl-cell mdl-cell--1-col'></div>
+	    <div class='card-wide mdl-card mdl-cell mdl-cell--4-col mdl-shadow--3dp'>
+	    	<figure class='mdl-card__media' style='background-color: white'>
+	    		<img src='http://m.hiapphere.com/data/icon/201506/HiAppHere_com_com.javiersantos.materialid.png' style='height: 60px; width: 60px;'>
+	    	</figure>
+	    	<div class='mdl-card__title'>
+			    <h2 class='mdl-card__title-text'>Help</h2>
+			</div>
+			<div class='mdl-card__supporting-text'>
+				What can the table do ?
+			</div>
+			<div class='mdl-card__supporting-text'>
+				<ul class='list-icon mdl-list'>
+				  <li class='mdl-list__item'>
+				    <span class='mdl-list__item-primary-content'>
+					    <i class='material-icons mdl-list__item-icon'>filter_list</i>
+					    By default, the 5 distance scores are ordered by ascending values.
+					    You can change ordering as you wish. You can even order data according to multiple columns:
+					    	SHIFT + LEFT CLICK on column headers.
+					</span>
+				  </li>
+				  <li class='mdl-list__item'>
+				    <span class='mdl-list__item-primary-content'>
+					    <i class='material-icons mdl-list__item-icon'>delete_sweep</i>
+					    You can delete multiple lines selected:
+					    Select lines and click on the button Delete selected rows.
+				  	</span>
+				  </li>
+				  <li class='mdl-list__item'>
+				    <span class='mdl-list__item-primary-content'>
+					    <i class='material-icons mdl-list__item-icon'>remove_red_eye</i>
+					    You have the possibility to toggle columns by clicking on the buttons above the table.
+				  </span>
+				  </li>
+				  <li class='mdl-list__item'>
+				    <span class='mdl-list__item-primary-content'>
+					    <i class='material-icons mdl-list__item-icon'>get_app</i>
+					    You can export the table in different formats: CSV & EXCEL, or print and copy it.
+				  </span>
+				  </li>
+				</ul>
+			</div>
+		</div>
+	</div>
 
 
 </br></br></br>
 
 <div style='text-align: center'>
-	<b>Click to hide/show a column:</b> <a class='toggle-vis' data-column='0'><b>N°</b></a> - <a class='toggle-vis' data-column='1'><b>Analyte Name</b></a> - <a class='toggle-vis' data-column=
-	'2'><b>Spectrum Name</b></a> - <a class='toggle-vis' data-column='3'><b>Retention Index</b></a> - <a class='toggle-vis' data-column='4'><b>RI Discrepancy</b></a> - <a class='toggle-vis' data-column=
-	'5'><b>Dot product</b></a> - <a class='toggle-vis' data-column='6'><b>Euclidean</b></a> - <a class='toggle-vis' data-column='7'><b>Jaccard</b></a>
-	 - <a class='toggle-vis' data-column='8'><b>Hamming</b></a> - <a class='toggle-vis' data-column='9'><b>s12 Gower-Legendre</b></a> - <a class='toggle-vis' data-column='10'><b>SpectrumID</b></a>
-	  - <a class='toggle-vis' data-column='11'><b>MetaboliteID</b></a>
-</div>
+	<h5><b>Click to hide/show a column:</b></h5> <button class='mdl-button mdl-js-button mdl-js-ripple-effect toggle-vis' data-column='0'><b>N° Spectre</b></button><button class='mdl-button mdl-js-button mdl-js-ripple-effect toggle-vis' data-column='1'><b>Analyte Name</b></button><button class='mdl-button mdl-js-button mdl-js-ripple-effect toggle-vis' data-column='2'><b>Spectrum Name</b></button><button class='mdl-button mdl-js-button mdl-js-ripple-effect toggle-vis' data-column='3'><b>Retention Index</b></button><button class='mdl-button mdl-js-button mdl-js-ripple-effect toggle-vis' data-column='4'><b>RI Discrepancy</b></button><button class='mdl-button mdl-js-button mdl-js-ripple-effect toggle-vis' data-column='5'><b>Dot product</b></button><button class='mdl-button mdl-js-button mdl-js-ripple-effect toggle-vis' data-column='6'><b>Euclidean</b></button><button class='mdl-button mdl-js-button mdl-js-ripple-effect toggle-vis' data-column='7'><b>Jaccard</b></button>
+	<button class='mdl-button mdl-js-button mdl-js-ripple-effect toggle-vis' data-column='8'><b>Hamming</b></button><button class='mdl-button mdl-js-button mdl-js-ripple-effect toggle-vis' data-column='9'><b>s12 Gower-Legendre</b></button><button class='mdl-button mdl-js-button mdl-js-ripple-effect toggle-vis' data-column='10'><b>SpectrumID</b></button><button class='mdl-button mdl-js-button mdl-js-ripple-effect toggle-vis' data-column='11'><b>MetaboliteID</b></button>
+	</div>
+</br></br>
 </br></br>
 <center>
 	<button class='mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--accent' id='delete'>Delete selected rows</button>
@@ -311,7 +369,7 @@ sub html_output {
 <table id='table_id' class='display stripe nowrap' cellspacing='0' width='100%' >
 	<thead>
 		<tr>
-            <th rowspan='2' style='text-align:center'>N°</th>
+            <th rowspan='2' style='text-align:center'>N° Spectre</th>
             <th colspan='2' style='text-align:center'>Names</th>
             <th colspan='2' style='text-align:center'>Retention Infos</th>
             <th colspan='5' style='text-align:center'>Distance Scores</th>
@@ -333,7 +391,7 @@ sub html_output {
 	</thead>
 	<tfoot>
 		<tr>
-			<th style='text-align:center'>N°</th>
+			<th style='text-align:center'>N° Spectre</th>
 			<th style='text-align:center'>Analyte Name</th>
 			<th style='text-align:center'>Spectrum Name</th>
 			<th style='text-align:center'>Retention Index</th>
