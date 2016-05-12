@@ -185,8 +185,7 @@ sub html_output {
 		.row_selected{
 			background-color: #b2b2b2 !important;
 		}
-	</style>
-	<style>
+		
 		.card-wide.mdl-card {
 		  width: 900px;
 		  height: 550px;
@@ -194,11 +193,12 @@ sub html_output {
 		.card-wide > .mdl-card__menu {
 		  color: #fff;
 		}
-	</style>
-	<style>
+	
 		.list-icon {
 		  width: 800px;
 		}
+		/*Force css to prevent a shift of the table when sorting*/
+		#table_id_wrapper { overflow-x: auto; }
 	</style>
     <!-- <script type='text/javascript' language='javascript' src='https://cdn.datatables.net/1.10.11/js/dataTables.material.min.js'></script> -->
 	<script type='text/javascript' language='javascript' src='https://code.jquery.com/jquery-1.12.0.min.js'></script>
@@ -221,33 +221,31 @@ sub html_output {
 		            'csvHtml5',
 		            'print'
 		        ],
-		        'scrollX': true,
 		        'scrollY': '50vh',
 		    	'responsive': true,
-		    	'paging': false,
-        		'scrollCollapse': true
-		    	// Problem quand on clique sur colonne pour trier: le tableau se décale à droite + plus de scroll bar X
-
-		  //   	initComplete: function () {
-		  //           this.api().columns().every( function () {
-		  //               var column = this;
-		  //               var select = \$('<select><option value=\"\"></option></select>')
-		  //                   .appendTo( \$(column.footer()).empty() )
-		  //                   .on( 'change', function () {
-		  //                       var val = \$.fn.dataTable.util.escapeRegex(
-		  //                           \$(this).val()
-		  //                       );
+		    	'paging': true,
+        		'scrollCollapse': true,
+        		
+		     	initComplete: function () {
+		             this.api().columns().every( function () {
+		                 var column = this;
+		                 var select = \$('<select><option value=\"\"></option></select>')
+		                     .appendTo( \$(column.footer()).empty() )
+		                     .on( 'change', function () {
+		                         var val = \$.fn.dataTable.util.escapeRegex(
+		                             \$(this).val()
+		                         );
 		 
-		  //                       column
-		  //                           .search( val ? '^'+val+'\$' : '', true, false )
-		  //                           .draw();
-		  //                   } );
+		                         column
+		                             .search( val ? '^'+val+'\$' : '', true, false )
+		                             .draw();
+		                     } );
  
-    //             column.data().unique().sort().each( function ( d, j ) {
-     //               select.append( '<option value=\"'+d+'\">'+d+'</option>' )
-     //           } );
-		  //           } );
-		  //       }
+	                 column.data().unique().sort().each( function ( d, j ) {
+	                    select.append( '<option value=\"'+d+'\">'+d+'</option>' )
+	                 } );
+             		} );
+		         }
 		    } );
 
 
