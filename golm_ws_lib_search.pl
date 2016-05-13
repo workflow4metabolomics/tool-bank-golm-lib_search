@@ -24,7 +24,7 @@ use lib::output qw( :ALL ) ;
 ## Initialized values
 my ($OptHelp,$ri,$riWindow,$gcColumn,$msp_file,$maxHits,$mzRes,$maxIons,$threshold,$spectrum_string,$relative) = (undef,undef,undef,undef,undef,undef,undef,undef,undef,undef,undef) ;
 my ( $JaccardDistanceThreshold,$s12GowerLegendreDistanceThreshold,$DotproductDistanceThreshold,$HammingDistanceThreshold,$EuclideanDistanceThreshold ) = (undef,undef,undef,undef,undef) ;
-
+my ($excel_file) = undef ;
 my (@hits, @ojson) = ( () , () ) ;
 my $encoded_spectra ;
 
@@ -49,7 +49,8 @@ if (!@ARGV){ &help ; }
 				"DotproductDistanceThreshold:f"		=> \$DotproductDistanceThreshold,
 				"HammingDistanceThreshold:f"		=> \$HammingDistanceThreshold,
 				"EuclideanDistanceThreshold:f"		=> \$EuclideanDistanceThreshold,
-				"relative"			=> \$relative
+				"relative"			=> \$relative,
+				"excel:s"				=> \$excel_file,
             ) ;
             
             die "maxHits must be >= 0\n" unless ($maxHits >= 0) ;
@@ -68,7 +69,7 @@ if(defined($OptHelp)){ &help ; }
 
 my $oapi = lib::golm_ws_api->new() ;
 my $omsp = lib::msp->new() ;
-
+my $o_output = lib::output->new() ;
 
 
 ############# -------------- Test the Golm web service -------------- ############# :
@@ -132,11 +133,11 @@ foreach my $spectrum (@$encoded_spectra){
 	push (@ojson , $res_json) ;
 }
 
-my $o_output = lib::output->new() ;
+
 my $jsons_output = $o_output->build_json_res_object(\@hits) ;
 
 $o_output->html_output($jsons_output) ;
-
+$o_output->excel_output($excel_file, $jsons_output) ;
 
 #print "final".Dumper \@hits ;
 #print Dumper $jsons_output ;
