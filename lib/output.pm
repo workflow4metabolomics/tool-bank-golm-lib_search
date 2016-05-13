@@ -4,6 +4,7 @@ use strict;
 use warnings ;
 use Exporter ;
 use Carp ;
+use Excel::Writer::XLSX ;
 
 use Data::Dumper ;
 
@@ -11,8 +12,8 @@ use vars qw($VERSION @ISA @EXPORT %EXPORT_TAGS);
 
 our $VERSION = "1.0";
 our @ISA = qw(Exporter);
-our @EXPORT = qw(build_json_res_object html_output);
-our %EXPORT_TAGS = ( ALL => [qw(build_json_res_object html_output)] );
+our @EXPORT = qw(build_json_res_object html_output excel_output);
+our %EXPORT_TAGS = ( ALL => [qw(build_json_res_object html_output excel_output)] );
 
 =head1 NAME
 My::Module - An example module
@@ -89,10 +90,10 @@ sub new {
 #														.
 #														.
 #													]
-#								.
-#								.
-#								.
 #							}
+#							.
+#							.
+#							.
 #						]
 =cut
 ## START of SUB
@@ -337,8 +338,9 @@ sub html_output {
 					    <span class='mdl-list__item-primary-content'>
 						    <i class='material-icons mdl-list__item-icon'>filter_list</i>
 						    By default, the 5 distance scores are ordered by ascending values.
-						    You can change ordering as you wish. You can even order data according to multiple columns:
+						    You can manage your data ordering as you wish. You can even order data according to multiple columns:
 						    	SHIFT + LEFT CLICK on column headers.
+						    You can sort data specifically by clicking on any entry in boxes under each columns.
 						</span>
 					  </li>
 					  <li class='mdl-list__item'>
@@ -351,13 +353,13 @@ sub html_output {
 					  <li class='mdl-list__item'>
 					    <span class='mdl-list__item-primary-content'>
 						    <i class='material-icons mdl-list__item-icon'>remove_red_eye</i>
-						    You have the possibility to toggle columns by clicking on the buttons above the table.
+						    You have the possibility to toggle columns by clicking on Column Visibility, and Show All buttons.
 					  </span>
 					  </li>
 					  <li class='mdl-list__item'>
 					    <span class='mdl-list__item-primary-content'>
 						    <i class='material-icons mdl-list__item-icon'>get_app</i>
-						    You can export the table in different formats: CSV & EXCEL, or print and copy it.
+						    You can print or copy the table with Copy and Print buttons.
 					  </span>
 					  </li>
 				</ul>
@@ -466,6 +468,74 @@ sub html_output {
     
     
     
+}
+## END of SUB
+
+
+=head2 METHOD excel_output
+
+	## Description : create an excel output of the results
+	## Input : $jsons, $excel_file
+	## Output :  $xls_output
+	## Usage : my ( $xls_output ) = excel_output( $jsons, $excel_file ) ;
+=cut
+## START of SUB
+sub excel_output {
+	## Retrieve Values
+    my $self = shift ;
+    my ( $excel_file, $jsons ) = @_ ;
+    
+    open (FILE, '>', $excel_file) or die "Failed to open filehandle: $!" ;
+    
+    # Create a new workbook and add a worksheet
+    my $workbook  = Excel::Writer::XLSX->new( \*FILE ) ;
+    my $worksheet = $workbook->add_worksheet() ;
+    
+    my $i = 0 ;
+    
+    # Create a format for the headings
+    my $format = $workbook->add_format() ;
+    $format->set_bold() ;
+    
+    $worksheet->write( $i, 0, "Num Spectre" , $format);
+	$worksheet->write( $i, 1, "Analyte Name" , $format);
+	$worksheet->write( $i, 2, "Spectrum Name" , $format);
+	$worksheet->write( $i, 3, "Retention Index" , $format);
+	$worksheet->write( $i, 4, "RI Discrepancy" , $format);
+	$worksheet->write( $i, 5, "DotproductDistance" , $format);
+	$worksheet->write( $i, 6, "EuclideanDistance" , $format);
+	$worksheet->write( $i, 7, "JaccardDistance" , $format);
+	$worksheet->write( $i, 8, "HammingDistance" , $format);
+	$worksheet->write( $i, 9, "s12GowerLegendreDistance" , $format);
+	$worksheet->write( $i, 10, "Spectrum ID" , $format);
+	$worksheet->write( $i, 11, "Metabolite ID" , $format);
+   
+    $i++;
+    
+   foreach my $href_grp (@$jsons) {
+		
+			foreach my $hit ( @{$href_grp->{'searchResults'}} ){
+				
+					$worksheet->write( $i, 0, $href_grp->{id} );
+			   		$worksheet->write( $i, 1, $hit->{analyte}{name} );
+			   		$worksheet->write( $i, 2, $hit->{spectrum}{name} );
+			   		$worksheet->write( $i, 3, $hit->{ri_infos}{ri} );
+			   		$worksheet->write( $i, 4, $hit->{ri_infos}{riDiscrepancy} );
+			   		$worksheet->write( $i, 5, $hit->{distance_scores}{DotproductDistance} );
+			   		$worksheet->write( $i, 6, $hit->{distance_scores}{EuclideanDistance} );
+			   		$worksheet->write( $i, 7, $hit->{distance_scores}{JaccardDistance} );
+			   		$worksheet->write( $i, 8, $hit->{distance_scores}{HammingDistance} );
+			   		$worksheet->write( $i, 9, $hit->{distance_scores}{s12GowerLegendreDistance} );
+			   		$worksheet->write( $i, 10, $hit->{spectrum}{id} );
+			   		$worksheet->write( $i, 11, $hit->{metaboliteID} );
+			   		
+			   		$i++;
+			}	
+	}
+
+   $workbook->close();
+   
+   binmode STDOUT ;
 }
 ## END of SUB
 
