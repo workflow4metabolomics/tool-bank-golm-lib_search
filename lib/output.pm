@@ -200,6 +200,18 @@ sub html_output {
 		/*Force css to prevent a shift of the table when sorting*/
 		#table_id_wrapper { overflow-x: auto; }
 	</style>
+	<style type='text/css' class='init'>
+		.mdl-dialog {
+		    border: none;
+		    box-shadow: 0 9px 46px 8px rgba(0,0,0,.14),0 11px 15px -7px rgba(0,0,0,.12),0 24px 38px 3px rgba(0,0,0,.2);
+		    width: 45%;
+		}
+		.mdl-button {
+			height: 40px;
+		}
+	</style>
+	
+	
     <!-- <script type='text/javascript' language='javascript' src='https://cdn.datatables.net/1.10.11/js/dataTables.material.min.js'></script> -->
 	<script type='text/javascript' language='javascript' src='https://code.jquery.com/jquery-1.12.0.min.js'></script>
 	<script type='text/javascript' language='javascript' src='https://cdn.datatables.net/select/1.1.2/js/dataTables.select.min.js'></script>
@@ -214,8 +226,16 @@ sub html_output {
 		    var table = \$('#table_id').DataTable( {
 		    	order: [[ 4, 'asc' ],[ 5, 'asc' ],[ 6, 'asc' ],[ 7, 'asc' ],[ 8, 'asc' ]],
 		    	'orderClasses': false,
-		    	'dom': 'Bfrtip',
+		    	'dom': 'Bfrltip',
 		        buttons: [
+		        	{
+		                extend: 'colvisGroup',
+		                text: 'Show all',
+		                show: ':hidden'
+		            },
+		            {
+		                extend: 'colvis',
+		            },
 		            'copyHtml5',
 		            'excelHtml5',
 		            'csvHtml5',
@@ -225,6 +245,8 @@ sub html_output {
 		    	'responsive': true,
 		    	'paging': true,
         		'scrollCollapse': true,
+        		'lengthMenu': [[10, 25, 50, -1], [10, 25, 50, 'All']],
+
         		
 		     	initComplete: function () {
 		             this.api().columns().every( function () {
@@ -246,6 +268,8 @@ sub html_output {
 	                 } );
              		} );
 		         }
+
+
 		    } );
 
 
@@ -299,71 +323,73 @@ sub html_output {
   <header class='mdl-layout__header'>
     <div class='mdl-layout__header-row'>
       <!-- Title -->
-      <span class='mdl-layout-title'><h3><b>Visualisation of Golm Database Results</b></h3></span>
+      <span class='mdl-layout-title'><h2><b>Visualisation of Golm Database Results</b></h2></span>
       <!-- Add spacer, to align navigation to the right -->
       <div class='mdl-layout-spacer'></div>
+      <!-- Navigation -->
+      <nav class='mdl-navigation'>
+        <button id='show-dialog' type='button' class='mdl-button'><img src='http://m.hiapphere.com/data/icon/201506/HiAppHere_com_com.javiersantos.materialid.png' style='height: 40px; width: 40px;'></button>
+		  <dialog class='mdl-dialog'>
+		    <h4 class='mdl-dialog__title'>What can the table do ?</h4>
+		    <div class='mdl-dialog__content'>
+		      <ul class='list-icon mdl-list'>
+					  <li class='mdl-list__item'>
+					    <span class='mdl-list__item-primary-content'>
+						    <i class='material-icons mdl-list__item-icon'>filter_list</i>
+						    By default, the 5 distance scores are ordered by ascending values.
+						    You can change ordering as you wish. You can even order data according to multiple columns:
+						    	SHIFT + LEFT CLICK on column headers.
+						</span>
+					  </li>
+					  <li class='mdl-list__item'>
+					    <span class='mdl-list__item-primary-content'>
+						    <i class='material-icons mdl-list__item-icon'>delete_sweep</i>
+						    You can delete multiple lines selected:
+						    Select lines and click on the button Delete selected rows.
+					  	</span>
+					  </li>
+					  <li class='mdl-list__item'>
+					    <span class='mdl-list__item-primary-content'>
+						    <i class='material-icons mdl-list__item-icon'>remove_red_eye</i>
+						    You have the possibility to toggle columns by clicking on the buttons above the table.
+					  </span>
+					  </li>
+					  <li class='mdl-list__item'>
+					    <span class='mdl-list__item-primary-content'>
+						    <i class='material-icons mdl-list__item-icon'>get_app</i>
+						    You can export the table in different formats: CSV & EXCEL, or print and copy it.
+					  </span>
+					  </li>
+				</ul>
+		    </div>
+		    <div class='mdl-dialog__actions'>
+		      <button type='button' class='mdl-button close'>Thanks!</button>
+		    </div>
+		  </dialog>
+		  <script>
+		    var dialog = document.querySelector('dialog');
+		    var showDialogButton = document.querySelector('#show-dialog');
+		    if (! dialog.showModal) {
+		      dialogPolyfill.registerDialog(dialog);
+		    }
+		    showDialogButton.addEventListener('click', function() {
+		      dialog.showModal();
+		    });
+		    dialog.querySelector('.close').addEventListener('click', function() {
+		      dialog.close();
+		    });
+		  </script>
+      </nav>
     </div>
   </header>
-  <br/><br/>
+  <br/>
   <main class='mdl-layout__content'>
-    <div class='mdl-grid'>
-		<div class='mdl-cell mdl-cell--1-col'></div>
-	    <div class='card-wide mdl-card mdl-cell mdl-cell--4-col mdl-shadow--3dp'>
-	    	<figure class='mdl-card__media' style='background-color: white'>
-	    		<img src='http://m.hiapphere.com/data/icon/201506/HiAppHere_com_com.javiersantos.materialid.png' style='height: 60px; width: 60px;'>
-	    	</figure>
-	    	<div class='mdl-card__title'>
-			    <h2 class='mdl-card__title-text'>Help</h2>
-			</div>
-			<div class='mdl-card__supporting-text'>
-				What can the table do ?
-			</div>
-			<div class='mdl-card__supporting-text'>
-				<ul class='list-icon mdl-list'>
-				  <li class='mdl-list__item'>
-				    <span class='mdl-list__item-primary-content'>
-					    <i class='material-icons mdl-list__item-icon'>filter_list</i>
-					    By default, the 5 distance scores are ordered by ascending values.
-					    You can change ordering as you wish. You can even order data according to multiple columns:
-					    	SHIFT + LEFT CLICK on column headers.
-					</span>
-				  </li>
-				  <li class='mdl-list__item'>
-				    <span class='mdl-list__item-primary-content'>
-					    <i class='material-icons mdl-list__item-icon'>delete_sweep</i>
-					    You can delete multiple lines selected:
-					    Select lines and click on the button Delete selected rows.
-				  	</span>
-				  </li>
-				  <li class='mdl-list__item'>
-				    <span class='mdl-list__item-primary-content'>
-					    <i class='material-icons mdl-list__item-icon'>remove_red_eye</i>
-					    You have the possibility to toggle columns by clicking on the buttons above the table.
-				  </span>
-				  </li>
-				  <li class='mdl-list__item'>
-				    <span class='mdl-list__item-primary-content'>
-					    <i class='material-icons mdl-list__item-icon'>get_app</i>
-					    You can export the table in different formats: CSV & EXCEL, or print and copy it.
-				  </span>
-				  </li>
-				</ul>
-			</div>
-		</div>
-	</div>
 
-
-</br></br></br>
-
-<div style='text-align: center'>
-	<h5><b>Click to hide/show a column:</b></h5> <button class='mdl-button mdl-js-button mdl-js-ripple-effect toggle-vis' data-column='0'><b>N° Spectre</b></button><button class='mdl-button mdl-js-button mdl-js-ripple-effect toggle-vis' data-column='1'><b>Analyte Name</b></button><button class='mdl-button mdl-js-button mdl-js-ripple-effect toggle-vis' data-column='2'><b>Spectrum Name</b></button><button class='mdl-button mdl-js-button mdl-js-ripple-effect toggle-vis' data-column='3'><b>Retention Index</b></button><button class='mdl-button mdl-js-button mdl-js-ripple-effect toggle-vis' data-column='4'><b>RI Discrepancy</b></button><button class='mdl-button mdl-js-button mdl-js-ripple-effect toggle-vis' data-column='5'><b>Dot product</b></button><button class='mdl-button mdl-js-button mdl-js-ripple-effect toggle-vis' data-column='6'><b>Euclidean</b></button><button class='mdl-button mdl-js-button mdl-js-ripple-effect toggle-vis' data-column='7'><b>Jaccard</b></button>
-	<button class='mdl-button mdl-js-button mdl-js-ripple-effect toggle-vis' data-column='8'><b>Hamming</b></button><button class='mdl-button mdl-js-button mdl-js-ripple-effect toggle-vis' data-column='9'><b>s12 Gower-Legendre</b></button><button class='mdl-button mdl-js-button mdl-js-ripple-effect toggle-vis' data-column='10'><b>SpectrumID</b></button><button class='mdl-button mdl-js-button mdl-js-ripple-effect toggle-vis' data-column='11'><b>MetaboliteID</b></button>
-	</div>
-</br></br>
 </br></br>
 <center>
 	<button class='mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--accent' id='delete'>Delete selected rows</button>
 <center>
+</br>
 <!-- <table id='table_id' class='mdl-data-table mdl-js-data-table mdl-shadow--2dp' cellpadding='0' cellspacing='0' border='0' width='100%' > -->
 <table id='table_id' class='display stripe nowrap' cellspacing='0' width='100%' >
 	<thead>
