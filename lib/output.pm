@@ -174,19 +174,13 @@ sub html_output {
 <html>
 <head>
 	<meta charset='UTF-8'>
-	<!-- <link rel='stylesheet' type='text/css' href='https://cdnjs.cloudflare.com/ajax/libs/material-design-lite/1.1.0/material.min.css'>
-	<link rel='stylesheet' type='text/css' href='https://cdn.datatables.net/1.10.11/css/dataTables.material.min.css'> -->
 	<link rel='stylesheet' type='text/css' href='https://cdn.datatables.net/1.10.11/css/jquery.dataTables.min.css'>
-	<link rel='stylesheet' type='text/css' href='https://cdn.datatables.net/select/1.1.2/css/select.dataTables.min.css'>
+	<link rel='stylesheet' type='text/css' href='https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.4.0/css/font-awesome.min.css'>
 	<link rel='stylesheet' type='text/css' href='https://cdn.datatables.net/buttons/1.1.2/css/buttons.dataTables.min.css'>
 	<link rel='stylesheet' type='text/css' href='https://cdn.datatables.net/r/dt/jq-2.1.4,jszip-2.5.0,pdfmake-0.1.18,dt-1.10.9,af-2.0.0,b-1.0.3,b-colvis-1.0.3,b-html5-1.0.3,b-print-1.0.3,se-1.0.1/datatables.min.css'/>
 	<link rel='stylesheet' href='https://code.getmdl.io/1.1.3/material.light_green-orange.min.css' /> 
 	<link rel='stylesheet' href='https://fonts.googleapis.com/icon?family=Material+Icons'>
 	<style type='text/css' class='init'>
-		.row_selected{
-			background-color: #b2b2b2 !important;
-		}
-		
 		.card-wide.mdl-card {
 		  width: 900px;
 		  height: 550px;
@@ -200,6 +194,10 @@ sub html_output {
 		}
 		/*Force css to prevent a shift of the table when sorting*/
 		#table_id_wrapper { overflow-x: auto; }
+		
+		.dataTables_wrapper {
+		    width: 92%;
+		}
 	</style>
 	<style type='text/css' class='init'>
 		.mdl-dialog {
@@ -213,12 +211,11 @@ sub html_output {
 	</style>
 	
 	
-    <!-- <script type='text/javascript' language='javascript' src='https://cdn.datatables.net/1.10.11/js/dataTables.material.min.js'></script> -->
 	<script type='text/javascript' language='javascript' src='https://code.jquery.com/jquery-1.12.0.min.js'></script>
 	<script type='text/javascript' language='javascript' src='https://cdn.datatables.net/select/1.1.2/js/dataTables.select.min.js'></script>
 	<script type='text/javascript' language='javascript' src='https://cdn.datatables.net/buttons/1.1.2/js/dataTables.buttons.min.js'></script>
-	<script type='text/javascript' language='javascript' src='https://cdn.datatables.net/buttons/1.1.2/js/dataTables.buttons.min.js'></script>
 	<script type='text/javascript' language='javascript' src='https://cdn.datatables.net/buttons/1.1.2/js/buttons.html5.min.js'></script>
+	<script type='text/javascript' language='javascript' src='https://cdn.datatables.net/buttons/1.1.2/js/buttons.print.min.js'></script>
 	<script type='text/javascript' language='javascript' src='https://cdn.datatables.net/1.10.11/js/jquery.dataTables.min.js'></script>
 	<script type='text/javascript' src='https://cdn.datatables.net/r/dt/jq-2.1.4,jszip-2.5.0,pdfmake-0.1.18,dt-1.10.9,af-2.0.0,b-1.0.3,b-colvis-1.0.3,b-html5-1.0.3,b-print-1.0.3,se-1.0.1/datatables.min.js'></script>
 	<script defer src='https://code.getmdl.io/1.1.3/material.min.js'></script>
@@ -227,26 +224,41 @@ sub html_output {
 		    var table = \$('#table_id').DataTable( {
 		    	order: [[ 4, 'asc' ],[ 5, 'asc' ],[ 6, 'asc' ],[ 7, 'asc' ],[ 8, 'asc' ]],
 		    	'orderClasses': false,
-		    	'dom': 'Bfrltip',
+		    	'dom': 'Bfrtilp',
 		        buttons: [
-		        	{
-		                extend: 'colvisGroup',
-		                text: 'Show all',
-		                show: ':hidden'
+		            {
+		                extend:    'copyHtml5',
+		                text:      '<i class=\"material-icons\">content_copy</i>',
+		                titleAttr: 'Copy'
 		            },
 		            {
-		                extend: 'colvis',
+		                extend: 'print',
+		                text:      '<i class=\"material-icons\">print</i>',
+		                titleAttr: 'Print',
+		                exportOptions: {
+		                    columns: ':visible'
+		                }
 		            },
-		            'copyHtml5',
-		            'excelHtml5',
-		            'csvHtml5',
-		            'print'
+		            {
+		                extend: 'collection',
+		                text:		'<i class=\"material-icons\">file_download</i>',
+		                titleAttr: 'Export',
+		                buttons: [
+		                    'excelHtml5',
+		            		'csvHtml5'
+		                ]
+		            },
+		            {
+		            	text: 'Show more',
+		                extend: 'colvis',
+		                postfixButtons: [ 'colvisRestore' ]
+		            },
 		        ],
 		        'scrollY': '50vh',
 		    	'responsive': true,
 		    	'paging': true,
         		'scrollCollapse': true,
-        		'lengthMenu': [[10, 25, 50, -1], [10, 25, 50, 'All']],
+        		'lengthMenu': [[5, 10, 25, 50, -1], [5, 10, 25, 50, 'All']],
 
         		
 		     	initComplete: function () {
@@ -273,42 +285,14 @@ sub html_output {
 
 		    } );
 
-
-		    \$('button.toggle-vis').on( 'click', function (e) {
-		        e.preventDefault();
-		 
-		        // Get the column API object
-		        var column = table.column( \$(this).attr('data-column') );
-		 
-		        // Toggle the visibility
-		        column.visible( ! column.visible() );
-			} );
-			
-			
-			/* Add a click handler to the rows - this could be used as a callback */
-		    \$('#table_id tbody tr').click( function( e ) {
-		        if ( \$(this).hasClass('row_selected') ) {
-		            \$(this).removeClass('row_selected');
-		        }
-		        else {
-		            table.\$('tr.row_selected')
-		            \$(this).addClass('row_selected');
-		        }
-		    });
-
-		     
-		    /* Add a click handler for the delete row */
-		    \$('#delete').click( function() {
-		        var anSelected = fnGetSelected( table );
-		        \$(anSelected).remove().draw();
+			\$('#table_id tbody').on( 'click', 'tr', function () {
+		        \$(this).toggleClass('selected');
 		    } );
-		 
-		 
-		/* Get the rows which are currently selected */
-		function fnGetSelected( oTableLocal )
-		{
-		    return oTableLocal.\$('tr.row_selected');
-		}
+		     
+		    /* Add a click handler for the delete button */
+		    \$('#delete').click( function() {
+		        table.rows( '.selected' ).remove().draw();
+		    } );
 		});
 
 	</script>
@@ -324,7 +308,7 @@ sub html_output {
   <header class='mdl-layout__header'>
     <div class='mdl-layout__header-row'>
       <!-- Title -->
-      <span class='mdl-layout-title'><h2><b>Visualisation of Golm Database Results</b></h2></span>
+      <span class='mdl-layout-title'><h2><b>Vizualisation of Golm Database Results</b></h2></span>
       <!-- Add spacer, to align navigation to the right -->
       <div class='mdl-layout-spacer'></div>
       <!-- Navigation -->
@@ -392,14 +376,13 @@ sub html_output {
 	<button class='mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--accent' id='delete'>Delete selected rows</button>
 <center>
 </br>
-<!-- <table id='table_id' class='mdl-data-table mdl-js-data-table mdl-shadow--2dp' cellpadding='0' cellspacing='0' border='0' width='100%' > -->
-<table id='table_id' class='display stripe nowrap' cellspacing='0' width='100%' >
+<table id='table_id' class='display stripe' cellspacing='0' width='100%' >
 	<thead>
 		<tr>
-            <th rowspan='2' style='text-align:center'>N° Spectre</th>
-            <th colspan='2' style='text-align:center'>Names</th>
-            <th colspan='2' style='text-align:center'>Retention Infos</th>
-            <th colspan='5' style='text-align:center'>Distance Scores</th>
+            <th rowspan='2' style='text-align:center'>N° SPECTRES</th>
+            <th colspan='2' style='text-align:center'>NAMES</th>
+            <th colspan='2' style='text-align:center'>RETENTION INFOS</th>
+            <th colspan='5' style='text-align:center'>DISTANCE SCORES</th>
             <th colspan='2' style='text-align:center'>IDs</th>
         </tr>
 		<tr>
@@ -455,7 +438,6 @@ sub html_output {
 	print HTML "
 	</tbody>
 </table>
-
 
 
 	</div>
