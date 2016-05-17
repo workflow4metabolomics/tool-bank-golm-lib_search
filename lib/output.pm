@@ -177,6 +177,7 @@ sub html_output {
 	<link rel='stylesheet' type='text/css' href='https://cdn.datatables.net/1.10.11/css/jquery.dataTables.min.css'>
 	<link rel='stylesheet' type='text/css' href='https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.4.0/css/font-awesome.min.css'>
 	<link rel='stylesheet' type='text/css' href='https://cdn.datatables.net/buttons/1.1.2/css/buttons.dataTables.min.css'>
+	<link rel='stylesheet' type='text/css' href='https://cdnjs.cloudflare.com/ajax/libs/dialog-polyfill/0.4.3/dialog-polyfill.min.css'>
 	<link rel='stylesheet' type='text/css' href='https://cdn.datatables.net/r/dt/jq-2.1.4,jszip-2.5.0,pdfmake-0.1.18,dt-1.10.9,af-2.0.0,b-1.0.3,b-colvis-1.0.3,b-html5-1.0.3,b-print-1.0.3,se-1.0.1/datatables.min.css'/>
 	<link rel='stylesheet' href='https://code.getmdl.io/1.1.3/material.light_green-orange.min.css' /> 
 	<link rel='stylesheet' href='https://fonts.googleapis.com/icon?family=Material+Icons'>
@@ -198,6 +199,14 @@ sub html_output {
 		.dataTables_wrapper {
 		    width: 92%;
 		}
+		
+		#mydialog + .backdrop {
+		  background-color: green;
+		}
+		
+		#mydialog::backdrop {
+		  background-color: green;
+		}
 	</style>
 	<style type='text/css' class='init'>
 		.mdl-dialog {
@@ -208,6 +217,16 @@ sub html_output {
 		.mdl-button {
 			height: 40px;
 		}
+		
+		.dataTables_wrapper .dataTables_length {
+		    float: left;
+		    padding-top: 11px;
+		    padding-left: 30px;
+		}
+		
+		td.highlight {
+		    background-color: whitesmoke !important;
+		}
 	</style>
 	
 	
@@ -217,12 +236,13 @@ sub html_output {
 	<script type='text/javascript' language='javascript' src='https://cdn.datatables.net/buttons/1.1.2/js/buttons.html5.min.js'></script>
 	<script type='text/javascript' language='javascript' src='https://cdn.datatables.net/buttons/1.1.2/js/buttons.print.min.js'></script>
 	<script type='text/javascript' language='javascript' src='https://cdn.datatables.net/1.10.11/js/jquery.dataTables.min.js'></script>
+	<script type='text/javascript' language='javascript' src='https://cdnjs.cloudflare.com/ajax/libs/dialog-polyfill/0.4.3/dialog-polyfill.min.js'></script>
 	<script type='text/javascript' src='https://cdn.datatables.net/r/dt/jq-2.1.4,jszip-2.5.0,pdfmake-0.1.18,dt-1.10.9,af-2.0.0,b-1.0.3,b-colvis-1.0.3,b-html5-1.0.3,b-print-1.0.3,se-1.0.1/datatables.min.js'></script>
 	<script defer src='https://code.getmdl.io/1.1.3/material.min.js'></script>
 	<script type='text/javascript' class='init'>
 		\$(document).ready( function () {
 		    var table = \$('#table_id').DataTable( {
-		    	order: [[ 4, 'asc' ],[ 5, 'asc' ],[ 6, 'asc' ],[ 7, 'asc' ],[ 8, 'asc' ]],
+		    	order: [[ 5, 'asc' ],[ 6, 'asc' ],[ 7, 'asc' ],[ 8, 'asc' ],[ 9, 'asc' ]],
 		    	'orderClasses': false,
 		    	'dom': 'Bfrtilp',
 		        buttons: [
@@ -254,6 +274,16 @@ sub html_output {
 		                postfixButtons: [ 'colvisRestore' ]
 		            },
 		        ],
+		        'columnDefs': [
+		            {
+		                'targets': [ 10 ],
+		                'visible': false,
+		            },
+		            {
+		                'targets': [ 11 ],
+		                'visible': false
+		            }
+		        ],
 		        'scrollY': '50vh',
 		    	'responsive': true,
 		    	'paging': true,
@@ -284,6 +314,14 @@ sub html_output {
 
 
 		    } );
+		    
+		    \$('#table_id tbody')
+        	.on( 'mouseenter', 'td', function () {
+            	var colIdx = table.cell(this).index().column;
+ 
+            	\$( table.cells().nodes() ).removeClass( 'highlight' );
+            	\$( table.column( colIdx ).nodes() ).addClass( 'highlight' );
+        	} );
 
 			\$('#table_id tbody').on( 'click', 'tr', function () {
 		        \$(this).toggleClass('selected');
