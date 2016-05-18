@@ -214,8 +214,16 @@ sub html_output {
 		    box-shadow: 0 9px 46px 8px rgba(0,0,0,.14),0 11px 15px -7px rgba(0,0,0,.12),0 24px 38px 3px rgba(0,0,0,.2);
 		    width: 45%;
 		}
-		.mdl-button {
+		.buttons-copy, .buttons-print, .buttons-collection {
 			height: 40px;
+		    margin-right: 10px;
+		    padding-right: 0px;
+		    padding-left: 0px;
+		    margin-left: 10px;
+		}
+		
+		.mdl-button--accent.mdl-button--accent.mdl-button--raised, .mdl-button--accent.mdl-button--accent.mdl-button--fab {
+		    background-color: #E3E3E3;
 		}
 		
 		.dataTables_wrapper .dataTables_length {
@@ -224,9 +232,22 @@ sub html_output {
 		    padding-left: 30px;
 		}
 		
-		td.highlight {
-		    background-color: whitesmoke !important;
+		.dataTables_wrapper {
+			text-align: center;
 		}
+		
+		table.display tbody tr:hover td {
+		    background-color: #B9DBD5 !important;
+		}
+		
+		.selected {
+		    background-color: #96ADA6 !important ;
+		 }
+		 
+		 .buttons-colvis {
+		 	padding-left: 15px; 
+		 	padding-right: 15px;	
+		 }
 	</style>
 	
 	
@@ -248,12 +269,12 @@ sub html_output {
 		        buttons: [
 		            {
 		                extend:    'copyHtml5',
-		                text:      '<i class=\"material-icons\">content_copy</i>',
+		                text:      '<i class=\"material-icons\" style=\"height:20px\">content_copy</i>',
 		                titleAttr: 'Copy'
 		            },
 		            {
 		                extend: 'print',
-		                text:      '<i class=\"material-icons\">print</i>',
+		                text:      '<i class=\"material-icons\" style=\"height:20px ; padding:\">print</i>',
 		                titleAttr: 'Print',
 		                exportOptions: {
 		                    columns: ':visible'
@@ -261,7 +282,7 @@ sub html_output {
 		            },
 		            {
 		                extend: 'collection',
-		                text:		'<i class=\"material-icons\">file_download</i>',
+		                text:		'<i class=\"material-icons\" style=\"height:20px\">file_download</i>',
 		                titleAttr: 'Export',
 		                buttons: [
 		                    'excelHtml5',
@@ -269,10 +290,10 @@ sub html_output {
 		                ]
 		            },
 		            {
-		            	text: 'Show more',
+		            	text: 'SHOW MORE',
 		                extend: 'colvis',
 		                postfixButtons: [ 'colvisRestore' ]
-		            },
+		            }
 		        ],
 		        'columnDefs': [
 		            {
@@ -315,14 +336,6 @@ sub html_output {
 
 		    } );
 		    
-		    \$('#table_id tbody')
-        	.on( 'mouseenter', 'td', function () {
-            	var colIdx = table.cell(this).index().column;
- 
-            	\$( table.cells().nodes() ).removeClass( 'highlight' );
-            	\$( table.column( colIdx ).nodes() ).addClass( 'highlight' );
-        	} );
-
 			\$('#table_id tbody').on( 'click', 'tr', function () {
 		        \$(this).toggleClass('selected');
 		    } );
@@ -331,6 +344,10 @@ sub html_output {
 		    \$('#delete').click( function() {
 		        table.rows( '.selected' ).remove().draw();
 		    } );
+		    
+		    \$('.buttons-copy, .buttons-print, .buttons-collection, .buttons-colvis, .buttons-columnVisibility').each(function() {
+			   \$(this).removeClass('dt-button').addClass('mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--accent')
+			})
 		});
 
 	</script>
@@ -346,7 +363,7 @@ sub html_output {
   <header class='mdl-layout__header'>
     <div class='mdl-layout__header-row'>
       <!-- Title -->
-      <span class='mdl-layout-title'><h2><b>Vizualisation of Golm Database Results</b></h2></span>
+      <span class='mdl-layout-title'><h2><b>Visualization of Golm Database Results</b></h2></span>
       <!-- Add spacer, to align navigation to the right -->
       <div class='mdl-layout-spacer'></div>
       <!-- Navigation -->
@@ -410,9 +427,9 @@ sub html_output {
   <main class='mdl-layout__content'>
 
 </br></br>
-<center>
-	<button class='mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--accent' id='delete'>Delete selected rows</button>
-<center>
+
+	
+
 </br>
 <table id='table_id' class='display stripe' cellspacing='0' width='100%' >
 	<thead>
@@ -476,7 +493,7 @@ sub html_output {
 	print HTML "
 	</tbody>
 </table>
-
+<button class='mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--accent' id='delete' style='position:relative'>Delete selected rows</button>
 
 	</div>
   </main>
