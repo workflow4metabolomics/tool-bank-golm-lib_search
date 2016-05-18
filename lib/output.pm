@@ -194,10 +194,19 @@ sub html_output {
 		  width: 800px;
 		}
 		/*Force css to prevent a shift of the table when sorting*/
-		#table_id_wrapper { overflow-x: auto; }
+		#table_id_wrapper { 
+			overflow-x: auto;
+		    margin-left: 100px;
+		    margin-right: 100px;
+		}
+				
+		.toolbar {
+		    float: left;
+		}
 		
-		.dataTables_wrapper {
-		    width: 92%;
+		.dt-buttons {
+			padding-right: 10px ;	
+			margin-bottom: 20px;
 		}
 		
 		#mydialog + .backdrop {
@@ -226,6 +235,17 @@ sub html_output {
 		    background-color: #E3E3E3;
 		}
 		
+		.mdl-button {
+			height: 40px;	
+		}
+		
+		#show-dialog {
+		    padding-left: 0px;
+		    padding-right: 0px;
+		    min-width: 40px;
+		    border-radius: 50%;
+		}
+		
 		.dataTables_wrapper .dataTables_length {
 		    float: left;
 		    padding-top: 11px;
@@ -244,10 +264,10 @@ sub html_output {
 		    background-color: #96ADA6 !important ;
 		 }
 		 
-		 .buttons-colvis {
+		.buttons-colvis {
 		 	padding-left: 15px; 
 		 	padding-right: 15px;	
-		 }
+		}		
 	</style>
 	
 	
@@ -265,7 +285,7 @@ sub html_output {
 		    var table = \$('#table_id').DataTable( {
 		    	order: [[ 5, 'asc' ],[ 6, 'asc' ],[ 7, 'asc' ],[ 8, 'asc' ],[ 9, 'asc' ]],
 		    	'orderClasses': false,
-		    	'dom': 'Bfrtilp',
+		    	'dom': 'B<\"toolbar\">frtilp',
 		        buttons: [
 		            {
 		                extend:    'copyHtml5',
@@ -307,7 +327,7 @@ sub html_output {
 		        ],
 		        'scrollY': '50vh',
 		    	'responsive': true,
-		    	'paging': true,
+		    	'paginationType': 'full_numbers',
         		'scrollCollapse': true,
         		'lengthMenu': [[5, 10, 25, 50, -1], [5, 10, 25, 50, 'All']],
 
@@ -335,6 +355,8 @@ sub html_output {
 
 
 		    } );
+		    
+		    \$('div.toolbar').html(\"<button class='mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--accent' id='delete'>Delete selected rows</button>\");
 		    
 			\$('#table_id tbody').on( 'click', 'tr', function () {
 		        \$(this).toggleClass('selected');
@@ -441,17 +463,17 @@ sub html_output {
             <th colspan='2' style='text-align:center'>IDs</th>
         </tr>
 		<tr>
-			<th style='text-align:center'>Analyte Name</th>
-			<th style='text-align:center'>Spectrum Name</th>
+			<th style='text-align:center;border-left: 1px solid #111;'>Analyte Name</th>
+			<th style='text-align:center;border-right: 1px solid #111;'>Spectrum Name</th>
 			<th style='text-align:center'>Retention Index</th>
-			<th style='text-align:center'>RI Discrepancy</th>
+			<th style='text-align:center;border-right: 1px solid #111;'>RI Discrepancy</th>
 			<th style='text-align:center'>Dot product</th>
 			<th style='text-align:center'>Euclidean</th>
 			<th style='text-align:center'>Jaccard</th>
 			<th style='text-align:center'>Hamming</th>
-			<th style='text-align:center'>s12 Gower-Legendre</th>
+			<th style='text-align:center;border-right: 1px solid #111;'>s12 Gower-Legendre</th>
 			<th style='text-align:center'>Spectrum</th>
-			<th style='text-align:center'>Metabolite</th>
+			<th style='text-align:center;border-right: 1px solid #111;'>Metabolite</th>
 		</tr>
 	</thead>
 	<tfoot>
@@ -492,12 +514,16 @@ sub html_output {
 	}
 	print HTML "
 	</tbody>
+	
 </table>
-<button class='mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--accent' id='delete' style='position:relative'>Delete selected rows</button>
+
 
 	</div>
+	
   </main>
+  
 </div>
+
 </body>
 
 
