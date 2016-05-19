@@ -279,7 +279,7 @@ sub html_output {
 	<script type='text/javascript' class='init'>
 		\$(document).ready( function () {
 		    var table = \$('#table_id').DataTable( {
-		    	order: [[ 5, 'asc' ],[ 6, 'asc' ],[ 7, 'asc' ],[ 8, 'asc' ],[ 9, 'asc' ]],
+		    	order: [ 0, 'asc' ],
 		    	'orderClasses': false,
 		    	'dom': 'B<\"toolbar\">frtilp',
 		        buttons: [
@@ -326,8 +326,6 @@ sub html_output {
 		    	'paginationType': 'full_numbers',
         		'scrollCollapse': true,
         		'lengthMenu': [[5, 10, 25, 50, -1], [5, 10, 25, 50, 'All']],
-
-        		
 		     	initComplete: function () {
 		             this.api().columns().every( function () {
 		                 var column = this;
@@ -408,11 +406,11 @@ sub html_output {
 								<th style='text-align:center;border-right: 1px solid #A7A7A7;'>Spectrum Name</th>
 								<th style='text-align:center'>Retention Index</th>
 								<th style='text-align:center;border-right: 1px solid #A7A7A7;'>RI Discrepancy</th>
-								<th style='text-align:center'>Dot product</th>
-								<th style='text-align:center'>Euclidean</th>
-								<th style='text-align:center'>Jaccard</th>
-								<th style='text-align:center'>Hamming</th>
-								<th style='text-align:center;border-right: 1px solid #A7A7A7;'>s12 Gower-Legendre</th>
+								<th id='mytooltip1' style='text-align:center'>Dot product</th>
+								<th id='mytooltip2' style='text-align:center'>Euclidean</th>
+								<th id='mytooltip3' style='text-align:center'>Jaccard</th>
+								<th id='mytooltip4' style='text-align:center'>Hamming</th>
+								<th id='mytooltip5' style='text-align:center;border-right: 1px solid #A7A7A7;'>s12 Gower-Legendre</th>
 								<th style='text-align:center'>Spectrum</th>
 								<th style='text-align:center;border-right: 1px solid #A7A7A7;'>Metabolite</th>
 							</tr>
@@ -457,6 +455,26 @@ sub html_output {
 						</tbody>
 					</table>
 			</div>
+			<div class='mdl-tooltip mdl-tooltip--large' for='mytooltip1'>
+		  		The dot product or scalar product is an algebric operation that takes two equal-length sequences of numbers (usually coordinate vectors) and returns a single number. It is
+				used to calculate differences between points of different spectra in 3D (3D constructed with Retention infos, mass and intensity)
+		    </div>
+		    <div class='mdl-tooltip mdl-tooltip--large' for='mytooltip2'>
+		  		The Euclidean distance is a generalization of the familiar Pythagorean theorem. It is the 'ordinary' distance between two points in Euclidean space
+		    </div>
+		    <div class='mdl-tooltip mdl-tooltip--large' for='mytooltip3'>
+		  		The Jaccard distance: also known as the Jaccard similarity coefficient is a statistic used for comparing the similarity and	diversity of sample sets. The Jaccard coefficient
+	measures similarity between finite sample sets, and is defined as the size of the intersection divided by the size of the union of the sample sets.
+
+		    </div>
+		    <div class='mdl-tooltip mdl-tooltip--large' for='mytooltip4'>
+		  		The Hamming distance between two strings of equal length is the number of positions at which the corresponding symbols are different. In other words, it is the number of
+	substitutions required to transform one string into another.
+		    </div>
+		    <div class='mdl-tooltip mdl-tooltip--large' for='mytooltip5'>
+		  		Let be the contingency table of binary data such as n11 = a, n10 = b, n01 = c and n00 = d. All these distances are of type d = sqrt(1 - s) with s a similarity coefficient.
+	S12 coefficient of Gower & Legendre s7 = a / sqrt((a + b)(a + c))
+		    </div>
 		</section>
 		<section class='mdl-layout__tab-panel' id='fixed-tab-2'>
 			<div class='page-content'>
