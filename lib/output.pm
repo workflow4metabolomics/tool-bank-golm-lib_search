@@ -177,7 +177,6 @@ sub html_output {
 	<link rel='stylesheet' type='text/css' href='https://cdn.datatables.net/1.10.11/css/jquery.dataTables.min.css'>
 	<link rel='stylesheet' type='text/css' href='https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.4.0/css/font-awesome.min.css'>
 	<link rel='stylesheet' type='text/css' href='https://cdn.datatables.net/buttons/1.1.2/css/buttons.dataTables.min.css'>
-	<link rel='stylesheet' type='text/css' href='https://cdnjs.cloudflare.com/ajax/libs/dialog-polyfill/0.4.3/dialog-polyfill.min.css'>
 	<link rel='stylesheet' type='text/css' href='https://cdn.datatables.net/r/dt/jq-2.1.4,jszip-2.5.0,pdfmake-0.1.18,dt-1.10.9,af-2.0.0,b-1.0.3,b-colvis-1.0.3,b-html5-1.0.3,b-print-1.0.3,se-1.0.1/datatables.min.css'/>
 	<link rel='stylesheet' href='https://code.getmdl.io/1.1.3/material.light_green-orange.min.css' /> 
 	<link rel='stylesheet' href='https://fonts.googleapis.com/icon?family=Material+Icons'>
@@ -209,20 +208,24 @@ sub html_output {
 			margin-bottom: 20px;
 		}
 		
-		#mydialog + .backdrop {
-		  background-color: green;
+		table.dataTable thead th, table.dataTable thead td {
+		    border-bottom: 1px solid #A7A7A7;
 		}
 		
-		#mydialog::backdrop {
-		  background-color: green;
+		div.dt-button-collection {
+		    width: 140px;
+		    margin-top: 7px;
+		    padding: 6px 6px 3px 6px;
+		    border: 1px solid rgba(0,0,0,0.4);
+		    background-color: rgba(171, 171, 171, 0.8);
+		    border-radius: 10px;
+		    box-shadow: 0px 0px 100px rgba(255, 255, 255, 0.3);
 		}
-	</style>
-	<style type='text/css' class='init'>
-		.mdl-dialog {
-		    border: none;
-		    box-shadow: 0 9px 46px 8px rgba(0,0,0,.14),0 11px 15px -7px rgba(0,0,0,.12),0 24px 38px 3px rgba(0,0,0,.2);
-		    width: 45%;
+		
+		div.dt-button-collection a.dt-button.active:not(.disabled) {
+		    box-shadow: inset 1px 1px 6px rgba(102, 102, 102, 0.69);
 		}
+		
 		.buttons-copy, .buttons-print, .buttons-collection {
 			height: 40px;
 		    margin-right: 10px;
@@ -235,15 +238,8 @@ sub html_output {
 		    background-color: #E3E3E3;
 		}
 		
-		.mdl-button {
-			height: 40px;	
-		}
-		
-		#show-dialog {
-		    padding-left: 0px;
-		    padding-right: 0px;
-		    min-width: 40px;
-		    border-radius: 50%;
+		.mdl-shadow--3dp {
+		    box-shadow: 0 25px 150px rgba(0,0,0,.14),0 3px 3px -2px rgba(0,0,0,.2),0 1px 8px 0 rgba(0,0,0,.12);
 		}
 		
 		.dataTables_wrapper .dataTables_length {
@@ -268,6 +264,7 @@ sub html_output {
 		 	padding-left: 15px; 
 		 	padding-right: 15px;	
 		}		
+		
 	</style>
 	
 	
@@ -277,7 +274,6 @@ sub html_output {
 	<script type='text/javascript' language='javascript' src='https://cdn.datatables.net/buttons/1.1.2/js/buttons.html5.min.js'></script>
 	<script type='text/javascript' language='javascript' src='https://cdn.datatables.net/buttons/1.1.2/js/buttons.print.min.js'></script>
 	<script type='text/javascript' language='javascript' src='https://cdn.datatables.net/1.10.11/js/jquery.dataTables.min.js'></script>
-	<script type='text/javascript' language='javascript' src='https://cdnjs.cloudflare.com/ajax/libs/dialog-polyfill/0.4.3/dialog-polyfill.min.js'></script>
 	<script type='text/javascript' src='https://cdn.datatables.net/r/dt/jq-2.1.4,jszip-2.5.0,pdfmake-0.1.18,dt-1.10.9,af-2.0.0,b-1.0.3,b-colvis-1.0.3,b-html5-1.0.3,b-print-1.0.3,se-1.0.1/datatables.min.js'></script>
 	<script defer src='https://code.getmdl.io/1.1.3/material.min.js'></script>
 	<script type='text/javascript' class='init'>
@@ -385,140 +381,131 @@ sub html_output {
   <header class='mdl-layout__header'>
     <div class='mdl-layout__header-row'>
       <!-- Title -->
-      <span class='mdl-layout-title'><h2><b>Visualization of Golm Database Results</b></h2></span>
-      <!-- Add spacer, to align navigation to the right -->
-      <div class='mdl-layout-spacer'></div>
-      <!-- Navigation -->
-      <nav class='mdl-navigation'>
-        <button id='show-dialog' type='button' class='mdl-button'><img src='http://m.hiapphere.com/data/icon/201506/HiAppHere_com_com.javiersantos.materialid.png' style='height: 40px; width: 40px;'></button>
-		  <dialog class='mdl-dialog'>
-		    <h4 class='mdl-dialog__title'>What can the table do ?</h4>
-		    <div class='mdl-dialog__content'>
-		      <ul class='list-icon mdl-list'>
-					  <li class='mdl-list__item'>
-					    <span class='mdl-list__item-primary-content'>
-						    <i class='material-icons mdl-list__item-icon'>filter_list</i>
-						    By default, the 5 distance scores are ordered by ascending values.
-						    You can manage your data ordering as you wish. You can even order data according to multiple columns:
-						    	SHIFT + LEFT CLICK on column headers.
-						    You can sort data specifically by clicking on any entry in boxes under each columns.
-						</span>
-					  </li>
-					  <li class='mdl-list__item'>
-					    <span class='mdl-list__item-primary-content'>
-						    <i class='material-icons mdl-list__item-icon'>delete_sweep</i>
-						    You can delete multiple lines selected:
-						    Select lines and click on the button Delete selected rows.
-					  	</span>
-					  </li>
-					  <li class='mdl-list__item'>
-					    <span class='mdl-list__item-primary-content'>
-						    <i class='material-icons mdl-list__item-icon'>remove_red_eye</i>
-						    You have the possibility to toggle columns by clicking on Column Visibility, and Show All buttons.
-					  </span>
-					  </li>
-					  <li class='mdl-list__item'>
-					    <span class='mdl-list__item-primary-content'>
-						    <i class='material-icons mdl-list__item-icon'>get_app</i>
-						    You can print or copy the table with Copy and Print buttons.
-					  </span>
-					  </li>
-				</ul>
-		    </div>
-		    <div class='mdl-dialog__actions'>
-		      <button type='button' class='mdl-button close'>Thanks!</button>
-		    </div>
-		  </dialog>
-		  <script>
-		    var dialog = document.querySelector('dialog');
-		    var showDialogButton = document.querySelector('#show-dialog');
-		    if (! dialog.showModal) {
-		      dialogPolyfill.registerDialog(dialog);
-		    }
-		    showDialogButton.addEventListener('click', function() {
-		      dialog.showModal();
-		    });
-		    dialog.querySelector('.close').addEventListener('click', function() {
-		      dialog.close();
-		    });
-		  </script>
-      </nav>
+      <span class='mdl-layout-title'><h3><b>Visualization of Golm Database Results</b></h3></span>
+    </div>
+      <!-- Tabs -->
+    <div class='mdl-layout__tab-bar mdl-js-ripple-effect'>
+      <a href='#fixed-tab-1' class='mdl-layout__tab is-active'><b>Table</b></a>
+      <a href='#fixed-tab-2' class='mdl-layout__tab'><b>Help</b></a>
     </div>
   </header>
-  <br/>
   <main class='mdl-layout__content'>
-
-</br></br>
-
-	
-
-</br>
-<table id='table_id' class='display stripe' cellspacing='0' width='100%' >
-	<thead>
-		<tr>
-            <th rowspan='2' style='text-align:center'>N° SPECTRES</th>
-            <th colspan='2' style='text-align:center'>NAMES</th>
-            <th colspan='2' style='text-align:center'>RETENTION INFOS</th>
-            <th colspan='5' style='text-align:center'>DISTANCE SCORES</th>
-            <th colspan='2' style='text-align:center'>IDs</th>
-        </tr>
-		<tr>
-			<th style='text-align:center;border-left: 1px solid #111;'>Analyte Name</th>
-			<th style='text-align:center;border-right: 1px solid #111;'>Spectrum Name</th>
-			<th style='text-align:center'>Retention Index</th>
-			<th style='text-align:center;border-right: 1px solid #111;'>RI Discrepancy</th>
-			<th style='text-align:center'>Dot product</th>
-			<th style='text-align:center'>Euclidean</th>
-			<th style='text-align:center'>Jaccard</th>
-			<th style='text-align:center'>Hamming</th>
-			<th style='text-align:center;border-right: 1px solid #111;'>s12 Gower-Legendre</th>
-			<th style='text-align:center'>Spectrum</th>
-			<th style='text-align:center;border-right: 1px solid #111;'>Metabolite</th>
-		</tr>
-	</thead>
-	<tfoot>
-		<tr>
-			<th style='text-align:center'>N° Spectre</th>
-			<th style='text-align:center'>Analyte Name</th>
-			<th style='text-align:center'>Spectrum Name</th>
-			<th style='text-align:center'>Retention Index</th>
-			<th style='text-align:center'>RI Discrepancy</th>
-			<th style='text-align:center'>Dot product</th>
-			<th style='text-align:center'>Euclidean</th>
-			<th style='text-align:center'>Jaccard</th>
-			<th style='text-align:center'>Hamming</th>
-			<th style='text-align:center'>s12 Gower-Legendre</th>
-			<th style='text-align:center'>Spectrum</th>
-			<th style='text-align:center'>Metabolite</th>
-		</tr>
-	</tfoot>
-	<tbody>";
-	
-	foreach my $href_grp (@$results) {
-		
-			foreach my $hit ( @{$href_grp->{'searchResults'}} ){
-					
-					print HTML "<tr><td>".$href_grp->{id}."</td>" ;
-					print HTML "<td>".$hit->{analyte}{name}."</td>" ;
-					print HTML "<td>".$hit->{spectrum}{name}."</td>" ;
-					print HTML "<td>".$hit->{ri_infos}{ri}."</td>" ;
-					print HTML "<td>".$hit->{ri_infos}{riDiscrepancy}."</td>" ;
-					print HTML "<td>".$hit->{distance_scores}{DotproductDistance}."</td>" ;
-					print HTML "<td>".$hit->{distance_scores}{EuclideanDistance}."</td>" ;
-					print HTML "<td>".$hit->{distance_scores}{JaccardDistance}."</td>" ;
-					print HTML "<td>".$hit->{distance_scores}{HammingDistance}."</td>" ;
-					print HTML "<td>".$hit->{distance_scores}{s12GowerLegendreDistance}."</td>" ;
-					print HTML "<td>".$hit->{spectrum}{id}."</td>" ;
-					print HTML "<td>".$hit->{metaboliteID}."</td></tr>" ;
-			}	
-	}
-	print HTML "
-	</tbody>
-	
-</table>
-
-
-	</div>
+  	<section class='mdl-layout__tab-panel is-active' id='fixed-tab-1'>
+		      <div class='page-content'>
+		      		</br></br></br></br>
+					<table id='table_id' class='display stripe' cellspacing='0' width='100%' >
+						<thead>
+							<tr>
+					            <th colspan='1'></th>
+					            <th colspan='2' style='text-align:center'>NAMES</th>
+					            <th colspan='2' style='text-align:center'>RETENTION INFOS</th>
+					            <th colspan='5' style='text-align:center'>DISTANCE SCORES</th>
+					            <th colspan='2' style='text-align:center'>IDs</th>
+					        </tr>
+							<tr>
+								<th style='text-align:center;border-left: 1px solid #A7A7A7;'>N° Spectres</th>
+								<th style='text-align:center;border-left: 1px solid #A7A7A7;'>Analyte Name</th>
+								<th style='text-align:center;border-right: 1px solid #A7A7A7;'>Spectrum Name</th>
+								<th style='text-align:center'>Retention Index</th>
+								<th style='text-align:center;border-right: 1px solid #A7A7A7;'>RI Discrepancy</th>
+								<th style='text-align:center'>Dot product</th>
+								<th style='text-align:center'>Euclidean</th>
+								<th style='text-align:center'>Jaccard</th>
+								<th style='text-align:center'>Hamming</th>
+								<th style='text-align:center;border-right: 1px solid #A7A7A7;'>s12 Gower-Legendre</th>
+								<th style='text-align:center'>Spectrum</th>
+								<th style='text-align:center;border-right: 1px solid #A7A7A7;'>Metabolite</th>
+							</tr>
+						</thead>
+						<tfoot>
+							<tr>
+								<th style='text-align:center'>N° Spectre</th>
+								<th style='text-align:center'>Analyte Name</th>
+								<th style='text-align:center'>Spectrum Name</th>
+								<th style='text-align:center'>Retention Index</th>
+								<th style='text-align:center'>RI Discrepancy</th>
+								<th style='text-align:center'>Dot product</th>
+								<th style='text-align:center'>Euclidean</th>
+								<th style='text-align:center'>Jaccard</th>
+								<th style='text-align:center'>Hamming</th>
+								<th style='text-align:center'>s12 Gower-Legendre</th>
+								<th style='text-align:center'>Spectrum</th>
+								<th style='text-align:center'>Metabolite</th>
+							</tr>
+						</tfoot>
+						<tbody>";
+						
+						foreach my $href_grp (@$results) {
+							
+								foreach my $hit ( @{$href_grp->{'searchResults'}} ){
+										
+										print HTML "<tr><td>".$href_grp->{id}."</td>" ;
+										print HTML "<td>".$hit->{analyte}{name}."</td>" ;
+										print HTML "<td>".$hit->{spectrum}{name}."</td>" ;
+										print HTML "<td>".$hit->{ri_infos}{ri}."</td>" ;
+										print HTML "<td>".$hit->{ri_infos}{riDiscrepancy}."</td>" ;
+										print HTML "<td>".$hit->{distance_scores}{DotproductDistance}."</td>" ;
+										print HTML "<td>".$hit->{distance_scores}{EuclideanDistance}."</td>" ;
+										print HTML "<td>".$hit->{distance_scores}{JaccardDistance}."</td>" ;
+										print HTML "<td>".$hit->{distance_scores}{HammingDistance}."</td>" ;
+										print HTML "<td>".$hit->{distance_scores}{s12GowerLegendreDistance}."</td>" ;
+										print HTML "<td>".$hit->{spectrum}{id}."</td>" ;
+										print HTML "<td>".$hit->{metaboliteID}."</td></tr>" ;
+								}	
+						}
+						print HTML "
+						</tbody>
+					</table>
+			</div>
+		</section>
+		<section class='mdl-layout__tab-panel' id='fixed-tab-2'>
+			<div class='page-content'>
+				<br/><br/><br/>
+				<div class='mdl-grid'>
+					<div class='mdl-cell mdl-cell--1-col'></div>
+					    <div class='card-wide mdl-card mdl-cell mdl-cell--4-col mdl-shadow--3dp'>
+					    	<figure class='mdl-card__media' style='background-color: white'>
+					    		<img src='http://m.hiapphere.com/data/icon/201506/HiAppHere_com_com.javiersantos.materialid.png' style='height: 60px; width: 60px;'>
+					    	</figure>
+					    	<div class='mdl-card__title'>
+							    <h1 class='mdl-card__title-text'>What can the table do ?</h1>
+							</div>
+							<div class='mdl-card__supporting-text'>
+				      		<ul class='list-icon mdl-list'>
+									  <li class='mdl-list__item'>
+									    <span class='mdl-list__item-primary-content'>
+										    <i class='material-icons mdl-list__item-icon'>filter_list</i>
+										    By default, the 5 distance scores are ordered by ascending values.
+										    You can manage your data ordering as you wish. You can even order data according to multiple columns:
+										    	SHIFT + LEFT CLICK on column headers.
+										    You can sort data specifically by clicking on any entry in boxes under each columns.
+										</span>
+									  </li>
+									  <li class='mdl-list__item'>
+									    <span class='mdl-list__item-primary-content'>
+										    <i class='material-icons mdl-list__item-icon'>delete_sweep</i>
+										    You can delete multiple lines selected:
+										    Select lines and click on the button DELETE SELECTED ROWS.
+									  	</span>
+									  </li>
+									  <li class='mdl-list__item'>
+									    <span class='mdl-list__item-primary-content'>
+										    <i class='material-icons mdl-list__item-icon'>remove_red_eye</i>
+										    You have the possibility to toggle columns by clicking on SHOW MORE.
+									  </span>
+									  </li>
+									  <li class='mdl-list__item'>
+									    <span class='mdl-list__item-primary-content'>
+										    <i class='material-icons mdl-list__item-icon'>get_app</i>
+										    You can print, copy, or export to excel and csv the table with the buttons above the table.
+									  </span>
+									  </li>
+							</ul>
+						</div>
+					</div>
+				</div>
+			</div>
+	    </section>
 	
   </main>
   
