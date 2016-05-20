@@ -26,7 +26,7 @@ use lib::conf qw( :ALL ) ;
 ## Initialized values
 my ($OptHelp,$ri,$riWindow,$gcColumn,$msp_file,$maxHits,$mzRes,$maxIons,$threshold,$spectrum_string,$relative) = (undef,undef,undef,undef,undef,undef,undef,undef,undef,undef,undef) ;
 my ( $JaccardDistanceThreshold,$s12GowerLegendreDistanceThreshold,$DotproductDistanceThreshold,$HammingDistanceThreshold,$EuclideanDistanceThreshold ) = (undef,undef,undef,undef,undef) ;
-my ($excel_file,$html_file,$html_template) = (undef,undef,undef) ;
+my ($excel_file,$html_file,$html_template,$json_file) = (undef,undef,undef,undef) ;
 my (@hits, @ojson) = ( () , () ) ;
 my $encoded_spectra ;
 
@@ -52,8 +52,9 @@ if (!@ARGV){ &help ; }
 				"HammingDistanceThreshold:f"		=> \$HammingDistanceThreshold,
 				"EuclideanDistanceThreshold:f"		=> \$EuclideanDistanceThreshold,
 				"relative"			=> \$relative,
-				"excel:s"			=> \$excel_file,
-				"htmlFile:s"		=> \$html_file
+				"excelFile:s"			=> \$excel_file,
+				"htmlFile:s"		=> \$html_file,
+				"json_file:s"		=> \$json_file
             ) ;
             
             die "maxHits must be >= 0\n" unless ($maxHits >= 0) ;
@@ -125,7 +126,7 @@ elsif (defined $msp_file and defined $mzRes and defined $maxIons and defined $ma
 	
 	## Relative intensity
 	my $relative_ints_res = undef ;
-	if ($relative) {
+	if ($relative eq "true") {
 		$relative_ints_res = $omsp->apply_relative_intensity($ints_res) ;
 	}
 	
@@ -152,11 +153,12 @@ foreach my $spectrum (@$encoded_spectra){
 
 ############# -------------- Build outputs -------------- ############# :
 
-my $jsons_output = $o_output->build_json_res_object(\@hits) ;
+my $jsons_obj = $o_output->build_json_res_object(\@hits) ;
+$o_output->write_json_skel(\$json_file, $jsons_obj) ;
 
-my $tbody_entries = $o_output->add_entries_to_tbody_object($jsons_output) ;
-$o_output->write_html_body($jsons_output, $tbody_entries, $html_file, $html_template) ;
-$o_output->excel_output($excel_file, $jsons_output) ;
+my $tbody_entries = $o_output->add_entries_to_tbody_object($jsons_obj) ;
+$o_output->write_html_body($jsons_obj, $tbody_entries, $html_file, $html_template) ;
+$o_output->excel_output($excel_file, $jsons_obj) ;
 
 
 #====================================================================================
@@ -194,8 +196,10 @@ USAGE :
 			-DotproductDistanceThreshold............[
 			-EuclideanDistanceThreshold.............[
 			-HammingDistanceThreshold[Threshold for hamming score. Hits with greater scores are ignored: 0 - perfect match to higher values indicating a mismatch]
-			-relative [if given in argument, transforms absolute intensities in the msp file into relative intensities: (intensity * 100)/ max(intensitiess), otherwise, absolute intensities]
+			-relative [Transforms absolute intensities in the msp file into relative intensities: (intensity * 100)/ max(intensitiess), otherwise, leave them absolute: true or false]
+			-excelFile [name of the xls file in output: string]
 			-htmlFile [name of the html file in output: string]
+			-json_file [name of the json file in output: string]
 				
 ";
 	exit(1);

@@ -13,8 +13,8 @@ use vars qw($VERSION @ISA @EXPORT %EXPORT_TAGS);
 
 our $VERSION = "1.0";
 our @ISA = qw(Exporter);
-our @EXPORT = qw(build_json_res_object excel_output write_html_body add_entries_to_tbody_object);
-our %EXPORT_TAGS = ( ALL => [qw(build_json_res_object excel_output write_html_body add_entries_to_tbody_object)] );
+our @EXPORT = qw(build_json_res_object excel_output write_html_body add_entries_to_tbody_object write_json_skel);
+our %EXPORT_TAGS = ( ALL => [qw(build_json_res_object excel_output write_html_body add_entries_to_tbody_object write_json_skel)] );
 
 =head1 NAME
 My::Module - An example module
@@ -308,7 +308,26 @@ sub excel_output {
 ## END of SUB
 
 
+=head2 METHOD write_json_skel
 
+	## Description : prepare and write json output file
+	## Input : $json_file, $scalar
+	## Output : $json_file
+	## Usage : my ( $json_file ) = write_json_skel( $csv_file, $scalar ) ;
+	
+=cut
+## START of SUB
+sub write_json_skel {
+	## Retrieve Values
+    my $self = shift ;
+    my ( $json_file, $json_obj ) = @_ ;
+    
+    open(JSON, '>:utf8', "$$json_file") or die "Cant' create the file $$json_file\n" ;
+    print JSON $json_obj ;
+    close(JSON) ;
+    
+}
+## END of SUB
 
 
 
@@ -334,6 +353,7 @@ You can find documentation for this module with the perldoc command.
 =head1 AUTHOR
 
 Gabriel Cretin E<lt>gabriel.cretin@clermont.inra.frE<gt>
+Franck Giacomoni E<lt>franck.giacomoni@clermont.inra.frE<gt>
 
 =head1 LICENSE
 
