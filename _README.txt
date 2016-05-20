@@ -1,0 +1,56 @@
+## ****** MON_MODULE environnemnt : ****** ##
+# version 1.0 XX.XX.2016 G Cretin / F Giacomoni / Y Guitton
+
+## --- PERL compilator / libraries : --- ##
+$ perl -v
+This is perl, v5.18.2 built for x86_64-linux-gnu-thread-multi
+
+# libs CORE PERL : 
+use strict ;
+use warnings ;
+use Carp qw (cluck croak carp) ;
+use Exporter ;
+use Data::Dumper ;
+use Getopt::Long ;
+use FindBin ;
+
+# libs CPAN PERL : 
+$ perl -e 'use SOAP::Lite +trace => [qw (debug)] ;'
+$ perl -e 'use Excel::Writer::XLSX ;'
+$ perl -e 'use JSON ;'
+$ perl -e 'use HTML::Template ;'
+
+
+# libs pfem PERL : 
+use lib::golm_ws_api qw( :ALL ) ;
+use lib::msp qw( :ALL ) ;
+use lib::output qw( :ALL ) ;
+--
+
+## --- R bin and Packages : --- ##
+
+No interaction with R
+
+-- 
+
+## --- Binary dependencies --- ##
+
+NA
+
+--
+
+## --- Config : --- ##
+Edit the following lines in the config file :
+HTML_TEMPLATE=absolute_path_to_/golm_out.tmpl
+
+--
+
+## --- XML HELP PART --- ##
+ 
+--
+
+## --- DATASETS --- ##
+--
+
+## --- ??? COMMENTS ??? --- ##
+--
