@@ -15,16 +15,18 @@ use FindBin ; ## Allows you to locate the directory of original perl script
 
 ## Specific Perl Modules (PFEM)
 use lib $FindBin::Bin ;
+my $binPath = $FindBin::Bin ;
 
 ## Dedicate Perl Modules PFEM
 use lib::golm_ws_api qw( :ALL ) ;
 use lib::msp qw( :ALL ) ;
 use lib::output qw( :ALL ) ;
+use lib::conf qw( :ALL ) ;
 
 ## Initialized values
 my ($OptHelp,$ri,$riWindow,$gcColumn,$msp_file,$maxHits,$mzRes,$maxIons,$threshold,$spectrum_string,$relative) = (undef,undef,undef,undef,undef,undef,undef,undef,undef,undef,undef) ;
 my ( $JaccardDistanceThreshold,$s12GowerLegendreDistanceThreshold,$DotproductDistanceThreshold,$HammingDistanceThreshold,$EuclideanDistanceThreshold ) = (undef,undef,undef,undef,undef) ;
-my ($excel_file) = undef ;
+my ($excel_file,$html_file,$html_template) = (undef,undef,undef) ;
 my (@hits, @ojson) = ( () , () ) ;
 my $encoded_spectra ;
 
@@ -50,7 +52,8 @@ if (!@ARGV){ &help ; }
 				"HammingDistanceThreshold:f"		=> \$HammingDistanceThreshold,
 				"EuclideanDistanceThreshold:f"		=> \$EuclideanDistanceThreshold,
 				"relative"			=> \$relative,
-				"excel:s"				=> \$excel_file,
+				"excel:s"			=> \$excel_file,
+				"htmlFile:s"		=> \$html_file
             ) ;
             
             die "maxHits must be >= 0\n" unless ($maxHits >= 0) ;
@@ -64,6 +67,20 @@ if(defined($OptHelp)){ &help ; }
 #=============================================================================
 #                                MAIN SCRIPT
 #=============================================================================
+
+
+## -------------- Conf file ------------------------ :
+my ( $CONF ) = ( undef ) ;
+foreach my $conf ( <$binPath/*.cfg> ) {
+	my $oConf = lib::conf->new() ;
+	$CONF = $oConf->as_conf($conf) ;
+}
+
+## -------------- HTML template file ------------------------ :
+$html_template = <$binPath/golm_out.tmpl> ;
+$CONF->{'HTML_TEMPLATE'} = $html_template ;
+
+
 
 ## Create new module objects ###
 
@@ -133,17 +150,13 @@ foreach my $spectrum (@$encoded_spectra){
 	push (@ojson , $res_json) ;
 }
 
+############# -------------- Build outputs -------------- ############# :
 
 my $jsons_output = $o_output->build_json_res_object(\@hits) ;
 
-$o_output->html_output($jsons_output) ;
+my $tbody_entries = $o_output->add_entries_to_tbody_object($jsons_output) ;
+$o_output->write_html_body($jsons_output, $tbody_entries, $html_file, $html_template) ;
 $o_output->excel_output($excel_file, $jsons_output) ;
-
-#print "final".Dumper \@hits ;
-#print Dumper $jsons_output ;
-
-
-
 
 
 #====================================================================================
@@ -181,7 +194,8 @@ USAGE :
 			-DotproductDistanceThreshold............[
 			-EuclideanDistanceThreshold.............[
 			-HammingDistanceThreshold[Threshold for hamming score. Hits with greater scores are ignored: 0 - perfect match to higher values indicating a mismatch]
-			-relative [if given in argument, transforms absolute intensities in the msp file into relative intensities: (intensity * 100)/ max(intensitiess)]
+			-relative [if given in argument, transforms absolute intensities in the msp file into relative intensities: (intensity * 100)/ max(intensitiess), otherwise, absolute intensities]
+			-htmlFile [name of the html file in output: string]
 				
 ";
 	exit(1);
@@ -193,7 +207,7 @@ __END__
 
 =head1 NAME
 
- XXX.pl -- script for
+ golm_ws_lib_search.pl -- script to send GC-MS spectra queries to Golm Metabolome Database (GMD)
 
 =head1 USAGE
 
@@ -202,7 +216,7 @@ __END__
 
 =head1 SYNOPSIS
 
-This script manage ... 
+This script sends GC-MS EI spectra from an msp file given in argument to Golm Database, and presents results on a web interface.
 
 =head1 DESCRIPTION
 
@@ -218,8 +232,8 @@ This main program is a ...
 
 =head1 AUTHOR
 
+Gabriel Cretin	E<lt>gabriel.cretin@clermont.inra.frE<gt>
 Franck Giacomoni E<lt>franck.giacomoni@clermont.inra.frE<gt>
-Marion Landi E<lt>marion.landi@clermont.inra.frE<gt>
 
 =head1 LICENSE
 
@@ -227,7 +241,7 @@ This program is free software; you can redistribute it and/or modify it under th
 
 =head1 VERSION
 
-version 1 : xx / xx / 201x
+version 1 : xx / xx / 2016
 
 version 2 : ??
 
