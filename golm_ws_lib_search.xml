@@ -5,21 +5,18 @@
   <command interpreter="perl">
   
     golm_ws_lib_search.pl
-    	#if str($input_type.choice) == "YES":
-    	-spectraFile="${input_type.masses}" -mzRes="${input_type.mzResolution}" -maxHits="${input_type.maxHits}" -maxIons="${input_type.maxIons}"
+   
+    	-inputSpectra="${input_type.masses}"
+    	-ri="${input_type.ri}"
+		-riWindow="${input_type.riWindow}"
+    	-mzRes="${input_type.mzResolution}"
+    	-maxHits="${input_type.maxHits}"
+    	-maxIons="${input_type.maxIons}"
 		-JaccardDistanceThreshold="${input_type.JaccardDistance}" -s12GowerLegendreDistanceThreshold="${input_type.s12GowerLegendreDistanceThreshold}" 
 		-DotproductDistanceThreshold="${input_type.DotproductDistanceThreshold}" -HammingDistanceThreshold="${input_type.HammingDistanceThreshold}"
 		-EuclideanDistanceThreshold="${input_type.EuclideanDistanceThreshold}"
-		#elsif str($input_type.choice) == "NO":
-		-spectrumString="${input_type.mass}" -mzRes="${input_type.mzResolution}" -maxHits="${input_type.maxHits}" -maxIons="${input_type.maxIons}"
-		-JaccardDistanceThreshold="${input_type.JaccardDistance}" -s12GowerLegendreDistanceThreshold="${input_type.s12GowerLegendreDistanceThreshold}" 
-		-DotproductDistanceThreshold="${input_type.DotproductDistanceThreshold}" -HammingDistanceThreshold="${input_type.HammingDistanceThreshold}"
-		-EuclideanDistanceThreshold="${input_type.EuclideanDistanceThreshold}"
-		#if str($input_type.intensity_type) == "YES":
-		-relative="true"
-		#else:
 		-relative="{$input_type.intensity_type}"
-		#end_if
+		
   </command>
   
   <inputs>
@@ -28,14 +25,16 @@
         <option value="YES">YES</option>
         <option value="NO">NO</option>
       </param>
-    </conditional>
       <when value="YES">
-    	<param name="masses" label=".msp file of masses (format: msp)" format="msp,txt" type="data" help=".msp output file from metaMS.runGC function, or any msp file." />
+      	<param name="masses" label=".msp file of masses (format: msp)" format="msp,txt" type="data" help=".msp output file from metaMS.runGC function, or any msp file." />
     	<param name="columnType" label="column" type="select" display="radio" help="5%-phenyl-95%-dimethylpolysiloxane (VAR5), 35%-phenyl-65%-dimethylpolysiloxane (MDN35), if you don't know select 'None'.">
           <option value="none">None</option>
           <option value="VAR5">VAR5</option>
           <option value="MDN35">MDN35</option>
         </param>
+        <param name="ri" type="integer" value="" label="Alkane Retention Index" help="If neither an alkane RIs for VAR5 nor MDN35 is available in your setup, please select 'none' in the input field above!" />
+    	<param name="riWindow" type="integer" value="" label="Retention Index Window" help="This value is for the library search used only. A larger window size will increase the number of matches.
+      	 At the same time the identification becomes less reliable due to false matching spectra without RI consensus. The maximal number of hits returned from the data base is limited due to performance reasons." />
         <param name="maxHits" type="integer" value="0" label="Maximum Hits" help="Maximum number of hits per queried spectra, default=all (0)." />
         <param name="mzResolution" type="integer" value="0" label="Number of significant decimal" help="Number of significant decimals of your m/z." />
         <param name="maxIons" type="integer" value="0" label="Maximum number of ions" help="Number of m/z per spectra you want to keep for the queries, default 0 = all of them." />
@@ -54,12 +53,15 @@
         </param>
       </when>
       <when value="NO">
-    	<param name="mass" size="20" type="text" label="Mass of the molecule "  help="For a list of masses + intensities write : mz1 int1 mz2 int2 mzx intx..."/>	
+    	<param name="masses" size="30" area="true" type="text" label="Mass of the molecule "  help="For a list of masses + intensities write : mz1 int1 mz2 int2 mzx intx..."/>	
 		<param name="columnType" label="column" type="select" display="radio" help="5%-phenyl-95%-dimethylpolysiloxane (VAR5), 35%-phenyl-65%-dimethylpolysiloxane (MDN35), if you don't know select 'None'.">
           <option value="none">None</option>
           <option value="VAR5">VAR5</option>
           <option value="MDN35">MDN35</option>
         </param>
+        <param name="ri" type="integer" value="" label="Alkane Retention Index" help="If neither an alkane RIs for VAR5 nor MDN35 is available in your setup, please select 'none' in the input field above)!" />
+    	<param name="riWindow" type="integer" value="" label="Retention Index Window" help="This value is for the library search used only. A larger window size will increase the number of matches.
+      	 At the same time the identification becomes less reliable due to false matching spectra without RI consensus. The maximal number of hits returned from the data base is limited due to performance reasons." />
         <param name="maxHits" type="integer" value="0" label="Maximum Hits" help="Maximum number of hits per queried spectra, default=all (0)." />
         <param name="mzResolution" type="integer" value="0" label="Number of significant decimal" help="Number of significant decimals of your m/z." />
         <param name="maxIons" type="integer" value="0" label="Maximum number of ions" help="Number of m/z per spectra you want to keep for the queries, default 0 = all of them." />
@@ -77,6 +79,7 @@
           <option value="false">NO</option>
         </param>
 	  </when>
+	 </conditional>
 	</inputs>
 	
 	 <outputs>
@@ -87,7 +90,12 @@
 	 
 	 
 	 
+	 <help>
 	 
+	 
+	 
+	 
+	 </help>
 	 
 	 
 	 
