@@ -155,7 +155,7 @@ sub LibrarySearch() {
 	$gcColumn = 'VAR5' if ( !defined $gcColumn ) ;
 	
 	my $result ;
-	my @limited_hits ;
+	my @filtered_limited_res = () ;
 	my @json_res ;
 	
 	if ( defined $spectrum ){
@@ -192,27 +192,26 @@ sub LibrarySearch() {
                    
             #print Dumper $results ;
             my $res_json = encode_json ($results) ;
-			my @results = @$results ;
-			my $oapi = lib::golm_ws_api->new() ;
             
             ## Limitate number of hits returned according to user's $maxHit
-            ## and filter hits on specific values ($filter) with a threshold
-            my @limited_hits = ();
-            
+            ## and filter hits on specific values with thresholds
+            my @results = @$results ;
+            print Dumper \@results ;
             ### Return all hits
-            if ($maxHits == 0 && $status eq 'success') {
-            	my $filtered_res = $oapi->filter_scores_golm_results(\@results,$JaccardDistanceThreshold,$s12GowerLegendreDistanceThreshold,
+            if ($maxHits == 100 && $status eq 'success') {
+            	my $filtered_res = _filter_scores_golm_results(\@results,$JaccardDistanceThreshold,$s12GowerLegendreDistanceThreshold,
 																		$DotproductDistanceThreshold,$HammingDistanceThreshold,$EuclideanDistanceThreshold) ;
             	return $filtered_res ;
             }
-            elsif ($maxHits > 0 && $status eq 'success'){
+            elsif ($maxHits < 100 && $maxHits > 0 && $status eq 'success'){
+            	my $filtered_res_before_hits_limited = _filter_scores_golm_results(\@results,$JaccardDistanceThreshold,$s12GowerLegendreDistanceThreshold,
+																		$DotproductDistanceThreshold,$HammingDistanceThreshold,$EuclideanDistanceThreshold) ;
             	for (my $i=0 ; $i<$maxHits ; $i++) {
-	            	push (@limited_hits , @$results[$i]) ;
+	            	push (@filtered_limited_res , @$filtered_res_before_hits_limited[$i]) ;
 	            	push (@json_res , $res_json) ;
             	}
-            	my $filtered_res = $oapi->_filter_scores_golm_results(\@limited_hits,$JaccardDistanceThreshold,$s12GowerLegendreDistanceThreshold,
-																		$DotproductDistanceThreshold,$HammingDistanceThreshold,$EuclideanDistanceThreshold) ;
-            	return $filtered_res ;
+            	
+            	return \@filtered_limited_res ;
             }
             else { carp "No match returned from Golm for the query.\n" }
         }
@@ -220,7 +219,7 @@ sub LibrarySearch() {
     }
     else { carp "The spectrum for query is undef, Golm soap will stop.\n" ; }
 	
-	return \@limited_hits ;
+	return \@filtered_limited_res ;
 }
 ### END of SUB
 
@@ -239,7 +238,6 @@ sub LibrarySearch() {
 
 sub _filter_scores_golm_results() {
 	## Retrieve Values
-    my $self = shift ;
 	my ($results,$JaccardDistanceThreshold,$s12GowerLegendreDistanceThreshold,
 		$DotproductDistanceThreshold,$HammingDistanceThreshold,$EuclideanDistanceThreshold) = @_ ;
 		
