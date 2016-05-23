@@ -6,6 +6,7 @@ use Exporter ;
 use Carp ;
 use Excel::Writer::XLSX ;
 use HTML::Template ;
+use JSON ;
 
 use Data::Dumper ;
 
@@ -322,8 +323,9 @@ sub write_json_skel {
     my $self = shift ;
     my ( $json_file, $json_obj ) = @_ ;
     
+    my $utf8_encoded_json_text = encode_json $json_obj ;
     open(JSON, '>:utf8', "$$json_file") or die "Cant' create the file $$json_file\n" ;
-    print JSON $json_obj ;
+    print JSON $utf8_encoded_json_text ;
     close(JSON) ;
     
 }
