@@ -54,7 +54,7 @@ if (!@ARGV){ &help ; }
 				"relative"			=> \$relative,
 				"excelFile:s"			=> \$excel_file,
 				"htmlFile:s"		=> \$html_file,
-				"json_file:s"		=> \$json_file
+				"jsonFile:s"		=> \$json_file
             ) ;
             
             die "maxHits must be >= 0\n" unless ($maxHits >= 0) ;
@@ -92,7 +92,7 @@ my $o_output = lib::output->new() ;
 
 ############# -------------- Test the Golm web service -------------- ############# :
 
-$oapi->test_query_golm() ;
+#$oapi->test_query_golm() ;
 
 ############# -------------- Parse the .msp file -------------- ############# :
 
@@ -121,8 +121,20 @@ elsif (defined $msp_file and defined $mzRes and defined $maxIons and defined $ma
 	$ref_mzs_res = $omsp->get_mzs($msp_file,$mzRes,$maxIons) ;
 	$ref_ints_res = $omsp->get_intensities($msp_file, $maxIons) ;
 	
+	## Remove redundant masses
+	my ($uniq_masses , $uniq_intensities) = (undef,undef) ;
+	my @uniq_total_masses = () ;
+	my @uniq_total_intensities = () ;
+	
+	for (my $i=0 ; $i<@$ref_mzs_res && $i<@$ref_ints_res ; $i++) {
+	
+		($uniq_masses , $uniq_intensities) = $omsp->remove_redundants(@$ref_mzs_res[$i], @$ref_ints_res[$i]) ;
+		push (@uniq_total_masses , $uniq_masses) ;
+		push (@uniq_total_intensities, $uniq_intensities) ;
+	} 
+	
 	## Sorting intensities
-	my ($mzs_res, $ints_res) = $omsp->sorting_descending_intensities($ref_mzs_res, $ref_ints_res) ;
+	my ($mzs_res, $ints_res) = $omsp->sorting_descending_intensities(\@uniq_total_masses, \@uniq_total_intensities) ;
 	
 	## Relative intensity
 	my $relative_ints_res = undef ;
