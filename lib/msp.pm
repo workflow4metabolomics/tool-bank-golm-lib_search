@@ -102,14 +102,13 @@ sub get_mzs {
 		    					push (@temp_mzs , $mz) ;
 		    				}
 		    				# Check that $mzRes is not greater than the number of digits after comma
-		    				elsif ($mzRes > 0 && $mzRes <= length(( $mz =~ /.+\.(.*)/)[0] )) {
+		    				elsif ($mzRes > 0) {
+		    					if($mzRes <= length(( $mz =~ /.+\.(.*)/)[0] )) {
+		    						$mz = sprintf("%.".$mzRes."f" , $mz) ;
+		    						print Dumper $mz ;
+		    					}
 		    					my $mz_rounded = _round_num($mz,$mzRes) ;
 		    					push (@temp_mzs , $$mz_rounded) ;    					
-		    				}
-		    				# Make sure the control is on masses with digits only
-		    				elsif ($mz =~ /(\d+\.\d+)/ && $mzRes > length(( $mz =~ /.+\.(.*)/)[0] )) { 
-		    					carp "mzRes is greater then the actual number of digits after comma\n" ; 
-		    					return undef ; 
 		    				}
 		    			}
 		    		}
