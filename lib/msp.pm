@@ -6,13 +6,14 @@ use Exporter ;
 use Carp ;
 
 use Data::Dumper ;
+use List::MoreUtils qw(uniq);
 
 use vars qw($VERSION @ISA @EXPORT %EXPORT_TAGS);
 
 our $VERSION = "1.0";
 our @ISA = qw(Exporter);
-our @EXPORT = qw( get_mzs get_intensities get_intensities_and_mzs_from_string encode_spectrum_for_query sorting_descending_intensities round_num apply_relative_intensity);
-our %EXPORT_TAGS = ( ALL => [qw( get_mzs get_intensities get_intensities_and_mzs_from_string encode_spectrum_for_query sorting_descending_intensities round_num apply_relative_intensity)] );
+our @EXPORT = qw( get_mzs get_intensities get_intensities_and_mzs_from_string encode_spectrum_for_query sorting_descending_intensities round_num apply_relative_intensity remove_redundants);
+our %EXPORT_TAGS = ( ALL => [qw( get_mzs get_intensities get_intensities_and_mzs_from_string encode_spectrum_for_query sorting_descending_intensities round_num apply_relative_intensity remove_redundants)] );
 
 =head1 NAME
 
@@ -69,6 +70,7 @@ sub get_mzs {
   
   	my @ions = () ;
   	my @temp_mzs = () ;
+  	my @uniq_masses ;
   	my @mzs = ();
   	my @total_spectra_mzs = ();
   	my $mz ;
@@ -103,12 +105,11 @@ sub get_mzs {
 		    				}
 		    				# Check that $mzRes is not greater than the number of digits after comma
 		    				elsif ($mzRes > 0) {
-		    					if($mzRes <= length(( $mz =~ /.+\.(.*)/)[0] )) {
+		    					if($mzRes > length(( $mz =~ /.+\.(.*)/)[0] )) {
 		    						$mz = sprintf("%.".$mzRes."f" , $mz) ;
-		    						print Dumper $mz ;
 		    					}
 		    					my $mz_rounded = _round_num($mz,$mzRes) ;
-		    					push (@temp_mzs , $$mz_rounded) ;    					
+		    					push (@temp_mzs , $$mz_rounded) ;
 		    				}
 		    			}
 		    		}
@@ -129,7 +130,7 @@ sub get_mzs {
 	    	if($line ne '') {
 		    	@{ $total_spectra_mzs[$i] } = @mzs ;
 			    $i++ ;
-			    @mzs = () ;	  
+			    @mzs = () ;
 	    	}  	
 	    }
     }
@@ -385,6 +386,44 @@ sub apply_relative_intensity {
     return \@relative_intensities ;
 }
 ## END of SUB
+
+
+
+=head2 METHOD remove_redundants
+
+	## Description : removes ions with redundant masses
+	## Input : $masses $intensities
+	## Output : \@intensities
+	## Usage : my ( $uniq_masses, $uniq_intensities ) = remove_redundants( $masses, $intensities ) ;
+	
+=cut
+## START of SUB 
+sub remove_redundants {
+	## Retrieve Values
+	my $self = shift ;
+    my ($masses, $intensities) = @_ ;
+    
+    my %uniq = () ;
+    my @uniq_intensities = () ;
+    
+    ## Create hash with key = mass and value = intensity
+    for (my $i=0 ; $i<@$masses ; $i++) {
+    	$uniq{ @$masses[$i] } = @$intensities[$i] ;
+    }
+    
+    ## Remove redundant masses
+    my @uniq_masses = uniq(@$masses) ;
+    
+    ## Keep intensities corresponding to uniq masses
+	foreach my $mass (@uniq_masses) {
+	    push (@uniq_intensities , $uniq{ $mass }) ;
+	}
+	
+	return \@uniq_masses , \@uniq_intensities ;
+	
+}  
+## END of SUB
+
 
 
 1 ;
