@@ -24,7 +24,7 @@ use lib::output qw( :ALL ) ;
 use lib::conf qw( :ALL ) ;
 
 ## Initialized values
-my ($OptHelp,$ri,$riWindow,$gcColumn,$msp_file,$maxHits,$mzRes,$maxIons,$threshold,$spectrum_string,$relative) = (undef,undef,undef,undef,undef,undef,undef,undef,undef,undef,undef) ;
+my ($OptHelp,$ri,$riWindow,$gcColumn,$inputSpectra,$maxHits,$mzRes,$maxIons,$threshold,$relative) = (undef,undef,undef,undef,undef,undef,undef,undef,undef,undef,undef) ;
 my ( $JaccardDistanceThreshold,$s12GowerLegendreDistanceThreshold,$DotproductDistanceThreshold,$HammingDistanceThreshold,$EuclideanDistanceThreshold ) = (undef,undef,undef,undef,undef) ;
 my ($excel_file,$html_file,$html_template,$json_file) = (undef,undef,undef,undef) ;
 my (@hits, @ojson) = ( () , () ) ;
@@ -38,10 +38,9 @@ if (!@ARGV){ &help ; }
 #=============================================================================
 &GetOptions ( 	
 				"help|h"     => \$OptHelp,       # HELP
-				"spectraFile:s"		=> \$msp_file,
-				"spectrumString:s"		=> \$spectrum_string,
-				"ri:f"		=> \$ri,
-				"riWindow:f"		=> \$riWindow,
+				"inputSpectra:s"		=> \$inputSpectra,
+				"ri:i"		=> \$ri,
+				"riWindow:i"		=> \$riWindow,
 				"gcColumn:s"		=> \$gcColumn,
 				"maxHits:i"		=> \$maxHits,
 				"mzRes:i"		=> \$mzRes,
@@ -100,10 +99,10 @@ my $o_output = lib::output->new() ;
 my $ref_mzs_res ;
 my $ref_ints_res ;
 
-## Case when only one spectra is queried
-if (defined $spectrum_string) { 
+## Case when masses are entered manually -> don't enter if ".msp" exists in $inputSpectra
+if (defined $inputSpectra && $inputSpectra =~ /^((?!\.msp).)*$/gm) { 
 	
-	my $mzs_res = $omsp->get_intensities_and_mzs_from_string($spectrum_string) ;
+	my $mzs_res = $omsp->get_intensities_and_mzs_from_string($inputSpectra) ;
 	my @mzs = @$mzs_res[0] ;
 	my @intensities = @$mzs_res[1] ;
 	
@@ -111,15 +110,14 @@ if (defined $spectrum_string) {
 	#print Dumper $encoded_spectra ;
 }
 ## Taking care of the msp file
-elsif (defined $msp_file and defined $mzRes and defined $maxIons and defined $maxHits) {
+elsif (defined $inputSpectra and -e $inputSpectra and defined $mzRes and defined $maxIons and defined $maxHits) {
+
+	unless (-f $inputSpectra)  { croak "$inputSpectra is not a file" ; }
+	unless (-s $inputSpectra)  { croak "$inputSpectra is empty" ; }
 	
-	unless (-e $msp_file)  { croak "$msp_file does not exist" ; }
-	unless (-f $msp_file)  { croak "$msp_file is not a file" ; }
-	unless (-s $msp_file)  { croak "$msp_file is empty" ; }
 	
-	
-	$ref_mzs_res = $omsp->get_mzs($msp_file,$mzRes,$maxIons) ;
-	$ref_ints_res = $omsp->get_intensities($msp_file, $maxIons) ;
+	$ref_mzs_res = $omsp->get_mzs($inputSpectra,$mzRes,$maxIons) ;
+	$ref_ints_res = $omsp->get_intensities($inputSpectra, $maxIons) ;
 	
 	## Remove redundant masses
 	my ($uniq_masses , $uniq_intensities) = (undef,undef) ;
@@ -149,7 +147,7 @@ elsif (defined $msp_file and defined $mzRes and defined $maxIons and defined $ma
 	else { $encoded_spectra = $omsp->encode_spectrum_for_query($mzs_res, $ints_res) ; }
 }
 elsif (!defined $maxHits or !defined $maxIons or !defined $mzRes) { croak "Parameters mzRes or maxIons or maxHits are undefined\n"; } 
-
+elsif(!-f $inputSpectra) { croak "$inputSpectra does not exist" ; }
 
 ############# -------------- Send queries to Golm -------------- ############# :
 
