@@ -189,7 +189,7 @@ sub get_intensities {
 		    			## If user wants a specific number of ions to be queried
 		    			elsif ($maxIons > 0) {
 		    				my $j = 0 ;
-		    				while ($j<$maxIons){
+		    				while (scalar @intensities < $maxIons && $j < @temp_intensities){
 		    					push (@intensities , $temp_intensities[$j++]) ;
 		    				}
 		    			} 
