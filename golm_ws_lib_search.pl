@@ -68,11 +68,17 @@ if(defined($OptHelp)){ &help ; }
 #                                MAIN SCRIPT
 #=============================================================================
 
+## Create module objects ###
+
+my $oapi = lib::golm_ws_api->new() ;
+my $omsp = lib::msp->new() ;
+my $o_output = lib::output->new() ;
+my $oConf = lib::conf->new() ;
+
 
 ## -------------- Conf file ------------------------ :
 my ( $CONF ) = ( undef ) ;
 foreach my $conf ( <$binPath/*.cfg> ) {
-	my $oConf = lib::conf->new() ;
 	$CONF = $oConf->as_conf($conf) ;
 }
 
@@ -81,17 +87,17 @@ $html_template = <$binPath/golm_out.tmpl> ;
 $CONF->{'HTML_TEMPLATE'} = $html_template ;
 
 
-
-## Create new module objects ###
-
-my $oapi = lib::golm_ws_api->new() ;
-my $omsp = lib::msp->new() ;
-my $o_output = lib::output->new() ;
-
+## -------------- Retrieve values from conf file ------------------------ :
+my $ws_url = $CONF->{'WS_URL'} ;
+my $ws_proxy = $CONF->{'WS_PROXY'} ;
+my $default_ri = $CONF->{'RI'} ;
+my $default_ri_window = $CONF->{'RI_WINDOW'} ;
+my $default_gc_column = $CONF->{'GC_COLUMN'} ;
+my $default_entries = $CONF->{'DEFAULT_ENTRIES'} ;
 
 ############# -------------- Test the Golm web service -------------- ############# :
 
-#$oapi->test_query_golm() ;
+$oapi->test_query_golm($ws_url, $ws_proxy) ;
 
 ############# -------------- Parse the .msp file -------------- ############# :
 
@@ -130,7 +136,7 @@ elsif (defined $inputSpectra and -e $inputSpectra and defined $mzRes and defined
 		push (@uniq_total_masses , $uniq_masses) ;
 		push (@uniq_total_intensities, $uniq_intensities) ;
 	} 
-	
+	print Dumper \@uniq_total_intensities ;
 	## Sorting intensities
 	my ($mzs_res, $ints_res) = $omsp->sorting_descending_intensities(\@uniq_total_masses, \@uniq_total_intensities) ;
 	
@@ -156,10 +162,14 @@ foreach my $spectrum (@$encoded_spectra){
 																										  $s12GowerLegendreDistanceThreshold,
 																										  $DotproductDistanceThreshold,
 																										  $HammingDistanceThreshold,
-																										  $EuclideanDistanceThreshold) ;
+																										  $EuclideanDistanceThreshold,
+																										  $ws_url, $ws_proxy,
+																										  $default_ri, $default_ri_window, $default_gc_column) ;
 	push (@hits , $limited_hits) ;
 	push (@ojson , $res_json) ;
 }
+
+
 
 ############# -------------- Build outputs -------------- ############# :
 
@@ -167,7 +177,7 @@ my $jsons_obj = $o_output->build_json_res_object(\@hits) ;
 $o_output->write_json_skel(\$json_file, $jsons_obj) ;
 
 my $tbody_entries = $o_output->add_entries_to_tbody_object($jsons_obj) ;
-$o_output->write_html_body($jsons_obj, $tbody_entries, $html_file, $html_template) ;
+$o_output->write_html_body($jsons_obj, $tbody_entries, $html_file, $html_template, $default_entries) ;
 $o_output->excel_output($excel_file, $jsons_obj) ;
 
 
@@ -198,7 +208,7 @@ USAGE :
 			-ri [Rentention Index: float or integer]
 			-riWindow [Retention Index Window: 1500 or the value of your choice]
 			-gcColumn [AlkaneRetentionIndexGcColumnComposition: 'VAR5' or 'MDN35' or 'None']
-			-maxHits [Maximum hits per queried spectra: integer (0 for all)]
+			-maxHits [Maximum hits per queried spectra: integer >= 1 (100 for all of them)]
 			-mzRes [Number of digits after the decimal point for m/z values: integer (0 if none)]
 			-maxIons [Number of m/z per spectra you want to keep for the queries, default 0 for all detected ions]
 			-JaccardDistanceThreshold...............[
