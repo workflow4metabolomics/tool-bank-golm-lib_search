@@ -218,7 +218,7 @@ sub write_html_body {
     
     if (defined $html_file){
     	
-	    	open (HTML, ">$html_file") or die "Failed to open filehandle: $!" ;
+	    	open (HTML, '>', "output/".$html_file) or die "Failed to open filehandle: $!" ;
 	    
 		    if (-e $html_template) {
 		    	
@@ -255,7 +255,7 @@ sub excel_output {
     my $self = shift ;
     my ( $excel_file, $jsons ) = @_ ;
     
-    open (FILE, '>', $excel_file) or die "Failed to open filehandle: $!" ;
+    open (FILE, '>', "output/".$excel_file) or die "Failed to open filehandle: $!" ;
     
     # Create a new workbook and add a worksheet
     my $workbook  = Excel::Writer::XLSX->new( \*FILE ) ;
@@ -325,7 +325,7 @@ sub write_json_skel {
     my ( $json_file, $json_obj ) = @_ ;
     
     my $utf8_encoded_json_text = encode_json $json_obj ;
-    open(JSON, '>:utf8', "$$json_file") or die "Cant' create the file $$json_file\n" ;
+    open(JSON, '>:utf8', "output/".$$json_file) or die "Cant' create the file $$json_file\n" ;
     print JSON $utf8_encoded_json_text ;
     close(JSON) ;
     
