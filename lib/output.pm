@@ -212,7 +212,7 @@ sub add_entries_to_tbody_object {
 sub write_html_body {
 	## Retrieve Values
     my $self = shift ;
-    my ( $results, $tbody_entries, $html_file_name, $html_template ) = @_ ;
+    my ( $results, $tbody_entries, $html_file_name, $html_template, $default_entries ) = @_ ;
     
     my $html_file = $html_file_name ;
     
@@ -224,6 +224,7 @@ sub write_html_body {
 		    	
 		    	my $ohtml = HTML::Template->new(filename => $html_template) ;
 		    	$ohtml->param( GROUPS => $tbody_entries ) ;
+		    	$ohtml->param( DEFAULT_ENTRIES => $default_entries ) ;
 		    	print HTML $ohtml->output ;
 		    }	
 	    	else {
