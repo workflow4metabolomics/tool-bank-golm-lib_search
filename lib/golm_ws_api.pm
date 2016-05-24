@@ -56,21 +56,23 @@ sub new {
 =head2 METHOD connectWSlibrarySearchGolm
 
 	## Description : create a soap object throught the webservice LibrarySearch of Golm.
-	## Input : $self
+	## Input : $ws_url, $ws_proxy
 	## Ouput : $soap ;
-	## Usage : my $soap = connectWSlibrarySearchGolm() ;
+	## Usage : my $soap = connectWSlibrarySearchGolm($ws_url, $ws_proxy) ;
 
 =cut
 
 sub connectWSlibrarySearchGolm() {
 	## Retrieve Values
     my $self = shift ;
+    my ($ws_url, $ws_proxy) = @_ ;
+    
 	my $osoap = SOAP::Lite
 		-> soapversion('1.2')
 		-> envprefix('soap12')
 		-> readable(1)
-		-> uri('gmd.mpimp-golm.mpg.de')
-		-> proxy('http://gmd.mpimp-golm.mpg.de/webservices/wsLibrarySearch.asmx/' )
+		-> uri( $ws_url )
+		-> proxy( $ws_proxy."/" )
 		-> on_fault(sub { my($soap, $res) = @_; 
          eval { die ref $res ? $res->faultstring : $soap->transport->status, "\n"};
          return ref $res ? $res : new SOAP::SOM ;
@@ -87,19 +89,21 @@ sub connectWSlibrarySearchGolm() {
 =head2 METHOD test_query_golm
 
 	## Description : send a test request (default given on ws website) to golm database.
-	## Input : $self
+	## Input : $ws_url, $ws_proxy
 	## Ouput : $soap ;
-	## Usage : my $soap = connectWSlibrarySearchGolm() ;
+	## Usage : my $soap = test_query_golm($ws_url, $ws_proxy) ;
 
 =cut
 
 sub test_query_golm() {
 	## Retrieve Values
     my $self = shift ;
+    my ($ws_url, $ws_proxy) = @_ ;
+    
 	my $soap = SOAP::Lite
-              -> uri('http://gmd.mpimp-golm.mpg.de')
-              -> on_action( sub { join '/', 'http://gmd.mpimp-golm.mpg.de/webservices/wsLibrarySearch.asmx', $_[1] } )
-              -> proxy('http://gmd.mpimp-golm.mpg.de/webservices/wsLibrarySearch.asmx', timeout => 500);
+              -> uri($ws_url)
+              -> on_action( sub { join '/', $ws_proxy, $_[1] } )
+              -> proxy($ws_proxy, timeout => 500);
                
            # Setting Content-Type myself
            my $http_request = $soap
@@ -109,7 +113,7 @@ sub test_query_golm() {
            $http_request->content_type("text/xml; charset=utf-8");
            
             my $method = SOAP::Data->name('LibrarySearch')
-                ->attr({xmlns => 'http://gmd.mpimp-golm.mpg.de/webservices/wsLibrarySearch.asmx/'});
+                ->attr({xmlns => $ws_proxy."/"});
            
             my @params = (
                            SOAP::Data->name('ri' => 1898),
@@ -147,12 +151,13 @@ sub LibrarySearch() {
 	## Retrieve Values
 	my $self = shift ;
 	my ($ri, $riWindow, $gcColumn, $spectrum, $maxHits,$JaccardDistanceThreshold,$s12GowerLegendreDistanceThreshold,$DotproductDistanceThreshold,
-		$HammingDistanceThreshold,$EuclideanDistanceThreshold) = @_ ;
+		$HammingDistanceThreshold,$EuclideanDistanceThreshold, $ws_url, $ws_proxy, $default_ri, $default_ri_window, $default_gc_column) = @_ ;
 
 	#init in case :
-	$ri = 1500 if ( !defined $ri ) ;
-	$riWindow = 3000 if ( !defined $riWindow ) ;
-	$gcColumn = 'VAR5' if ( !defined $gcColumn ) ;
+	$ri = $default_ri if ( !defined $ri ) ;
+	$riWindow = $default_ri_window if ( !defined $riWindow ) ;
+	$gcColumn = $default_gc_column if ( !defined $gcColumn ) ;
+	
 	
 	my $result ;
 	my @filtered_limited_res = () ;
@@ -163,9 +168,9 @@ sub LibrarySearch() {
     	if ( $spectrum ne '' ) {
     		
 		   my $soap = SOAP::Lite
-              -> uri('http://gmd.mpimp-golm.mpg.de')
-              -> on_action( sub { join '/', 'http://gmd.mpimp-golm.mpg.de/webservices/wsLibrarySearch.asmx', $_[1] } )
-              -> proxy('http://gmd.mpimp-golm.mpg.de/webservices/wsLibrarySearch.asmx');
+              -> uri($ws_url)
+              -> on_action( sub { join '/', $ws_proxy, $_[1] } )
+              -> proxy($ws_proxy);
                
            # Setting Content-Type myself
            my $http_request = $soap
@@ -175,7 +180,7 @@ sub LibrarySearch() {
            $http_request->content_type("text/xml; charset=utf-8");
            
             my $method = SOAP::Data->name('LibrarySearch')
-                ->attr({xmlns => 'http://gmd.mpimp-golm.mpg.de/webservices/wsLibrarySearch.asmx/'});
+                ->attr({xmlns => $ws_proxy."/"});
            
             my @params = (
                            SOAP::Data->name('ri' => $ri),
