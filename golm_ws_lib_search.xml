@@ -92,12 +92,28 @@
 	 
 	 <help>
 	 
-	 
-	 
+	 **Authors**
+  | Gabriel Cretin (for perl and Galaxy), Franck Giacomoni (for perl)
+
+---------------------------------------------------
+
+.. class:: infomark
+
+**Please cite** If you use this tool, please cite MassBank.
+
+for `Golm Metabolome Database &lt;http://gmd.mpimp-golm.mpg.de/&gt;`_ :
+  `Hummel, J., Strehmel, N., Selbig, J., Walther, D. and Kopka, J. (2010) Decision tree supported substructure prediction of metabolites from GC-MS profiles, Metabolomics.&lt;http://dx.doi.org/10.1007/s11306-010-0198-7&gt;`_
 	 
 	 </help>
 	 
 	 
+-----------
+Description
+-----------
+
+The Golm Metabolome Database (GMD) facilitates the search for and dissemination of reference mass spectra from biologically active metabolites quantified using gas chromatography (GC) coupled to mass spectrometry (MS).
+This tool intends to facilitate the annotation of masses from GC-MS by searching informations through GMD webservices.  
+
 	 
 </tool>
 	 
