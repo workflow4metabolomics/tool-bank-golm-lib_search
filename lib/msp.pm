@@ -221,7 +221,7 @@ sub get_intensities {
 sub get_intensities_and_mzs_from_string {
 	## Retrieve Values
     my $self = shift ;
-    my ( $spectrum_string ) = @_ ;
+    my ( $spectrum_string, $mzRes ) = @_ ;
     
     my @intensities = () ;
     my @mzs = () ;
@@ -234,12 +234,28 @@ sub get_intensities_and_mzs_from_string {
     		
 	    		my @val = split (/\s+/ , $spectrum_string) ;
 	    		for (my $i=0 ; $i<@val ; $i++) {
-	    			if ($i%2 == 0)  { push @mzs,$val[$i] ; }
-	    			else 			{ push @intensities,$val[$i] ; }
+	    			if ($i%2 == 0) {
+	    				my $mz = $val[$i] ;
+	    				# Truncate/round mzs depending on $mzRes wanted
+	    				if ($mzRes == 0) {
+	    					$mz = int($mz) ;
+	    					push ( @mzs , $val[$i] ) ;
+	    				}
+	    				# Check that $mzRes is not greater than the number of digits after comma
+	    				elsif ($mzRes > 0) {
+	    					if($mzRes > length(( $mz =~ /.+\.(.*)/)[0] )) {
+	    						$mz = sprintf("%.".$mzRes."f" , $mz) ;
+	    					}
+	    					my $mz_rounded = _round_num($mz,$mzRes) ;
+	    					push ( @mzs , $$mz_rounded ) ;
+	    				}
+	    			}
+	    			else {
+	    				my $int = $val[$i] ;
+	    				push ( @intensities , $int ) ; 
+	    			}
 	    		}
-	    		my @spectrum_intensities_mzs = (\@mzs , \@intensities) ;
-	    		#print Dumper \@spectrum_intensities_mzs ;
-	    		return \@spectrum_intensities_mzs ;
+	    		return (\@mzs , \@intensities) ;
     		}
     		else { croak "Wrong format of the spectrum. See help\n" }
     	}
@@ -268,22 +284,31 @@ sub sorting_descending_intensities {
     my @mzs_res = () ;
     my @ints_res = () ;
     
-    
-    
     if ( defined $ref_mzs_res && defined $ref_ints_res ) {
     	if ( (scalar @$ref_mzs_res) != 0 && (scalar @$ref_ints_res) != 0 ) {
+		    
 		    @mzs_res = @$ref_mzs_res ;
 			@ints_res = @$ref_ints_res ;
-		
-			## Sorting ions by decreasing intensity values
-			for (my $i=0 ; $i<@ints_res ; $i++) {
-				my @sorted_indices = sort { @{$ints_res[$i]}[$b] <=> @{$ints_res[$i]}[$a] } 0..$#{$ints_res[$i]};
-				@$_ = @{$_}[@sorted_indices] for \(@{$ints_res[$i]},@{$mzs_res[$i]});
+			
+			# Case when we have only one array of masses (input is a string of masses and not a file)
+		    if ( ref(@$ref_ints_res[0]) ne "ARRAY") {
+		    
+		    	my @sorted_indices = sort { $ints_res[$b] <=> $ints_res[$a] } 0..$#ints_res;
+				@$_ = @{$_}[@sorted_indices] for \(@mzs_res, @ints_res);
+				
+		    }
+			else {
+				## Sorting ions by decreasing intensity values
+				for (my $i=0 ; $i<@ints_res ; $i++) {
+					my @sorted_indices = sort { @{$ints_res[$i]}[$b] <=> @{$ints_res[$i]}[$a] } 0..$#{$ints_res[$i]};
+					@$_ = @{$_}[@sorted_indices] for \(@{$ints_res[$i]},@{$mzs_res[$i]});
+				}
 			}
     	} 
     	else { carp "Cannot sort intensities, mzs or intensities are empty" ; return (\@mzs_res, \@ints_res) ; } 
     } 
-    else { carp "Cannot sort intensities, mzs or intensities are undef" ; return (\@mzs_res, \@ints_res) ; } 
+    else { carp "Cannot sort intensities, mzs or intensities are undef" ; return (\@mzs_res, \@ints_res) ; }
+    
 	return (\@mzs_res, \@ints_res) ;
 }
 ## END of SUB
@@ -314,17 +339,29 @@ sub encode_spectrum_for_query {
     
     if ( defined $mzs && defined $intensities ) {
     	if ( @$mzs && @$intensities ) {
-		    for (my $i=0 ; $i< @$mzs ; $i++) {
-		    	
-		    	for ( my $j=0 ; $j< @{ @$mzs[$i] } ; $j++ ) {
-		    		
-		    		$spectrum = $spectrum . $$mzs[$i][$j] . "%20" . $$intensities[$i][$j] . "%20";
-		    	}
-		    	#remove the "%20" at the end
-		    	$spectrum = substr($spectrum,0,-3);
-		    	$encoded_spectra[$k] = $spectrum ;
-		    	$k++ ;
-		    	$spectrum = '' ;
+    		
+    		# Case when we have only one array of masses (input is a string of masses and not a file)
+		    if ( ref(@$mzs[0]) ne "ARRAY") {
+    			for (my $i=0 ; $i< @$mzs ; $i++) {
+    				$spectrum = $spectrum . @$mzs[$i] . "%20" . @$intensities[$i] . "%20";
+    			}
+    			#remove the "%20" at the end
+			    $spectrum = substr($spectrum,0,-3);
+			    push ( @encoded_spectra , $spectrum ) ;
+		    }
+		    else {
+			    for (my $i=0 ; $i< @$mzs ; $i++) {
+			    	
+			    	for ( my $j=0 ; $j< @{ @$mzs[$i] } ; $j++ ) {
+			    		
+			    		$spectrum = $spectrum . $$mzs[$i][$j] . "%20" . $$intensities[$i][$j] . "%20";
+			    	}
+			    	#remove the "%20" at the end
+			    	$spectrum = substr($spectrum,0,-3);
+			    	$encoded_spectra[$k] = $spectrum ;
+			    	$k++ ;
+			    	$spectrum = '' ;
+			    }
 		    }
     	}
     	else { carp "Cannot encode spectrum, mzs and intensities arrays are empty" ; return \@encoded_spectra ; }
@@ -419,7 +456,7 @@ sub remove_redundants {
 	    push (@uniq_intensities , $uniq{ $mass }) ;
 	}
 	
-	return \@uniq_masses , \@uniq_intensities ;
+	return (\@uniq_masses , \@uniq_intensities) ;
 	
 }  
 ## END of SUB
