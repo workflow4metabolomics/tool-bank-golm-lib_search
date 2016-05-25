@@ -50,7 +50,7 @@ if (!@ARGV){ &help ; }
 				"DotproductDistanceThreshold:f"		=> \$DotproductDistanceThreshold,
 				"HammingDistanceThreshold:f"		=> \$HammingDistanceThreshold,
 				"EuclideanDistanceThreshold:f"		=> \$EuclideanDistanceThreshold,
-				"relative"			=> \$relative,
+				"relative:s"			=> \$relative,
 				"excelFile:s"			=> \$excel_file,
 				"htmlFile:s"		=> \$html_file,
 				"jsonFile:s"		=> \$json_file
@@ -108,23 +108,38 @@ my $ref_ints_res ;
 ## Case when masses are entered manually -> don't enter if ".msp" exists in $inputSpectra
 if (defined $inputSpectra && $inputSpectra =~ /^((?!\.msp).)*$/gm) { 
 	
-	my $mzs_res = $omsp->get_intensities_and_mzs_from_string($inputSpectra) ;
-	my @mzs = @$mzs_res[0] ;
-	my @intensities = @$mzs_res[1] ;
+	my ($ref_mzs_res , $ref_ints_res) = $omsp->get_intensities_and_mzs_from_string($inputSpectra, $mzRes) ;
 	
-	$encoded_spectra = $omsp->encode_spectrum_for_query(\@mzs,\@intensities) ;
-	#print Dumper $encoded_spectra ;
+	## Remove redundant masses
+	my ($uniq_masses , $uniq_intensities) = $omsp->remove_redundants($ref_mzs_res, $ref_ints_res) ;
+	
+	## Sorting intensities
+	my ($mzs_res_sorted, $ints_res_sorted) = $omsp->sorting_descending_intensities($uniq_masses, $uniq_intensities) ;
+	
+	## Relative intensity
+	my $relative_ints_res = undef ;
+	if ($relative eq "true") {
+		my @relative_ints = map { ($_ * 100)/@$ints_res_sorted[0] } @$ints_res_sorted ;
+		$relative_ints_res = \@relative_ints ;
+	}
+	
+	## Encode spectra
+	if (defined $relative_ints_res) {
+		$encoded_spectra = $omsp->encode_spectrum_for_query($mzs_res_sorted, $relative_ints_res) ;
+	}
+	else { $encoded_spectra = $omsp->encode_spectrum_for_query($mzs_res_sorted, $ints_res_sorted) ; }
+	
 }
-## Taking care of the msp file
+## Case with the msp file
 elsif (defined $inputSpectra and -e $inputSpectra and defined $mzRes and defined $maxIons and defined $maxHits) {
 
 	unless (-f $inputSpectra)  { croak "$inputSpectra is not a file" ; }
 	unless (-s $inputSpectra)  { croak "$inputSpectra is empty" ; }
 	
-	
-	$ref_mzs_res = $omsp->get_mzs($inputSpectra,$mzRes,$maxIons) ;
+	$ref_mzs_res = $omsp->get_mzs($inputSpectra, $mzRes, $maxIons) ;
 	$ref_ints_res = $omsp->get_intensities($inputSpectra, $maxIons) ;
-	
+
+
 	## Remove redundant masses
 	my ($uniq_masses , $uniq_intensities) = (undef,undef) ;
 	my @uniq_total_masses = () ;
@@ -135,25 +150,26 @@ elsif (defined $inputSpectra and -e $inputSpectra and defined $mzRes and defined
 		($uniq_masses , $uniq_intensities) = $omsp->remove_redundants(@$ref_mzs_res[$i], @$ref_ints_res[$i]) ;
 		push (@uniq_total_masses , $uniq_masses) ;
 		push (@uniq_total_intensities, $uniq_intensities) ;
-	} 
-	print Dumper \@uniq_total_intensities ;
+	}
+	
 	## Sorting intensities
-	my ($mzs_res, $ints_res) = $omsp->sorting_descending_intensities(\@uniq_total_masses, \@uniq_total_intensities) ;
+	my ($mzs_res_sorted, $ints_res_sorted) = $omsp->sorting_descending_intensities(\@uniq_total_masses, \@uniq_total_intensities) ;
 	
 	## Relative intensity
 	my $relative_ints_res = undef ;
 	if ($relative eq "true") {
-		$relative_ints_res = $omsp->apply_relative_intensity($ints_res) ;
+		$relative_ints_res = $omsp->apply_relative_intensity($ints_res_sorted) ;
 	}
 	
 	## Encode spectra
 	if (defined $relative_ints_res) {
-		$encoded_spectra = $omsp->encode_spectrum_for_query($mzs_res, $relative_ints_res) ;
+		$encoded_spectra = $omsp->encode_spectrum_for_query($mzs_res_sorted, $relative_ints_res) ;
 	}
-	else { $encoded_spectra = $omsp->encode_spectrum_for_query($mzs_res, $ints_res) ; }
+	else { $encoded_spectra = $omsp->encode_spectrum_for_query($mzs_res_sorted, $ints_res_sorted) ; }
+
 }
 elsif (!defined $maxHits or !defined $maxIons or !defined $mzRes) { croak "Parameters mzRes or maxIons or maxHits are undefined\n"; } 
-elsif(!-f $inputSpectra) { croak "$inputSpectra does not exist" ; }
+elsif (!-f $inputSpectra) 										  { croak "$inputSpectra does not exist" ; }
 
 ############# -------------- Send queries to Golm -------------- ############# :
 
