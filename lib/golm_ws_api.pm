@@ -201,7 +201,7 @@ sub LibrarySearch() {
             ## Limitate number of hits returned according to user's $maxHit
             ## and filter hits on specific values with thresholds
             my @results = @$results ;
-            print Dumper \@results ;
+            
             ### Return all hits
             if ($maxHits == 100 && $status eq 'success') {
             	my $filtered_res = _filter_scores_golm_results(\@results,$JaccardDistanceThreshold,$s12GowerLegendreDistanceThreshold,
@@ -251,7 +251,7 @@ sub _filter_scores_golm_results() {
 	
 	foreach my $res (@results){
 		
-			if ($res->{'JaccardDistance'} <= $JaccardDistanceThreshold && $s12GowerLegendreDistanceThreshold <= $DotproductDistanceThreshold
+			if ($res->{'JaccardDistance'} <= $JaccardDistanceThreshold && $res->{'s12GowerLegendreDistance'} <= $s12GowerLegendreDistanceThreshold
 				&& $res->{'DotproductDistance' } <= $DotproductDistanceThreshold && $res->{'HammingDistance'} <= $HammingDistanceThreshold && 
 				$res->{'EuclideanDistance' } <= $EuclideanDistanceThreshold) {
 					
