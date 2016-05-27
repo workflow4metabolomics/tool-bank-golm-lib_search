@@ -128,7 +128,6 @@ sub build_json_res_object {
 				# Get rid of false results
 				if ($hash_res{'metaboliteID'} eq '00000000-0000-0000-0000-000000000000') {
 					--$json_results[$i]{'nb_hits'} ;
-					next ;
 				}
 				else {
 					$hit_infos{'metaboliteID'} = $hash_res{'metaboliteID'} ;
