@@ -81,8 +81,7 @@
 		
 		.mdl-tooltip {
 			border-radius: 20px;
-			margin-top:44px;
-		}	
+		}
 		
 		.dataTables_wrapper .dataTables_length {
 		    float: left;
@@ -109,7 +108,11 @@
 	</style>
 	
 	
+	<script type='text/javascript' language='javascript' src='https://cdnjs.cloudflare.com/ajax/libs/jszip/2.5.0/jszip.min.js'></script>
+	<script type='text/javascript' language='javascript' src='https://cdn.rawgit.com/bpampuch/pdfmake/0.1.18/build/pdfmake.min.js'></script>
 	<script type='text/javascript' language='javascript' src='https://code.jquery.com/jquery-1.12.0.min.js'></script>
+	<script type='text/javascript' language='javascript' src='https://cdn.datatables.net/buttons/1.2.0/js/buttons.colVis.min.js'></script>
+	<script type='text/javascript' language='javascript' src='https://cdn.rawgit.com/bpampuch/pdfmake/0.1.18/build/vfs_fonts.js'></script>
 	<script type='text/javascript' language='javascript' src='https://cdn.datatables.net/select/1.1.2/js/dataTables.select.min.js'></script>
 	<script type='text/javascript' language='javascript' src='https://cdn.datatables.net/buttons/1.1.2/js/dataTables.buttons.min.js'></script>
 	<script type='text/javascript' language='javascript' src='https://cdn.datatables.net/buttons/1.1.2/js/buttons.html5.min.js'></script>
@@ -126,6 +129,9 @@
 		        buttons: [
 		            {
 		                extend:    'copyHtml5',
+		                exportOptions: {
+		                    columns: [ 0, ':visible' ]
+		                },
 		                text:      '<i class="material-icons" style="height:25px">content_copy</i>',
 		                titleAttr: 'Copy'
 		            },
@@ -142,7 +148,12 @@
 		                text:		'<i class="material-icons" style="height:25px">file_download</i>',
 		                titleAttr: 'Export',
 		                buttons: [
-		                    'excelHtml5',
+		                    {
+				                extend: 'excelHtml5',
+				                exportOptions: {
+				                    columns: ':visible'
+				                }
+				            },
 		            		'csvHtml5'
 		                ]
 		            },
@@ -291,14 +302,14 @@
 							</tbody>
 					</table>
 			</div>
-			<div class='mdl-tooltip mdl-tooltip--large mdl-tooltip--top' for='mytooltip1'>
+			<div class='mdl-tooltip mdl-tooltip--large mdl-tooltip--left' for='mytooltip1'>
 		  		The dot product or scalar product is an algebric operation that takes two equal-length sequences of numbers (usually coordinate vectors) and returns a single number. It is
 				used to calculate differences between points of different spectra in 3D (3D constructed with Retention infos, mass and intensity)
 		    </div>
 		    <div class='mdl-tooltip mdl-tooltip--large mdl-tooltip--top' for='mytooltip2'>
 		  		The Euclidean distance is a generalization of the familiar Pythagorean theorem. It is the 'ordinary' distance between two points in Euclidean space
 		    </div>
-		    <div class='mdl-tooltip mdl-tooltip--large mdl-tooltip--top' for='mytooltip3'>
+		    <div class='mdl-tooltip mdl-tooltip--large mdl-tooltip--left' for='mytooltip3'>
 		  		The Jaccard distance: is a statistic used for comparing the similarity and diversity of sample sets. The Jaccard coefficient
 	measures similarity between finite sample sets, and is defined as the size of the intersection divided by the size of the union of the sample sets.
 
