@@ -13,8 +13,8 @@ use vars qw($VERSION @ISA @EXPORT %EXPORT_TAGS);
 
 our $VERSION = "1.0";
 our @ISA = qw(Exporter);
-our @EXPORT = qw( connectWSlibrarySearchGolm LibrarySearch test_query_golm _filter_scores_golm_results);
-our %EXPORT_TAGS = ( ALL => [qw( connectWSlibrarySearchGolm LibrarySearch test_query_golm _filter_scores_golm_results)] );
+our @EXPORT = qw( connectWSlibrarySearchGolm LibrarySearch test_query_golm _filter_scores_golm_results _filter_replica_results);
+our %EXPORT_TAGS = ( ALL => [qw( connectWSlibrarySearchGolm LibrarySearch test_query_golm _filter_scores_golm_results _filter_replica_results)] );
 
 =head1 NAME
 
@@ -258,8 +258,32 @@ sub _filter_scores_golm_results() {
 				push (@filtered_res , $res) ;
 			}
 	}
-	return \@filtered_res ;
+	my $sorted_analytes = _filter_replica_results(\@filtered_res) ;
+	return $sorted_analytes ;
 }
+
+
+
+=head2 METHOD _filter_replica_results
+     ## Description : remove replicated hits, keep the ones with lowest dot product distance
+     ## Input : $results
+     ## Ouput : \@clean_res ;
+     ## Usage : my ($clean_res) = _filter_replica_results($results) ;
+
+=cut
+
+sub _filter_replica_results() {
+     ## Retrieve Values
+     my ($results) = @_ ;
+
+	my %seen ;
+	my @sortAnalytes = grep { !$seen{$_->{'analyteName'}}++ } sort { $a->{'DotproductDistance'} <=> $b->{'DotproductDistance'} } @$results ;
+
+     return \@sortAnalytes ;
+}
+
+
+
 
 	
 1 ;
