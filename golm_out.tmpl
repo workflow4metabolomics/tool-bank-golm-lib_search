@@ -25,6 +25,7 @@
 			overflow-x: auto;
 		    margin-left: 100px;
 		    margin-right: 100px;
+		    padding-top:20px;
 		}
 				
 		.toolbar {
@@ -70,17 +71,66 @@
 			height: 40px;
 			line-height:40px;
 		}
+		
+		.mdl-button:hover {
+		    transform: translateY(-3px);
+		    box-shadow: 0px 2px 15px #777;
+		}
+		
+		.ripple{
+		  overflow:hidden;
+		  position: relative;
+		  box-sizing: border-box;
+		  transform: translate3d(0, 0, 0);
+		}
+		
+		.ripple-effect{
+		  position: absolute;
+		  border-radius: 50%;
+		  background-color: rgba(255,255,255,0.5);
+		  user-select: none;
+		  pointer-events: none;
+		  padding: 0;
+		  margin: 0;
+		  opacity: 0.6;
+		  transform: translate3d(-50%,-50%,0);
+		}
 
 		.mdl-shadow--3dp {
-		    box-shadow: 0 25px 150px rgba(0,0,0,.14),0 3px 3px -2px rgba(0,0,0,.2),0 1px 8px 0 rgba(0,0,0,.12);
+		    box-shadow: 0 25px 150px rgba(0,0,0,.33),0 3px 3px -2px rgba(0,0,0,.2),0 1px 8px 0 rgba(0,0,0,.12);
 		}
 		
 		.mdl-tooltip.is-active {
-			animation: pulse 1000ms cubic-bezier(0,0,.2,1)forwards;	
+			animation: pulse 1000ms cubic-bezier(0,0,.2,1)forwards;
+			z-index: 1000;
 		}
 		
 		.mdl-tooltip {
 			border-radius: 20px;
+			line-height: 18px;
+		}
+		
+		.mdl-list__item {
+    		line-height: 1.25 ;
+		}
+		
+		.mdl-list__item-icon {
+    		font-size: 35px;
+		}
+		
+		#large_card {
+			height: 850px;
+		}
+		
+		#dist_table th, td {
+		    padding: 15px;
+		    text-align: left;
+		}
+		
+		.mdl-card__supporting-text {
+		    color: rgba(0,0,0,.87);
+		    font-size: 16px;
+		    line-height: 22px;
 		}
 		
 		.dataTables_wrapper .dataTables_length {
@@ -203,7 +253,7 @@
 
 		    } );
 		    
-		    $('div.toolbar').html("<button class='mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--accent' id='delete'>Delete selected rows</button>");
+		    $('div.toolbar').html("<button class='mdl-button mdl-js-button mdl-button--raised ripple mdl-button--accent' data-ripple-color='#b3b3b3' id='delete'>Delete selected rows</button>");
 		    
 			$('#table_id tbody').on( 'click', 'tr', function () {
 		        $(this).toggleClass('selected');
@@ -215,10 +265,41 @@
 		    } );
 		    
 		    $('.buttons-copy, .buttons-print, .buttons-collection, .buttons-colvis, .buttons-columnVisibility').each(function() {
-			   $(this).removeClass('dt-button').addClass('mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--accent')
+			   $(this).removeClass('dt-button').addClass('mdl-button mdl-js-button mdl-button--raised ripple mdl-button--accent');
+			   $(this).attr("data-ripple-color", "#b3b3b3");
 			})
 		});
-
+		
+		
+		$(document).on('click', '.ripple', function(e) {
+		  var $rippleElement = $('<span class="ripple-effect" />'),
+		    $buttonElement = $(this),
+		    btnOffset = $buttonElement.offset(),
+		    xPos = e.pageX - btnOffset.left,
+		    yPos = e.pageY - btnOffset.top,
+		    size = parseInt(Math.min($buttonElement.height(), $buttonElement.width()) * 0.5),
+		    animateSize = parseInt(Math.max($buttonElement.width(), $buttonElement.height()) * Math.PI);
+		
+		  $rippleElement
+		    .css({
+		      top: yPos,
+		      left: xPos,
+		      width: size,
+		      height: size,
+		
+		      backgroundColor: $buttonElement.data("ripple-color")
+		    })
+		    .appendTo($buttonElement)
+		    .animate({
+		      width: animateSize,
+		      height: animateSize,
+		      opacity: 0
+		    }, 700, function() {
+		      $(this).remove();
+		    });
+		});
+		
+		
 	</script>
 
 <title>Golm Search Results</title>
@@ -255,8 +336,8 @@
 					        </tr>
 							<tr>
 								<th style='text-align:center;border-left: 1px solid #A7A7A7;'>N° Spectres</th>
-								<th style='text-align:center;border-left: 1px solid #A7A7A7;'>Spectrum Name</th>
-								<th style='text-align:center;border-right: 1px solid #A7A7A7;'>Analyte Name</th>
+								<th style='text-align:center;border-left: 1px solid #A7A7A7;'>Spectrum</th>
+								<th id='mytooltip6' style='text-align:center;border-right: 1px solid #A7A7A7;'>Analyte</th>
 								<th style='text-align:center'>Retention Index</th>
 								<th style='text-align:center;border-right: 1px solid #A7A7A7;'>RI Discrepancy</th>
 								<th id='mytooltip1' style='text-align:center'>Dot product</th>
@@ -264,15 +345,15 @@
 								<th id='mytooltip3' style='text-align:center'>Jaccard</th>
 								<th id='mytooltip4' style='text-align:center'>Hamming</th>
 								<th id='mytooltip5' style='text-align:center;border-right: 1px solid #A7A7A7;'>s12 Gower-Legendre</th>
-								<th style='text-align:center'>Spectrum</th>
-								<th style='text-align:center;border-right: 1px solid #A7A7A7;'>Metabolite</th>
+								<th style='text-align:center'>Spectrum id</th>
+								<th style='text-align:center;border-right: 1px solid #A7A7A7;'>Metabolite id</th>
 							</tr>
 						</thead>
 						<tfoot>
 							<tr>
 								<th style='text-align:center'>N° Spectre</th>
-								<th style='text-align:center'>Spectrum Name</th>
-								<th style='text-align:center'>Analyte Name</th>
+								<th style='text-align:center'>Spectrum</th>
+								<th style='text-align:center'>Analyte</th>
 								<th style='text-align:center'>Retention Index</th>
 								<th style='text-align:center'>RI Discrepancy</th>
 								<th style='text-align:center'>Dot product</th>
@@ -280,8 +361,8 @@
 								<th style='text-align:center'>Jaccard</th>
 								<th style='text-align:center'>Hamming</th>
 								<th style='text-align:center'>s12 Gower-Legendre</th>
-								<th style='text-align:center'>Spectrum</th>
-								<th style='text-align:center'>Metabolite</th>
+								<th style='text-align:center'>Spectrum id</th>
+								<th style='text-align:center'>Metabolite id</th>
 							</tr>
 						</tfoot>
 							<tbody>
@@ -302,32 +383,34 @@
 							</tbody>
 					</table>
 			</div>
-			<div class='mdl-tooltip mdl-tooltip--large mdl-tooltip--left' for='mytooltip1'>
+			<div class='mdl-tooltip mdl-tooltip--large mdl-tooltip--top' for='mytooltip1'>
 		  		The dot product or scalar product is an algebric operation that takes two equal-length sequences of numbers (usually coordinate vectors) and returns a single number. It is
 				used to calculate differences between points of different spectra in 3D (3D constructed with Retention infos, mass and intensity)
 		    </div>
 		    <div class='mdl-tooltip mdl-tooltip--large mdl-tooltip--top' for='mytooltip2'>
 		  		The Euclidean distance is a generalization of the familiar Pythagorean theorem. It is the 'ordinary' distance between two points in Euclidean space
 		    </div>
-		    <div class='mdl-tooltip mdl-tooltip--large mdl-tooltip--left' for='mytooltip3'>
+		    <div class='mdl-tooltip mdl-tooltip--large mdl-tooltip--top' for='mytooltip3'>
 		  		The Jaccard distance: is a statistic used for comparing the similarity and diversity of sample sets. The Jaccard coefficient
-	measures similarity between finite sample sets, and is defined as the size of the intersection divided by the size of the union of the sample sets.
+	measures similarity between finite sample sets, and is defined as the size of the intersection divided by the size of the union of the sample sets
 
 		    </div>
 		    <div class='mdl-tooltip mdl-tooltip--large mdl-tooltip--top' for='mytooltip4'>
 		  		The Hamming distance between two strings of equal length is the number of positions at which the corresponding symbols are different. In other words, it is the number of
-	substitutions required to transform one string into another.
+	substitutions required to transform one string into another
 		    </div>
 		    <div class='mdl-tooltip mdl-tooltip--large mdl-tooltip--top' for='mytooltip5'>
 		  		Let be the contingency table of binary data such as n11 = a, n10 = b, n01 = c and n00 = d. All these distances are of type d = sqrt(1 - s) with s a similarity coefficient.
 	S12 coefficient of Gower & Legendre s7 = a / sqrt((a + b)(a + c))
 		    </div>
+		    <div class='mdl-tooltip mdl-tooltip--large mdl-tooltip--top' for='mytooltip6'>
+		  		Is the derivatised metabolite that is measured by GC-MS
+		    </div>
 		</section>
 		<section class='mdl-layout__tab-panel' id='fixed-tab-2'>
 			<div class='page-content'>
-				<br/><br/><br/>
+				<br/>
 				<div class='mdl-grid'>
-					<div class='mdl-cell mdl-cell--1-col'></div>
 					    <div class='card-wide mdl-card mdl-cell mdl-cell--4-col mdl-shadow--3dp'>
 					    	<figure class='mdl-card__media' style='background-color: white'>
 					    		<img src='http://m.hiapphere.com/data/icon/201506/HiAppHere_com_com.javiersantos.materialid.png' style='height: 60px; width: 60px;'>
@@ -366,6 +449,53 @@
 									  </span>
 									  </li>
 							</ul>
+						</div>
+					</div>
+					<div id="large_card" class='card-wide mdl-card mdl-cell mdl-cell--4-col mdl-shadow--3dp'>
+					    	<figure class='mdl-card__media' style='background-color: white'>
+					    		<img src='http://image005.flaticon.com/1/svg/125/125279.svg' style='height: 60px; width: 60px;'>
+					    	</figure>
+					    	<div class='mdl-card__title'>
+							    <h1 class='mdl-card__title-text'>Distances scores</h1>
+							</div>
+							<div class='mdl-card__supporting-text'>
+							<table id="dist_table" style="color: rgba(0,0,0,.87);">
+								<tr>
+									<td style="padding-right:10px;"><b style="white-space: nowrap;">S12Gower-Legendre Distance</b></td>
+									<td> 
+										 The distance measure S12GowLeg = sqrt(1 - s12) is derived from the S12 coefficient of Gower & Legendre
+									     defined as s12 = a / sqrt((a + b)(a + c)), with "a" representing the number of positions at which both 
+									     spectra are in "on-state" and "b" respectively "c" representing the number of positions at which only the 
+									     query spectrum or the hit spectrum are in "on-state".
+								     </td>
+								</tr>
+								<tr>
+									<td style="padding-right:10px;"><b style="white-space: nowrap;">Hamming Distance</b></td>
+									<td>
+									    In information theory, the Hamming distance between two strings of equal length is the number of positions for which the corresponding
+									     symbols are different. Put another way, it measures the minimum number of substitutions required to change one into the other, or the number 
+									     of errors that transformed one string into the other. 
+								  	</td>
+							  	</tr>
+							  	<tr>
+							  		<td style="padding-right:10px;"><b style="white-space: nowrap;">Jaccard Distance</b></td>
+							  		
+									<td>Number of matches (a mass with appropriate intensity in both spectra) divided by the sum of matches and mismatches (a mass where only one of both 
+									    spectra has a intensity). The jaccard distance is a binary distance.
+									</td>
+								</tr>
+							  <tr>
+							  	<td style="padding-right:10px;"><b style="white-space: nowrap;padding-right:60px;">Dotproduct Distance</b></td>
+								<td>The Dotproduct distance is summing the multiplied intensities over all matching peaks within both spectra. Here, to satisfy the conditions
+								     of a metric I) non-negativity, II) identity of indiscernibles, III) symmetry and IV) subadditivity / triangle inequality, we use 1-Dotproduct.
+								      Both spectra are normalised prior to the spectral vector norm in that way, that the absolute value of the squared intensities is equal to 1.
+								</td>
+						
+							  </tr>
+							  <tr>
+								  <td style="padding-right:10px;"><b style="white-space: nowrap;padding-right:60px;">Euclidean Distance</b></td>
+								  <td>The Euclid is the square root of the sum of the squared differences over all matching peaks.</td>
+							  </tr>
 						</div>
 					</div>
 				</div>
