@@ -5,8 +5,16 @@ use warnings ;
 use Exporter ;
 use Carp ;
 use Excel::Writer::XLSX ;
+use Spreadsheet::XLSX;
+use Spreadsheet::ParseExcel;
+use Text::Iconv;
+use CGI qw(:standard);
 use HTML::Template ;
 use JSON ;
+
+use FindBin ;
+use lib $FindBin::Bin ;
+my $binPath = $FindBin::Bin ;
 
 use Data::Dumper ;
 
@@ -205,7 +213,7 @@ sub add_entries_to_tbody_object {
 	## Description : Write the html output file 
 	## Input : $results, $tbody_entries, $html_file, $html_template
 	## Output :  $html_file
-	## Usage : my ( $html_file ) = write_html_body( $results, $tbody_entries, $html_file, $html_template ) ;
+	## Usage : $o_output->write_html_body( $results, $tbody_entries, $html_file, $html_template ) ;
 =cut
 ## START of SUB
 sub write_html_body {
@@ -234,7 +242,6 @@ sub write_html_body {
     else {
     	croak "Problem with the html output file: $html_file is not defined\n" ;
     }
-    return(\$html_file) ;
 }
 ## END of SUB
 
@@ -243,10 +250,10 @@ sub write_html_body {
 
 =head2 METHOD excel_output
 
-	## Description : create an excel output of the results
+	## Description : create an excel XLS output of the results
 	## Input : $jsons, $excel_file
-	## Output :  $xls_output
-	## Usage : my ( $xls_output ) = excel_output( $jsons, $excel_file ) ;
+	## Output :  excel file in output directory
+	## Usage : $o_output->excel_output( $jsons, $excel_file ) ;
 =cut
 ## START of SUB
 sub excel_output {
@@ -313,8 +320,8 @@ sub excel_output {
 
 	## Description : prepare and write json output file
 	## Input : $json_file, $scalar
-	## Output : $json_file
-	## Usage : my ( $json_file ) = write_json_skel( $csv_file, $scalar ) ;
+	## Output : json file in output directory
+	## Usage : $o_output->write_json_skel( $csv_file, $scalar ) ;
 	
 =cut
 ## START of SUB
@@ -324,9 +331,64 @@ sub write_json_skel {
     my ( $json_file, $json_obj ) = @_ ;
     
     my $utf8_encoded_json_text = encode_json $json_obj ;
-    open(JSON, '>:utf8', "output/".$$json_file) or die "Cant' create the file $$json_file\n" ;
+    open(JSON, '>:utf8', "output/".$$json_file) or die "Can't create the file $$json_file\n" ;
     print JSON $utf8_encoded_json_text ;
     close(JSON) ;
+    
+}
+## END of SUB
+
+
+
+=head2 METHOD write_csv
+
+	## Description : write csv output file
+	## Input : $xls_file, $csv_file
+	## Output : csv file in output directory
+	## Usage : $o_output->write_csv( $xls_file, $csv_file ) ;
+	
+=cut
+## START of SUB
+sub write_csv {
+	## Retrieve Values
+    my $self = shift ;
+    my ( $xls_file, $csv_file ) = @_ ;
+    
+    my $cgi = new CGI();
+    
+    my $csv_file_dir = "output/".$csv_file ;
+    my $xls_file_dir = "output/excel_output.xlsx" ;
+    
+    open (CSV , ">" , $csv_file_dir) or die "Can't create the file $csv_file_dir\n" ; 
+    
+    
+	my $converter = Text::Iconv -> new ("utf-8", "windows-1251") ;
+	 
+	my $excel = Spreadsheet::XLSX -> new ($xls_file_dir, $converter);
+	my $line ;
+	foreach my $sheet (@{$excel -> {Worksheet}}) {
+	 
+	       printf("Sheet: %s\n", $sheet->{Name});
+	        
+	       $sheet -> {MaxRow} ||= $sheet -> {MinRow};
+	        
+	        foreach my $row ($sheet -> {MinRow} .. $sheet -> {MaxRow}) {
+	         
+	               $sheet -> {MaxCol} ||= $sheet -> {MinCol};
+	                
+	               foreach my $col ($sheet -> {MinCol} ..  $sheet -> {MaxCol}) {
+	                
+	                       my $cell = $sheet -> {Cells} [$row] [$col];
+	 
+	                       if ($cell) {
+	                           $line .= $cell -> {Val}.",";
+				           }
+			        }
+			        chomp($line);
+			        print CSV "$line\n";
+			        $line = '';
+    		}
+	}	
     
 }
 ## END of SUB
