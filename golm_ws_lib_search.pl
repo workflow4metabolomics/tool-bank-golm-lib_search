@@ -26,7 +26,7 @@ use lib::conf qw( :ALL ) ;
 ## Initialized values
 my ($OptHelp,$ri,$riWindow,$gcColumn,$inputSpectra,$maxHits,$mzRes,$maxIons,$threshold,$relative) = (undef,undef,undef,undef,undef,undef,undef,undef,undef,undef,undef) ;
 my ( $JaccardDistanceThreshold,$s12GowerLegendreDistanceThreshold,$DotproductDistanceThreshold,$HammingDistanceThreshold,$EuclideanDistanceThreshold ) = (undef,undef,undef,undef,undef) ;
-my ($excel_file,$html_file,$html_template,$json_file) = (undef,undef,undef,undef) ;
+my ($excel_file,$html_file,$html_template,$json_file,$csv_file) = (undef,undef,undef,undef,undef) ;
 my (@hits, @ojson) = ( () , () ) ;
 my $encoded_spectra ;
 
@@ -53,7 +53,8 @@ if (!@ARGV){ &help ; }
 				"relative:s"			=> \$relative,
 				"excelFile:s"			=> \$excel_file,
 				"htmlFile:s"		=> \$html_file,
-				"jsonFile:s"		=> \$json_file
+				"jsonFile:s"		=> \$json_file,
+				"csvFile:s"		=> \$csv_file,
             ) ;
             
             die "maxHits must be >= 0\n" unless ($maxHits >= 0) ;
@@ -197,6 +198,7 @@ $o_output->write_json_skel(\$json_file, $jsons_obj) ;
 my $tbody_entries = $o_output->add_entries_to_tbody_object($jsons_obj) ;
 $o_output->write_html_body($jsons_obj, $tbody_entries, $html_file, $html_template, $default_entries) ;
 $o_output->excel_output($excel_file, $jsons_obj) ;
+$o_output->write_csv($excel_file, $csv_file) ;
 
 
 #====================================================================================
