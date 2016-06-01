@@ -194,14 +194,12 @@ sub LibrarySearch() {
 			## Get the hits + status of the query
 			my $results = $som->result->{Results} ;
 			my $status = $som->result->{Status} ;
-                   
-            #print Dumper $results ;
-            my $res_json = encode_json ($results) ;
             
             ## Limitate number of hits returned according to user's $maxHit
             ## and filter hits on specific values with thresholds
             my @results = @$results ;
             
+            #print Dumper \@results ;
             ### Return all hits
             if ($maxHits == 100 && $status eq 'success') {
             	my $filtered_res = _filter_scores_golm_results(\@results,$JaccardDistanceThreshold,$s12GowerLegendreDistanceThreshold,
@@ -213,7 +211,6 @@ sub LibrarySearch() {
 																		$DotproductDistanceThreshold,$HammingDistanceThreshold,$EuclideanDistanceThreshold) ;
             	for (my $i=0 ; $i<$maxHits ; $i++) {
 	            	push (@filtered_limited_res , @$filtered_res_before_hits_limited[$i]) ;
-	            	push (@json_res , $res_json) ;
             	}
             	
             	return \@filtered_limited_res ;
