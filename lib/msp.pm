@@ -343,10 +343,8 @@ sub encode_spectrum_for_query {
     		# Case when we have only one array of masses (input is a string of masses and not a file)
 		    if ( ref(@$mzs[0]) ne "ARRAY") {
     			for (my $i=0 ; $i< @$mzs ; $i++) {
-    				$spectrum = $spectrum . @$mzs[$i] . "%20" . @$intensities[$i] . "%20";
+    				$spectrum = $spectrum . @$mzs[$i] . " " . @$intensities[$i] . " ";
     			}
-    			#remove the "%20" at the end
-			    $spectrum = substr($spectrum,0,-3);
 			    push ( @encoded_spectra , $spectrum ) ;
 		    }
 		    else {
@@ -354,10 +352,8 @@ sub encode_spectrum_for_query {
 			    	
 			    	for ( my $j=0 ; $j< @{ @$mzs[$i] } ; $j++ ) {
 			    		
-			    		$spectrum = $spectrum . $$mzs[$i][$j] . "%20" . $$intensities[$i][$j] . "%20";
+			    		$spectrum = $spectrum . $$mzs[$i][$j] . " " . $$intensities[$i][$j] . " ";
 			    	}
-			    	#remove the "%20" at the end
-			    	$spectrum = substr($spectrum,0,-3);
 			    	$encoded_spectra[$k] = $spectrum ;
 			    	$k++ ;
 			    	$spectrum = '' ;
