@@ -12,8 +12,8 @@ use vars qw($VERSION @ISA @EXPORT %EXPORT_TAGS);
 
 our $VERSION = "1.0";
 our @ISA = qw(Exporter);
-our @EXPORT = qw( get_mzs get_intensities get_intensities_and_mzs_from_string encode_spectrum_for_query sorting_descending_intensities round_num apply_relative_intensity remove_redundants);
-our %EXPORT_TAGS = ( ALL => [qw( get_mzs get_intensities get_intensities_and_mzs_from_string encode_spectrum_for_query sorting_descending_intensities round_num apply_relative_intensity remove_redundants)] );
+our @EXPORT = qw( get_mzs get_intensities get_masses_from_string get_intensities_from_string keep_only_max_masses keep_only_max_intensities encode_spectrum_for_query sorting_descending_intensities round_num apply_relative_intensity remove_redundants);
+our %EXPORT_TAGS = ( ALL => [qw( get_mzs get_intensities get_masses_from_string get_intensities_from_string keep_only_max_masses keep_only_max_intensities encode_spectrum_for_query sorting_descending_intensities round_num apply_relative_intensity remove_redundants)] );
 
 =head1 NAME
 
@@ -66,7 +66,7 @@ sub new {
 sub get_mzs {
 	## Retrieve Values
     my $self = shift ;
-    my ( $msp_file, $mzRes, $maxIons ) = @_ ;
+    my ( $msp_file, $mzRes ) = @_ ;
   
   	my @ions = () ;
   	my @temp_mzs = () ;
@@ -113,24 +113,12 @@ sub get_mzs {
 		    				}
 		    			}
 		    		}
-		    		## If user wants all ions to be queried
-	    			if ($maxIons == 0) {
-	    				@mzs = @temp_mzs ;
-	    			}
-	    			## If user wants a specific number of ions to be queried
-	    			elsif ($maxIons > 0) {
-	    				my $j = 0 ;
-	    				while (scalar @mzs < $maxIons && $j < @temp_mzs){
-	    					push (@mzs , $temp_mzs[$j++]) ;
-	    				}
-	    			}
 		    	}
 	    	}
-	    	@temp_mzs = () ;
 	    	if($line ne '') {
-		    	@{ $total_spectra_mzs[$i] } = @mzs ;
+		    	@{ $total_spectra_mzs[$i] } = @temp_mzs ;
 			    $i++ ;
-			    @mzs = () ;
+			    @temp_mzs = () ;
 	    	}  	
 	    }
     }
@@ -155,7 +143,7 @@ sub get_mzs {
 sub get_intensities {
 	## Retrieve Values
     my $self = shift ;
-    my ( $msp_file, $maxIons ) = @_ ;
+    my ( $msp_file ) = @_ ;
   
   	my @ions = () ;
   	my @temp_intensities = () ;
@@ -182,25 +170,13 @@ sub get_intensities {
     						my $intensity = $2 ;
     						push ( @temp_intensities , $intensity ) ;
 		    			}
-		    			## If user wants all ions to be queried
-		    			if ($maxIons == 0) {
-		    				@intensities = @temp_intensities ;
-		    			}
-		    			## If user wants a specific number of ions to be queried
-		    			elsif ($maxIons > 0) {
-		    				my $j = 0 ;
-		    				while (scalar @intensities < $maxIons && $j < @temp_intensities){
-		    					push (@intensities , $temp_intensities[$j++]) ;
-		    				}
-		    			} 
 		    		}
 		    	}
 	    	}
-	    	@temp_intensities = () ;
 	    	if($line ne '') {
-		    	@{ $total_spectra_intensities[$i] } = @intensities ;
+		    	@{ $total_spectra_intensities[$i] } = @temp_intensities ;
 			    $i++ ;
-			    @intensities = () ;	  
+			    @temp_intensities = () ;	  
 	    	}  	
 	    }
     }
@@ -210,15 +186,15 @@ sub get_intensities {
 ## END of SUB
 
 
-=head2 METHOD get_intensities_and_mzs_from_string
+=head2 METHOD get_masses_from_string
 
 	## Description : parse a spectrum string and get mzs and intensities
-	## Input : $spectrum_string
+	## Input : $spectrum_string, $mzRes
 	## Output : \@spectrum_intensities_mzs 
-	## Usage : my ( $spectrum_intensities_mzs ) = get_intensities_and_mzs_from_string( $spectrum_string ) ;
+	## Usage : my ( $spectrum_mzs ) = get_masses_from_string( $spectrum_string , $mzRes ) ;
 =cut
 ## START of SUB
-sub get_intensities_and_mzs_from_string {
+sub get_masses_from_string {
 	## Retrieve Values
     my $self = shift ;
     my ( $spectrum_string, $mzRes ) = @_ ;
@@ -250,12 +226,8 @@ sub get_intensities_and_mzs_from_string {
 	    					push ( @mzs , $$mz_rounded ) ;
 	    				}
 	    			}
-	    			else {
-	    				my $int = $val[$i] ;
-	    				push ( @intensities , $int ) ; 
-	    			}
 	    		}
-	    		return (\@mzs , \@intensities) ;
+	    		return (\@mzs) ;
     		}
     		else { croak "Wrong format of the spectrum. See help\n" }
     	}
@@ -264,6 +236,48 @@ sub get_intensities_and_mzs_from_string {
     else { croak "Spectrum is not defined, service will stop\n" } ;
 }
 ## END of SUB
+
+
+
+=head2 METHOD get_intensities_from_string
+
+	## Description : parse a spectrum string and get intensities
+	## Input : $spectrum_string
+	## Output : \@spectrum_intensities 
+	## Usage : my ( $spectrum_intensities ) = get_intensities_from_string( $spectrum_string ) ;
+=cut
+## START of SUB
+sub get_intensities_from_string {
+	## Retrieve Values
+    my $self = shift ;
+    my ( $spectrum_string ) = @_ ;
+    
+    my @intensities = () ;
+    my @mzs = () ;
+        
+    if (defined $spectrum_string) {
+    	
+    	if ($spectrum_string ne '') {
+    		
+    		if ($spectrum_string =~ /\s*(\d+\.?\d*)\s+(\d+\.?\d*)\s*/ ) {
+    		
+	    		my @val = split (/\s+/ , $spectrum_string) ;
+	    		for (my $i=0 ; $i<@val ; $i++) {
+	    			if ($i%2 != 0) {
+	    				my $int = $val[$i] ;
+	    				push ( @intensities , $int ) ; 
+	    			}
+	    		}
+	    		return (\@intensities) ;
+    		}
+    		else { croak "Wrong format of the spectrum. See help\n" }
+    	}
+    	else { croak "Spectrum is empty, the service will stop\n" } ;
+    }
+    else { croak "Spectrum is not defined, service will stop\n" } ;
+}
+## END of SUB
+
 
 
 
@@ -310,6 +324,81 @@ sub sorting_descending_intensities {
     else { carp "Cannot sort intensities, mzs or intensities are undef" ; return (\@mzs_res, \@ints_res) ; }
     
 	return (\@mzs_res, \@ints_res) ;
+}
+## END of SUB
+
+
+
+
+=head2 METHOD keep_only_max_masses
+
+	## Description : keep only $maxIons masses 
+	## Input : $mzs_res_sorted, $maxIons
+	## Output : \@mzs
+	## Usage : my ( $mzs ) = keep_only_max_masses( $mzs_res_sorted, $ints_res_sorted, $maxIons ) ;
+=cut
+## START of SUB
+sub keep_only_max_masses {
+	## Retrieve Values
+    my $self = shift ;
+    my ( $ref_mzs_res, $maxIons ) = @_ ;
+    
+    my @mzs = () ;
+    my @tot_mzs = () ;
+    
+    if ( ref(@$ref_mzs_res[0]) ne "ARRAY") {
+    	my $i = 0 ;
+    	while (scalar @tot_mzs < $maxIons && $i < @$ref_mzs_res){
+	    	push (@tot_mzs , $$ref_mzs_res[$i++]) ;
+    	}
+    }
+    else {
+	    for (my $i=0 ; $i<@$ref_mzs_res ; $i++) {
+		  	my $j = 0 ;
+		    while (scalar @mzs < $maxIons && $j < @$ref_mzs_res[$i]){
+		    	push (@mzs , $ref_mzs_res->[$i][$j++]) ;
+	    	}
+	    	push (@tot_mzs , \@mzs) ;
+	    }
+    }
+	return (\@tot_mzs) ;
+}
+## END of SUB
+
+
+
+
+=head2 METHOD keep_only_max_intensities
+
+	## Description : keep only $maxIons intensities 
+	## Input : $ints_res_sorted, $maxIons
+	## Output : \@ints
+	## Usage : my ( $ints ) = keep_only_max_intensities( $ints_res_sorted, $maxIons ) ;
+=cut
+## START of SUB
+sub keep_only_max_intensities {
+	## Retrieve Values
+    my $self = shift ;
+    my ( $ref_ints_res, $maxIons ) = @_ ;
+    
+    my @ints = () ;
+    my @tot_ints = () ;
+	if ( ref(@$ref_ints_res[0]) ne "ARRAY") {
+    	my $i = 0 ;
+    	while (scalar @tot_ints < $maxIons && $i < @$ref_ints_res){
+	    	push (@tot_ints , $$ref_ints_res[$i++]) ;
+    	}
+    }
+    else {
+    	for (my $i=0 ; $i<@$ref_ints_res ; $i++) {
+	    	my $j = 0 ;
+	    	while (scalar @ints < $maxIons && $j < @$ref_ints_res[$i]){
+	    		push (@ints , $ref_ints_res->[$i][$j++]) ;
+	    	}
+	    	push (@tot_ints , \@ints) ;
+    	}
+    }    
+	return (\@tot_ints) ;
 }
 ## END of SUB
 
