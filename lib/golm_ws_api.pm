@@ -13,8 +13,8 @@ use vars qw($VERSION @ISA @EXPORT %EXPORT_TAGS);
 
 our $VERSION = "1.0";
 our @ISA = qw(Exporter);
-our @EXPORT = qw( connectWSlibrarySearchGolm LibrarySearch test_query_golm _filter_scores_golm_results _filter_replica_results);
-our %EXPORT_TAGS = ( ALL => [qw( connectWSlibrarySearchGolm LibrarySearch test_query_golm _filter_scores_golm_results _filter_replica_results)] );
+our @EXPORT = qw( connectWSlibrarySearchGolm LibrarySearch test_query_golm filter_scores_golm_results filter_replica_results);
+our %EXPORT_TAGS = ( ALL => [qw( connectWSlibrarySearchGolm LibrarySearch test_query_golm filter_scores_golm_results filter_replica_results)] );
 
 =head1 NAME
 
@@ -130,6 +130,7 @@ sub test_query_golm() {
 			
 			if ($status eq 'success' && $results ne '') {
 				print "\n\n\nThe test request succeeded.\n\n\n" ;
+				return 1 ;
 			}
 			else { croak "\n\n\nSomething went wrong with the test request. Status delivered by Golm = ".$status."\n\n" ; }
 }
@@ -201,14 +202,16 @@ sub LibrarySearch() {
             
             #print Dumper \@results ;
             ### Return all hits
+            my $oapi = lib::golm_ws_api->new() ;
             if ($maxHits == 100 && $status eq 'success') {
-            	my $filtered_res = _filter_scores_golm_results(\@results,$JaccardDistanceThreshold,$s12GowerLegendreDistanceThreshold,
+            	my $filtered_res = $oapi->filter_scores_golm_results(\@results,$JaccardDistanceThreshold,$s12GowerLegendreDistanceThreshold,
 																		$DotproductDistanceThreshold,$HammingDistanceThreshold,$EuclideanDistanceThreshold) ;
             	return $filtered_res ;
             }
             elsif ($maxHits < 100 && $maxHits > 0 && $status eq 'success'){
-            	my $filtered_res_before_hits_limited = _filter_scores_golm_results(\@results,$JaccardDistanceThreshold,$s12GowerLegendreDistanceThreshold,
+            	my $filtered_res_before_hits_limited = $oapi->filter_scores_golm_results(\@results,$JaccardDistanceThreshold,$s12GowerLegendreDistanceThreshold,
 																		$DotproductDistanceThreshold,$HammingDistanceThreshold,$EuclideanDistanceThreshold) ;
+            	
             	for (my $i=0 ; $i<$maxHits ; $i++) {
 	            	push (@filtered_limited_res , @$filtered_res_before_hits_limited[$i]) ;
             	}
@@ -238,8 +241,9 @@ sub LibrarySearch() {
 
 =cut
 
-sub _filter_scores_golm_results() {
+sub filter_scores_golm_results() {
 	## Retrieve Values
+	my $self = shift ;
 	my ($results,$JaccardDistanceThreshold,$s12GowerLegendreDistanceThreshold,
 		$DotproductDistanceThreshold,$HammingDistanceThreshold,$EuclideanDistanceThreshold) = @_ ;
 		
@@ -255,26 +259,28 @@ sub _filter_scores_golm_results() {
 				push (@filtered_res , $res) ;
 			}
 	}
-	my $sorted_analytes = _filter_replica_results(\@filtered_res) ;
+	my $oapi = lib::golm_ws_api->new() ;
+	my $sorted_analytes = $oapi->filter_replica_results(\@filtered_res) ;
+	
 	return $sorted_analytes ;
 }
 
 
 
 =head2 METHOD _filter_replica_results
-     ## Description : remove replicated hits, keep the ones with lowest dot product distance
+     ## Description : remove replicated hits, keep the ones with the lowest dot product distance
      ## Input : $results
      ## Ouput : \@clean_res ;
-     ## Usage : my ($clean_res) = _filter_replica_results($results) ;
+     ## Usage : my ($clean_res) = filter_replica_results($results) ;
 
 =cut
 
-sub _filter_replica_results() {
+sub filter_replica_results() {
      ## Retrieve Values
+     my $self = shift ;
      my ($results) = @_ ;
-
-	my %seen ;
-	my @sortAnalytes = grep { !$seen{$_->{'analyteName'}}++ } sort { $a->{'DotproductDistance'} <=> $b->{'DotproductDistance'} } @$results ;
+	 my %seen ;
+	 my @sortAnalytes = grep { !$seen{$_->{'analyteName'}}++ } sort { $a->{'DotproductDistance'} <=> $b->{'DotproductDistance'} } @$results ;
 
      return \@sortAnalytes ;
 }
@@ -298,7 +304,7 @@ You can find documentation for this module with the perldoc command.
 
 =over 4
 
-=item :ALL is ...
+=item :ALL is connectWSlibrarySearchGolm LibrarySearch test_query_golm filter_scores_golm_results filter_replica_results
 
 =back
 
@@ -313,7 +319,7 @@ This program is free software; you can redistribute it and/or modify it under th
 
 =head1 VERSION
 
-version 1 : xx / xx / xx
+version 1 : xx / 06 / 2016
 
 version 2 : ??
 
