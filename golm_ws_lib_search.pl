@@ -109,13 +109,24 @@ my $ref_ints_res ;
 ## Case when masses are entered manually -> don't enter if ".msp" exists in $inputSpectra
 if (defined $inputSpectra && $inputSpectra =~ /^((?!\.msp).)*$/gm) { 
 	
-	my ($ref_mzs_res , $ref_ints_res) = $omsp->get_intensities_and_mzs_from_string($inputSpectra, $mzRes) ;
+	## Retrieve masses from msp file
+	$ref_mzs_res = $omsp->get_masses_from_string($inputSpectra, $mzRes) ;
+	
+	## Retrieve intensities from msp file
+	$ref_ints_res = $omsp->get_intensities_from_string($inputSpectra) ;
+	
+	## Sorting intensities
+	my ($mzs_res_sorted, $ints_res_sorted) = $omsp->sorting_descending_intensities($ref_mzs_res, $ref_ints_res) ;
+	
+	## Keep a limited number of ions according to $maxIons
+	if($maxIons > 0){
+		
+		$ref_mzs_res = $omsp->keep_only_max_masses( $mzs_res_sorted, $maxIons ) ;
+		$ref_ints_res = $omsp->keep_only_max_intensities( $ints_res_sorted, $maxIons ) ;
+	}
 	
 	## Remove redundant masses
 	my ($uniq_masses , $uniq_intensities) = $omsp->remove_redundants($ref_mzs_res, $ref_ints_res) ;
-	
-	## Sorting intensities
-	my ($mzs_res_sorted, $ints_res_sorted) = $omsp->sorting_descending_intensities($uniq_masses, $uniq_intensities) ;
 	
 	## Relative intensity
 	my $relative_ints_res = undef ;
@@ -137,36 +148,42 @@ elsif (defined $inputSpectra and -e $inputSpectra and defined $mzRes and defined
 	unless (-f $inputSpectra)  { croak "$inputSpectra is not a file" ; }
 	unless (-s $inputSpectra)  { croak "$inputSpectra is empty" ; }
 	
-	$ref_mzs_res = $omsp->get_mzs($inputSpectra, $mzRes, $maxIons) ;
+	## Get masses and their intensities
+	$ref_mzs_res = $omsp->get_mzs($inputSpectra, $mzRes) ;
 	$ref_ints_res = $omsp->get_intensities($inputSpectra, $maxIons) ;
-
-
+	
+	## Sorting intensities
+	my ($mzs_res_sorted, $ints_res_sorted) = $omsp->sorting_descending_intensities($ref_mzs_res, $ref_ints_res) ;
+	
+	## Keep only $maxIons ions
+	if($maxIons > 0){
+		( $mzs_res_sorted ) = $omsp->keep_only_max_masses( $mzs_res_sorted, $maxIons ) ;
+		( $ints_res_sorted ) = $omsp->keep_only_max_intensities( $ints_res_sorted, $maxIons ) ;
+	}
+	
 	## Remove redundant masses
 	my ($uniq_masses , $uniq_intensities) = (undef,undef) ;
 	my @uniq_total_masses = () ;
 	my @uniq_total_intensities = () ;
 	
-	for (my $i=0 ; $i<@$ref_mzs_res && $i<@$ref_ints_res ; $i++) {
+	for (my $i=0 ; $i<@$mzs_res_sorted && $i<@$ints_res_sorted ; $i++) {
 	
-		($uniq_masses , $uniq_intensities) = $omsp->remove_redundants(@$ref_mzs_res[$i], @$ref_ints_res[$i]) ;
+		($uniq_masses , $uniq_intensities) = $omsp->remove_redundants(@$mzs_res_sorted[$i], @$ints_res_sorted[$i]) ;
 		push (@uniq_total_masses , $uniq_masses) ;
 		push (@uniq_total_intensities, $uniq_intensities) ;
 	}
 	
-	## Sorting intensities
-	my ($mzs_res_sorted, $ints_res_sorted) = $omsp->sorting_descending_intensities(\@uniq_total_masses, \@uniq_total_intensities) ;
-	
 	## Relative intensity
 	my $relative_ints_res = undef ;
 	if ($relative eq "true") {
-		$relative_ints_res = $omsp->apply_relative_intensity($ints_res_sorted) ;
+		$relative_ints_res = $omsp->apply_relative_intensity(\@uniq_total_intensities) ;
 	}
 	
 	## Encode spectra
 	if (defined $relative_ints_res) {
-		$encoded_spectra = $omsp->encode_spectrum_for_query($mzs_res_sorted, $relative_ints_res) ;
+		$encoded_spectra = $omsp->encode_spectrum_for_query(\@uniq_total_masses, $relative_ints_res) ;
 	}
-	else { $encoded_spectra = $omsp->encode_spectrum_for_query($mzs_res_sorted, $ints_res_sorted) ; }
+	else { $encoded_spectra = $omsp->encode_spectrum_for_query(\@uniq_total_masses, \@uniq_total_intensities) ; }
 
 }
 elsif (!defined $maxHits or !defined $maxIons or !defined $mzRes) { croak "Parameters mzRes or maxIons or maxHits are undefined\n"; } 
@@ -175,7 +192,7 @@ elsif (!-f $inputSpectra) 										  { croak "$inputSpectra does not exist" ; }
 ############# -------------- Send queries to Golm -------------- ############# :
 
 foreach my $spectrum (@$encoded_spectra){
-	my ($limited_hits, $res_json) = $oapi->LibrarySearch ($ri, $riWindow, $gcColumn, $spectrum, $maxHits, $JaccardDistanceThreshold,
+	my ($limited_hits) = $oapi->LibrarySearch ($ri, $riWindow, $gcColumn, $spectrum, $maxHits, $JaccardDistanceThreshold,
 																										  $s12GowerLegendreDistanceThreshold,
 																										  $DotproductDistanceThreshold,
 																										  $HammingDistanceThreshold,
@@ -183,7 +200,6 @@ foreach my $spectrum (@$encoded_spectra){
 																										  $ws_url, $ws_proxy,
 																										  $default_ri, $default_ri_window, $default_gc_column) ;
 	push (@hits , $limited_hits) ;
-	push (@ojson , $res_json) ;
 }
 
 
@@ -198,7 +214,7 @@ $o_output->write_json_skel(\$json_file, $jsons_obj) ;
 my $tbody_entries = $o_output->add_entries_to_tbody_object($jsons_obj) ;
 $o_output->write_html_body($jsons_obj, $tbody_entries, $html_file, $html_template, $default_entries) ;
 $o_output->excel_output($excel_file, $jsons_obj) ;
-$o_output->write_csv($excel_file, $csv_file) ;
+$o_output->write_csv($csv_file , $jsons_obj) ;
 
 
 #====================================================================================
