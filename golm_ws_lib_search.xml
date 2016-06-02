@@ -47,7 +47,7 @@
     	<param name="HammingDistanceThreshold" type="integer" value="0" label="HammingDistanceThreshold" help="The Hamming distance between two strings of equal length is the number of positions at which the corresponding symbols are different. In other words, it is the number of
 					substitutions required to transform one string into another." />
     	<param name="EuclideanDistanceThreshold" type="integer" value="0" label="EuclideanDistanceThreshold" help="The Euclidean distance is a generalization of the familiar Pythagorean theorem. It is the 'ordinary' distance between two points in Euclidean space." />
-    	<param name="intensity_type" label="Type of intensities" type="select" display="radio" help="Would you work with relative or absolute intensities? Example: relative = percentage, absolute = untouched">
+    	<param name="intensity_type" label="Type of intensities" type="select" display="radio" help="Would you work with relative or absolute intensities? Example: relative = percentage, absolute = untouched. Relative is preferred">
           <option value="true">YES</option>
           <option value="false">NO</option>
         </param>
@@ -83,9 +83,10 @@
 	</inputs>
 	
 	 <outputs>
-	    <data name="GolmResExcel" label="${tool.name}_XLS" format="tabular" />
-	    <data name="GolmResHtml" label="${tool.name}_HTML" format="html" />
-	    <data name="GolmResJson" label="${tool.name}_JSON" format="vjson" />
+	    <data name="GolmResEXCEL" label="${tool.name}_XLSX" format="tabular" />
+	    <data name="GolmResHTML" label="${tool.name}_HTML" format="html" />
+	    <data name="GolmResJSON" label="${tool.name}_JSON" format="vjson" />
+	    <data name="GolmResCSV" label="${tool.name}_JSON" format="csv" />
 	 </outputs>
 	 
 	 
@@ -93,7 +94,7 @@
 	 <help>
 	 
 	 **Authors**
-  | Gabriel Cretin (for perl and Galaxy), Franck Giacomoni (for perl)
+  | Gabriel Cretin (for perl and Galaxy), Franck Giacomoni (for perl and Galaxy)
 
 ---------------------------------------------------
 
