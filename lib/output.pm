@@ -115,43 +115,73 @@ sub build_json_res_object {
 	my $i = 0 ;
 	my $spectrumID = 1 ;
 	
+	
+	
 	## Loop on each spectra
 	foreach my $res (@array_results) {
 		
-		$nb_hits = scalar @$res;
+		if (@$res[0] eq 'no results'){
 		
-		if ($nb_hits != 0) {
+			my %hit_infos = () ;
+			
+			$json_results[$i]{'id'} = $spectrumID++ ;
+			$json_results[$i]{'nb_hits'} = $nb_hits ;
+			$hit_infos{'metaboliteID'} = "no results" ;
+			$hit_infos{'distance_scores'}{'EuclideanDistance'} = "no results (too restrictive)" ;
+			$hit_infos{'distance_scores'}{'DotproductDistance'} = "no results (too restrictive)" ;
+			$hit_infos{'distance_scores'}{'HammingDistance'} = "no results (too restrictive)" ;
+			$hit_infos{'distance_scores'}{'JaccardDistance'} = "no results (too restrictive)" ;
+			$hit_infos{'distance_scores'}{'s12GowerLegendreDistance'} = "no results (too restrictive)" ;
+			$hit_infos{'ri_infos'}{'ri'} = "no results" ;
+			$hit_infos{'ri_infos'}{'riDiscrepancy'} = "no results" ;
+			$hit_infos{'analyte'}{'id'} = "no results" ;
+			$hit_infos{'analyte'}{'name'} = "no results" ;
+			$hit_infos{'spectrum'}{'id'} = "no results" ;
+			$hit_infos{'spectrum'}{'name'} = "no results" ;
+			
+			push ( @{ $json_results[$i]{'searchResults'} } , \%hit_infos );
+		}
+		else {
+			
+			$nb_hits = scalar @$res;
+			
 			$json_results[$i]{'id'} = $spectrumID++ ;
 			$json_results[$i]{'nb_hits'} = $nb_hits ;
 			
 			## Loop on each hit of a spectrum + build json
 			foreach my $href (@$res) {
 				
-				my %hash_res = %$href ;
-				my %hit_infos = () ;
-				# Get rid of false results
-				if ($hash_res{'metaboliteID'} eq '00000000-0000-0000-0000-000000000000') {
-					--$json_results[$i]{'nb_hits'} ;
+				if (!defined $href){
+					
+					last ;
 				}
 				else {
-					$hit_infos{'metaboliteID'} = $hash_res{'metaboliteID'} ;
-					$hit_infos{'distance_scores'}{'EuclideanDistance'} = $hash_res{'EuclideanDistance'} ;
-					$hit_infos{'distance_scores'}{'DotproductDistance'} = $hash_res{'DotproductDistance'} ;
-					$hit_infos{'distance_scores'}{'HammingDistance'} = $hash_res{'HammingDistance'} ;
-					$hit_infos{'distance_scores'}{'JaccardDistance'} = $hash_res{'JaccardDistance'} ;
-					$hit_infos{'distance_scores'}{'s12GowerLegendreDistance'} = $hash_res{'s12GowerLegendreDistance'} ;
-					$hit_infos{'ri_infos'}{'ri'} = $hash_res{'ri'} ;
-					$hit_infos{'ri_infos'}{'riDiscrepancy'} = $hash_res{'riDiscrepancy'} ;
-					$hit_infos{'analyte'}{'id'} = $hash_res{'analyteID'} ;
-					$hit_infos{'analyte'}{'name'} = $hash_res{'analyteName'} ;
-					$hit_infos{'spectrum'}{'id'} = $hash_res{'spectrumID'} ;
-					$hit_infos{'spectrum'}{'name'} = $hash_res{'spectrumName'} ;
-					
-					push ( @{ $json_results[$i]{'searchResults'} } , \%hit_infos );
+					my %hash_res = %$href ;
+					my %hit_infos = () ;
+					# Get rid of false results
+					if ($hash_res{'metaboliteID'} eq '00000000-0000-0000-0000-000000000000') {
+						--$json_results[$i]{'nb_hits'} ;
+					}
+					else {
+						$hit_infos{'metaboliteID'} = $hash_res{'metaboliteID'} ;
+						$hit_infos{'distance_scores'}{'EuclideanDistance'} = $hash_res{'EuclideanDistance'} ;
+						$hit_infos{'distance_scores'}{'DotproductDistance'} = $hash_res{'DotproductDistance'} ;
+						$hit_infos{'distance_scores'}{'HammingDistance'} = $hash_res{'HammingDistance'} ;
+						$hit_infos{'distance_scores'}{'JaccardDistance'} = $hash_res{'JaccardDistance'} ;
+						$hit_infos{'distance_scores'}{'s12GowerLegendreDistance'} = $hash_res{'s12GowerLegendreDistance'} ;
+						$hit_infos{'ri_infos'}{'ri'} = $hash_res{'ri'} ;
+						$hit_infos{'ri_infos'}{'riDiscrepancy'} = $hash_res{'riDiscrepancy'} ;
+						$hit_infos{'analyte'}{'id'} = $hash_res{'analyteID'} ;
+						$hit_infos{'analyte'}{'name'} = $hash_res{'analyteName'} ;
+						$hit_infos{'spectrum'}{'id'} = $hash_res{'spectrumID'} ;
+						$hit_infos{'spectrum'}{'name'} = $hash_res{'spectrumName'} ;
+						
+						push ( @{ $json_results[$i]{'searchResults'} } , \%hit_infos );
+					}
 				}
 			}
-			$i++ ;
 		}
+		$i++ ;
 	}
     return \@json_results ;
 }

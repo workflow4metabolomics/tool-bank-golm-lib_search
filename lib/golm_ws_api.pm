@@ -206,16 +206,25 @@ sub LibrarySearch() {
             if ($maxHits == 100 && $status eq 'success') {
             	my $filtered_res = $oapi->filter_scores_golm_results(\@results,$JaccardDistanceThreshold,$s12GowerLegendreDistanceThreshold,
 																		$DotproductDistanceThreshold,$HammingDistanceThreshold,$EuclideanDistanceThreshold) ;
+            	if(!@$filtered_res){ push (@$filtered_res , "no results") ; }
+            	
             	return $filtered_res ;
             }
             elsif ($maxHits < 100 && $maxHits > 0 && $status eq 'success'){
+            	
             	my $filtered_res_before_hits_limited = $oapi->filter_scores_golm_results(\@results,$JaccardDistanceThreshold,$s12GowerLegendreDistanceThreshold,
 																		$DotproductDistanceThreshold,$HammingDistanceThreshold,$EuclideanDistanceThreshold) ;
-            	
-            	for (my $i=0 ; $i<$maxHits ; $i++) {
-	            	push (@filtered_limited_res , @$filtered_res_before_hits_limited[$i]) ;
+            	if (@$filtered_res_before_hits_limited) {
+            		
+	            	for (my $i=0 ; $i<$maxHits ; $i++) {
+	            		
+		            	push (@filtered_limited_res , @$filtered_res_before_hits_limited[$i]) ;
+	            	}
             	}
-            	
+            	else {
+            		
+	            	if(!@$filtered_res_before_hits_limited){ push (@filtered_limited_res , "no results") ; }
+            	}
             	return \@filtered_limited_res ;
             }
             else { carp "No match returned from Golm for the query.\n" }
@@ -259,6 +268,7 @@ sub filter_scores_golm_results() {
 				push (@filtered_res , $res) ;
 			}
 	}
+	
 	my $oapi = lib::golm_ws_api->new() ;
 	my $sorted_analytes = $oapi->filter_replica_results(\@filtered_res) ;
 	
