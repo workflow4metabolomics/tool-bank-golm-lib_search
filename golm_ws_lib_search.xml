@@ -1,4 +1,4 @@
-<tool id="golm_ws_lib_search" name="Golm Metabolome Database search spectrum" version="2016-xx-xx">
+<tool id="golm_ws_lib_search" name="Golm Metabolome Database search spectrum" version="2016-06-xx">
   <description>
        : GC-MS Mass Spectral Database.
   </description>
@@ -12,8 +12,10 @@
     	-mzRes="${input_type.mzResolution}"
     	-maxHits="${input_type.maxHits}"
     	-maxIons="${input_type.maxIons}"
-		-JaccardDistanceThreshold="${input_type.JaccardDistance}" -s12GowerLegendreDistanceThreshold="${input_type.s12GowerLegendreDistanceThreshold}" 
-		-DotproductDistanceThreshold="${input_type.DotproductDistanceThreshold}" -HammingDistanceThreshold="${input_type.HammingDistanceThreshold}"
+		-JaccardDistanceThreshold="${input_type.JaccardDistance}" 
+		-s12GowerLegendreDistanceThreshold="${input_type.s12GowerLegendreDistanceThreshold}" 
+		-DotproductDistanceThreshold="${input_type.DotproductDistanceThreshold}" 
+		-HammingDistanceThreshold="${input_type.HammingDistanceThreshold}"
 		-EuclideanDistanceThreshold="${input_type.EuclideanDistanceThreshold}"
 		-relative="{$input_type.intensity_type}"
 		
@@ -38,15 +40,11 @@
         <param name="maxHits" type="integer" value="0" label="Maximum Hits" help="Maximum number of hits per queried spectra, default=all (0)." />
         <param name="mzResolution" type="integer" value="0" label="Number of significant decimal" help="Number of significant decimals of your m/z." />
         <param name="maxIons" type="integer" value="0" label="Maximum number of ions" help="Number of m/z per spectra you want to keep for the queries, default 0 = all of them." />
-    	<param name="JaccardDistanceThreshold" type="integer" value="0" label="JaccardDistance" help="The Jaccard distance: also known as the Jaccard similarity coefficient is a statistic used for comparing the similarity and	diversity of sample sets. The Jaccard coefficient
-					measures similarity between finite sample sets, and is defined as the size of the intersection divided by the size of the union of the sample sets." />
-    	<param name="s12GowerLegendreDistanceThreshold" type="integer" value="0" label="s12GowerLegendreDistanceThreshold" help="Let be the contingency table of binary data such as n11 = a, n10 = b, n01 = c and n00 = d. All these distances are of type d = sqrt(1 - s) with s a similarity coefficient.
-					S12 coefficient of Gower and Legendre s7 = a / sqrt((a + b)(a + c))." />
-    	<param name="DotproductDistanceThreshold" type="integer" value="0" label="DotproductDistanceThreshold" help="The dot product or scalar product is an algebric operation that takes two equal-length sequences of numbers (usually coordinate vectors) and returns a single number. It is
-					used to calculate differences between points of different spectra in 3D (3D constructed with Retention infos, mass and intensity)." />
-    	<param name="HammingDistanceThreshold" type="integer" value="0" label="HammingDistanceThreshold" help="The Hamming distance between two strings of equal length is the number of positions at which the corresponding symbols are different. In other words, it is the number of
-					substitutions required to transform one string into another." />
-    	<param name="EuclideanDistanceThreshold" type="integer" value="0" label="EuclideanDistanceThreshold" help="The Euclidean distance is a generalization of the familiar Pythagorean theorem. It is the 'ordinary' distance between two points in Euclidean space." />
+    	<param name="JaccardDistanceThreshold" type="integer" value="0" label="JaccardDistance" help="Number of matches (a mass with appropriate intensity in both spectra) divided by the sum of matches and mismatches (a mass where only one of both spectra has a intensity). The jaccard distance is a binary distance." />
+    	<param name="s12GowerLegendreDistanceThreshold" type="integer" value="0" label="s12GowerLegendreDistanceThreshold" help="The distance measure S12GowLeg = sqrt(1 - s12) is derived from the S12 coefficient of Gower & Legendre defined as s12 = a / sqrt((a + b)(a + c)), with "a" representing the number of positions at which both spectra are in "on-state" and "b" respectively "c" representing the number of positions at which only the query spectrum or the hit spectrum are in "on-state"." />
+    	<param name="DotproductDistanceThreshold" type="integer" value="0" label="DotproductDistanceThreshold" help="The Dotproduct distance is summing the multiplied intensities over all matching peaks within both spectra. Here, to satisfy the conditions of a metric I) non-negativity, II) identity of indiscernibles, III) symmetry and IV) subadditivity / triangle inequality, we use 1-Dotproduct. Both spectra are normalised prior to the spectral vector norm in that way, that the absolute value of the squared intensities is equal to 1." />
+    	<param name="HammingDistanceThreshold" type="integer" value="0" label="HammingDistanceThreshold" help="In information theory, the Hamming distance between two strings of equal length is the number of positions for which the corresponding symbols are different. Put another way, it measures the minimum number of substitutions required to change one into the other, or the number of errors that transformed one string into the other." />
+    	<param name="EuclideanDistanceThreshold" type="integer" value="0" label="EuclideanDistanceThreshold" help="The Euclid is the square root of the sum of the squared differences over all matching peaks." />
     	<param name="intensity_type" label="Type of intensities" type="select" display="radio" help="Would you work with relative or absolute intensities? Example: relative = percentage, absolute = untouched. Relative is preferred">
           <option value="true">YES</option>
           <option value="false">NO</option>
@@ -65,15 +63,11 @@
         <param name="maxHits" type="integer" value="0" label="Maximum Hits" help="Maximum number of hits per queried spectra, default=all (0)." />
         <param name="mzResolution" type="integer" value="0" label="Number of significant decimal" help="Number of significant decimals of your m/z." />
         <param name="maxIons" type="integer" value="0" label="Maximum number of ions" help="Number of m/z per spectra you want to keep for the queries, default 0 = all of them." />
-    	<param name="JaccardDistanceThreshold" type="integer" value="0" label="JaccardDistance" help="The Jaccard distance: also known as the Jaccard similarity coefficient is a statistic used for comparing the similarity and	diversity of sample sets. The Jaccard coefficient
-					measures similarity between finite sample sets, and is defined as the size of the intersection divided by the size of the union of the sample sets." />
-    	<param name="s12GowerLegendreDistanceThreshold" type="integer" value="0" label="s12GowerLegendreDistanceThreshold" help="Let be the contingency table of binary data such as n11 = a, n10 = b, n01 = c and n00 = d. All these distances are of type d = sqrt(1 - s) with s a similarity coefficient.
-					S12 coefficient of Gower and Legendre s7 = a / sqrt((a + b)(a + c))." />
-    	<param name="DotproductDistanceThreshold" type="integer" value="0" label="DotproductDistanceThreshold" help="The dot product or scalar product is an algebric operation that takes two equal-length sequences of numbers (usually coordinate vectors) and returns a single number. It is
-					used to calculate differences between points of different spectra in 3D (3D constructed with Retention infos, mass and intensity)." />
-    	<param name="HammingDistanceThreshold" type="integer" value="0" label="HammingDistanceThreshold" help="The Hamming distance between two strings of equal length is the number of positions at which the corresponding symbols are different. In other words, it is the number of
-					substitutions required to transform one string into another." />
-    	<param name="EuclideanDistanceThreshold" type="integer" value="0" label="EuclideanDistanceThreshold" help="The Euclidean distance is a generalization of the familiar Pythagorean theorem. It is the 'ordinary' distance between two points in Euclidean space." />
+    	<param name="JaccardDistanceThreshold" type="integer" value="0" label="JaccardDistance" help="Number of matches (a mass with appropriate intensity in both spectra) divided by the sum of matches and mismatches (a mass where only one of both spectra has a intensity). The jaccard distance is a binary distance." />
+    	<param name="s12GowerLegendreDistanceThreshold" type="integer" value="0" label="s12GowerLegendreDistanceThreshold" help="The distance measure S12GowLeg = sqrt(1 - s12) is derived from the S12 coefficient of Gower & Legendre defined as s12 = a / sqrt((a + b)(a + c)), with "a" representing the number of positions at which both spectra are in "on-state" and "b" respectively "c" representing the number of positions at which only the query spectrum or the hit spectrum are in "on-state"." />
+    	<param name="DotproductDistanceThreshold" type="integer" value="0" label="DotproductDistanceThreshold" help="The Dotproduct distance is summing the multiplied intensities over all matching peaks within both spectra. Here, to satisfy the conditions of a metric I) non-negativity, II) identity of indiscernibles, III) symmetry and IV) subadditivity / triangle inequality, we use 1-Dotproduct. Both spectra are normalised prior to the spectral vector norm in that way, that the absolute value of the squared intensities is equal to 1." />
+    	<param name="HammingDistanceThreshold" type="integer" value="0" label="HammingDistanceThreshold" help="In information theory, the Hamming distance between two strings of equal length is the number of positions for which the corresponding symbols are different. Put another way, it measures the minimum number of substitutions required to change one into the other, or the number of errors that transformed one string into the other." />
+    	<param name="EuclideanDistanceThreshold" type="integer" value="0" label="EuclideanDistanceThreshold" help="The Euclid is the square root of the sum of the squared differences over all matching peaks." />
     	<param name="intensity_type" label="Type of intensities" type="select" display="radio" help="Would you work with relative or absolute intensities? Example: relative = percentage, absolute = untouched">
           <option value="true">YES</option>
           <option value="false">NO</option>
@@ -116,5 +110,25 @@ The Golm Metabolome Database (GMD) facilitates the search for and dissemination 
 This tool intends to facilitate the annotation of masses from GC-MS by searching informations through GMD webservices.  
 
 	 
+-----------
+Input files
+-----------
+
++-------------------------+-----------+
+| Parameter : num + label |  Format   |
++=========================+===========+
+| 1 : variableMetadata    |  tabular  |
++-------------------------+-----------+
+
+
+----------
+Parameters
+----------
+
+
+
+
+
+
 </tool>
 	 
