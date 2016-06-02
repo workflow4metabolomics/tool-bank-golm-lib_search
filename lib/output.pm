@@ -5,10 +5,6 @@ use warnings ;
 use Exporter ;
 use Carp ;
 use Excel::Writer::XLSX ;
-use Spreadsheet::XLSX;
-use Spreadsheet::ParseExcel;
-use Text::Iconv;
-use CGI qw(:standard);
 use HTML::Template ;
 use JSON ;
 
@@ -260,11 +256,9 @@ sub excel_output {
 	## Retrieve Values
     my $self = shift ;
     my ( $excel_file, $jsons ) = @_ ;
-    
-    open (FILE, '>', "output/".$excel_file) or die "Failed to open filehandle: $!" ;
-    
+        
     # Create a new workbook and add a worksheet
-    my $workbook  = Excel::Writer::XLSX->new( \*FILE ) ;
+    my $workbook  = Excel::Writer::XLSX->new( "output/".$excel_file ) ;
     my $worksheet = $workbook->add_worksheet() ;
     
     my $i = 0 ;
@@ -310,8 +304,6 @@ sub excel_output {
 	}
 
    $workbook->close();
-   
-   binmode STDOUT ;
 }
 ## END of SUB
 
@@ -343,52 +335,36 @@ sub write_json_skel {
 =head2 METHOD write_csv
 
 	## Description : write csv output file
-	## Input : $xls_file, $csv_file
+	## Input : $xlsx_file, $csv_file
 	## Output : csv file in output directory
-	## Usage : $o_output->write_csv( $xls_file, $csv_file ) ;
+	## Usage : $o_output->write_csv( $xlsx_file, $csv_file ) ;
 	
 =cut
 ## START of SUB
 sub write_csv {
 	## Retrieve Values
     my $self = shift ;
-    my ( $xls_file, $csv_file ) = @_ ;
-    
-    my $cgi = new CGI();
+    my ( $csv_file, $jsons ) = @_ ;
     
     my $csv_file_dir = "output/".$csv_file ;
-    my $xls_file_dir = "output/excel_output.xlsx" ;
     
-    open (CSV , ">" , $csv_file_dir) or die "Can't create the file $csv_file_dir\n" ; 
-    
-    
-	my $converter = Text::Iconv -> new ("utf-8", "windows-1251") ;
-	 
-	my $excel = Spreadsheet::XLSX -> new ($xls_file_dir, $converter);
-	my $line ;
-	foreach my $sheet (@{$excel -> {Worksheet}}) {
-	 
-	       printf("Sheet: %s\n", $sheet->{Name});
-	        
-	       $sheet -> {MaxRow} ||= $sheet -> {MinRow};
-	        
-	        foreach my $row ($sheet -> {MinRow} .. $sheet -> {MaxRow}) {
-	         
-	               $sheet -> {MaxCol} ||= $sheet -> {MinCol};
-	                
-	               foreach my $col ($sheet -> {MinCol} ..  $sheet -> {MaxCol}) {
-	                
-	                       my $cell = $sheet -> {Cells} [$row] [$col];
-	 
-	                       if ($cell) {
-	                           $line .= $cell -> {Val}.",";
-				           }
-			        }
-			        chomp($line);
-			        print CSV "$line\n";
-			        $line = '';
-    		}
-	}	
+    open (CSV , ">" , $csv_file_dir) or die "Can't create the file $csv_file_dir\n" ;
+     
+    print CSV "Num Spectre,Analyte Name,Spectrum Name,Retention Index,RI Discrepancy,DotproductDistance,EuclideanDistance,JaccardDistance,HammingDistance,s12GowerLegendreDistance,Spectrum ID,Metabolite ID\n";
+			   		
+    my $i = 0 ;
+    foreach my $href_grp (@$jsons) {
+		
+			foreach my $hit ( @{$href_grp->{'searchResults'}} ){
+				
+					print CSV $href_grp->{id}.",".$hit->{analyte}{name}.",".$hit->{spectrum}{name}.",".$hit->{ri_infos}{ri}.",".$hit->{ri_infos}{riDiscrepancy}.",".
+			   		$hit->{distance_scores}{DotproductDistance}.",".$hit->{distance_scores}{EuclideanDistance}.",".$hit->{distance_scores}{JaccardDistance}.",".
+			   		$hit->{distance_scores}{HammingDistance}.",".$hit->{distance_scores}{s12GowerLegendreDistance}.",".$hit->{spectrum}{id}.",".$hit->{metaboliteID}."\n" ;
+			   		
+			   		$i++;
+			}
+	}
+    close(CSV) ;
     
 }
 ## END of SUB
