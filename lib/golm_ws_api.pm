@@ -199,8 +199,29 @@ sub LibrarySearch() {
             ## Limitate number of hits returned according to user's $maxHit
             ## and filter hits on specific values with thresholds
             my @results = @$results ;
-            
-            #print Dumper \@results ;
+#            my %ajax = () ;
+#            my $i = 0 ;
+#            
+#            open (AJAX,">ajax.txt") or die "ERROR at opening file" ;
+#            
+#            foreach my $elt (@results){
+#            	
+#            	push ($ajax{ 'data' }[$i] , $i) ;
+#            	push ($ajax{ 'data' }[$i] , $elt->{spectrumName}) ;
+#            	push ($ajax{ 'data' }[$i] , $elt->{analyteName}) ;
+#            	push ($ajax{ 'data' }[$i] , $elt->{ri}) ;
+#            	push ($ajax{ 'data' }[$i] , $elt->{riDiscrepancy}) ;
+#            	push ($ajax{ 'data' }[$i] , $elt->{DotproductDistance}) ;
+#            	push ($ajax{ 'data' }[$i] , $elt->{EuclideanDistance}) ;
+#            	push ($ajax{ 'data' }[$i] , $elt->{JaccardDistance}) ;
+#            	push ($ajax{ 'data' }[$i] , $elt->{HammingDistance}) ;
+#            	push ($ajax{ 'data' }[$i] , $elt->{s12GowerLegendreDistance}) ;
+#            	push ($ajax{ 'data' }[$i] , $elt->{spectrumID}) ;
+#            	push ($ajax{ 'data' }[$i] , $elt->{metaboliteID}) ;
+#            	
+#            	$i++ ;
+#            }
+#            print AJAX Dumper %ajax ;
             ### Return all hits
             my $oapi = lib::golm_ws_api->new() ;
             if ($maxHits == 100 && $status eq 'success') {
@@ -208,7 +229,7 @@ sub LibrarySearch() {
 																		$DotproductDistanceThreshold,$HammingDistanceThreshold,$EuclideanDistanceThreshold) ;
             	if(!@$filtered_res){ push (@$filtered_res , "no results") ; }
             	
-            	return $filtered_res ;
+            	return ($filtered_res) ;
             }
             elsif ($maxHits < 100 && $maxHits > 0 && $status eq 'success'){
             	
@@ -225,7 +246,7 @@ sub LibrarySearch() {
             		
 	            	if(!@$filtered_res_before_hits_limited){ push (@filtered_limited_res , "no results") ; }
             	}
-            	return \@filtered_limited_res ;
+            	return (\@filtered_limited_res) ;
             }
             else { carp "No match returned from Golm for the query.\n" }
         }
