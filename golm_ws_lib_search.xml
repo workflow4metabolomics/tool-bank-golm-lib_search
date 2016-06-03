@@ -1,12 +1,14 @@
-<tool id="golm_ws_lib_search" name="Golm Metabolome Database search spectrum" version="2016-06-xx">
+<tool id="golm_ws_lib_search" name="Golm Metabolome Database search spectrum" version="2016-06-03">
   <description>
        : GC-MS Mass Spectral Database.
   </description>
   <command interpreter="perl">
-  
     golm_ws_lib_search.pl
-   
+	#if str($input_type.choice) == "YES":
     	-inputSpectra="${input_type.masses}"
+    #else:
+    	-inputSpectra="${input_type.masses}"
+    #end if
     	-ri="${input_type.ri}"
 		-riWindow="${input_type.riWindow}"
     	-mzRes="${input_type.mzResolution}"
@@ -18,9 +20,7 @@
 		-HammingDistanceThreshold="${input_type.HammingDistanceThreshold}"
 		-EuclideanDistanceThreshold="${input_type.EuclideanDistanceThreshold}"
 		-relative="{$input_type.intensity_type}"
-		
   </command>
-  
   <inputs>
   	<conditional name="input_type">
       <param name="choice" type="select" label="Would you use a file" help="If 'NO' is selected then one or more mass(es) must be entered manually.">
