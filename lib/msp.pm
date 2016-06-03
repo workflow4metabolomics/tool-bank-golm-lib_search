@@ -100,8 +100,8 @@ sub get_mzs {
 		    				$mz = $1 ;
 		    				# Truncate/round mzs depending on $mzRes wanted
 		    				if ($mzRes == 0) {
-		    					$mz = int($mz) ;
-		    					push (@temp_mzs , $mz) ;
+		    					my $mz_rounded = sprintf("%.".$mzRes."f", $mz) ;
+		    					push (@temp_mzs , $mz_rounded) ;
 		    				}
 		    				# Check that $mzRes is not greater than the number of digits after comma
 		    				elsif ($mzRes > 0) {
