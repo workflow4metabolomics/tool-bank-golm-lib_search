@@ -41,7 +41,7 @@
         <param name="mzResolution" type="integer" value="0" label="Number of significant decimal" help="Number of significant decimals of your m/z." />
         <param name="maxIons" type="integer" value="0" label="Maximum number of ions" help="Number of m/z per spectra you want to keep for the queries, default 0 = all of them." />
     	<param name="JaccardDistanceThreshold" type="integer" value="0" label="JaccardDistance" help="Number of matches, divided by the sum of matches and mismatches." />
-    	<param name="s12GowerLegendreDistanceThreshold" type="integer" value="0" label="s12GowerLegendreDistanceThreshold" help="The distance measure S12GowLeg = sqrt(1 - s12) is derived from the S12 coefficient of Gower & Legendre defined as s12 = a / sqrt((a + b)(a + c))." />
+    	<param name="s12GowerLegendreDistanceThreshold" type="integer" value="0" label="s12GowerLegendreDistanceThreshold" help="The distance measure S12GowLeg = sqrt(1 - s12) is derived from the S12 coefficient of Gower &amp; Legendre defined as s12 = a / sqrt((a + b)(a + c))." />
     	<param name="DotproductDistanceThreshold" type="integer" value="0" label="DotproductDistanceThreshold" help="The Dotproduct distance is summing the multiplied intensities over all matching peaks within both spectra. Here, to satisfy the conditions of a metric I) non-negativity, II) identity of indiscernibles, III) symmetry and IV) subadditivity / triangle inequality, we use 1-Dotproduct. Both spectra are normalised prior to the spectral vector norm in that way, that the absolute value of the squared intensities is equal to 1." />
     	<param name="HammingDistanceThreshold" type="integer" value="0" label="HammingDistanceThreshold" help="In information theory, the Hamming distance between two strings of equal length is the number of positions for which the corresponding symbols are different. Put another way, it measures the minimum number of substitutions required to change one into the other, or the number of errors that transformed one string into the other." />
     	<param name="EuclideanDistanceThreshold" type="integer" value="0" label="EuclideanDistanceThreshold" help="The Euclid is the square root of the sum of the squared differences over all matching peaks." />
@@ -64,7 +64,7 @@
         <param name="mzResolution" type="integer" value="0" label="Number of significant decimal" help="Number of significant decimals of your m/z." />
         <param name="maxIons" type="integer" value="0" label="Maximum number of ions" help="Number of m/z per spectra you want to keep for the queries, default 0 = all of them." />
     	<param name="JaccardDistanceThreshold" type="integer" value="0" label="JaccardDistance" help="Number of matches, divided by the sum of matches and mismatches." />
-    	<param name="s12GowerLegendreDistanceThreshold" type="integer" value="0" label="s12GowerLegendreDistanceThreshold" help="The distance measure S12GowLeg = sqrt(1 - s12) is derived from the S12 coefficient of Gower & Legendre defined as s12 = a / sqrt((a + b)(a + c))." />
+    	<param name="s12GowerLegendreDistanceThreshold" type="integer" value="0" label="s12GowerLegendreDistanceThreshold" help="The distance measure S12GowLeg = sqrt(1 - s12) is derived from the S12 coefficient of Gower &amp; Legendre defined as s12 = a / sqrt((a + b)(a + c))." />
     	<param name="DotproductDistanceThreshold" type="integer" value="0" label="DotproductDistanceThreshold" help="The Dotproduct distance is summing the multiplied intensities over all matching peaks within both spectra." />
     	<param name="HammingDistanceThreshold" type="integer" value="0" label="HammingDistanceThreshold" help="In information theory, the Hamming distance between two strings of equal length is the number of positions for which the corresponding symbols are different." />
     	<param name="EuclideanDistanceThreshold" type="integer" value="0" label="EuclideanDistanceThreshold" help="The Euclid is the square root of the sum of the squared differences over all matching peaks." />
@@ -161,7 +161,7 @@
 **Please cite** If you use this tool, please cite MassBank.
 
 for `Golm Metabolome Database &lt;http://gmd.mpimp-golm.mpg.de/&gt;`_ :
-  `Hummel, J., Strehmel, N., Selbig, J., Walther, D. and Kopka, J. (2010) Decision tree supported substructure prediction of metabolites from GC-MS profiles, Metabolomics.&lt;http://dx.doi.org/10.1007/s11306-010-0198-7&gt;`_
+  `Hummel, J., Strehmel, N., Selbig, J., Walther, D. and Kopka, J. (2010) Decision tree supported substructure prediction of metabolites from GC-MS profiles, Metabolomics.&amp;lt;http://dx.doi.org/10.1007/s11306-010-0198-7&amp;gt;`_
 	 
 	 </help>
 	 
@@ -242,7 +242,7 @@ JaccardDistanceThreshold
 
 
 s12GowerLegendreDistanceThreshold
-	| The distance measure S12GowLeg = sqrt(1 - s12) is derived from the S12 coefficient of Gower & Legendre defined as s12 = a / sqrt((a + b)(a + c)), with "a" representing the number of positions at which both spectra are in "on-state" and "b" respectively "c" representing the number of positions at which only the query spectrum or the hit spectrum are in "on-state".
+	| The distance measure S12GowLeg = sqrt(1 - s12) is derived from the S12 coefficient of Gower &amp; Legendre defined as s12 = a / sqrt((a + b)(a + c)), with "a" representing the number of positions at which both spectra are in "on-state" and "b" respectively "c" representing the number of positions at which only the query spectrum or the hit spectrum are in "on-state".
 
 
 DotproductDistanceThreshold
