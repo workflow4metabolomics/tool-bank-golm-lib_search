@@ -24,7 +24,7 @@ use lib::output qw( :ALL ) ;
 use lib::conf qw( :ALL ) ;
 
 ## Initialized values
-my ($OptHelp,$ri,$riWindow,$gcColumn,$inputSpectra,$maxHits,$mzRes,$maxIons,$threshold,$relative) = (undef,undef,undef,undef,undef,undef,undef,undef,undef,undef,undef) ;
+my ($OptHelp,$ri,$riWindow,$gcColumn,$inputFile,$inputMasses,$maxHits,$mzRes,$maxIons,$threshold,$relative) = (undef,undef,undef,undef,undef,undef,undef,undef,undef,undef,undef) ;
 my ( $JaccardDistanceThreshold,$s12GowerLegendreDistanceThreshold,$DotproductDistanceThreshold,$HammingDistanceThreshold,$EuclideanDistanceThreshold ) = (undef,undef,undef,undef,undef) ;
 my ($excel_file,$html_file,$html_template,$json_file,$csv_file) = (undef,undef,undef,undef,undef) ;
 my (@hits, @ojson) = ( () , () ) ;
@@ -38,7 +38,8 @@ if (!@ARGV){ &help ; }
 #=============================================================================
 &GetOptions ( 	
 				"help|h"     => \$OptHelp,       # HELP
-				"inputSpectra:s"		=> \$inputSpectra,
+				"inputFile:s"		=> \$inputFile,
+				"inputMasses:s"		=> \$inputMasses,
 				"ri:i"		=> \$ri,
 				"riWindow:i"		=> \$riWindow,
 				"gcColumn:s"		=> \$gcColumn,
@@ -106,14 +107,14 @@ $oapi->test_query_golm($ws_url, $ws_proxy) ;
 my $ref_mzs_res ;
 my $ref_ints_res ;
 
-## Case when masses are entered manually -> don't enter if ".msp" exists in $inputSpectra
-if (defined $inputSpectra && $inputSpectra =~ /^((?!\.msp).)*$/gm) { 
+## Case when masses are entered manually
+if (defined $inputMasses && !defined $inputFile) { 
 	
 	## Retrieve masses from msp file
-	$ref_mzs_res = $omsp->get_masses_from_string($inputSpectra, $mzRes) ;
+	$ref_mzs_res = $omsp->get_masses_from_string($inputMasses, $mzRes) ;
 	
 	## Retrieve intensities from msp file
-	$ref_ints_res = $omsp->get_intensities_from_string($inputSpectra) ;
+	$ref_ints_res = $omsp->get_intensities_from_string($inputMasses) ;
 	
 	## Sorting intensities
 	my ($mzs_res_sorted, $ints_res_sorted) = $omsp->sorting_descending_intensities($ref_mzs_res, $ref_ints_res) ;
@@ -143,14 +144,14 @@ if (defined $inputSpectra && $inputSpectra =~ /^((?!\.msp).)*$/gm) {
 	
 }
 ## Case with the msp file
-elsif (defined $inputSpectra and -e $inputSpectra and defined $mzRes and defined $maxIons and defined $maxHits) {
+elsif (defined $inputFile and -e $inputFile and !defined $inputMasses and defined $mzRes and defined $maxIons and defined $maxHits) {
 
-	unless (-f $inputSpectra)  { croak "$inputSpectra is not a file" ; }
-	unless (-s $inputSpectra)  { croak "$inputSpectra is empty" ; }
+	unless (-f $inputFile)  { croak "$inputFile is not a file" ; }
+	unless (-s $inputFile)  { croak "$inputFile is empty" ; }
 	
 	## Get masses and their intensities
-	$ref_mzs_res = $omsp->get_mzs($inputSpectra, $mzRes) ;
-	$ref_ints_res = $omsp->get_intensities($inputSpectra, $maxIons) ;
+	$ref_mzs_res = $omsp->get_mzs($inputFile, $mzRes) ;
+	$ref_ints_res = $omsp->get_intensities($inputFile, $maxIons) ;
 	
 	## Sorting intensities
 	my ($mzs_res_sorted, $ints_res_sorted) = $omsp->sorting_descending_intensities($ref_mzs_res, $ref_ints_res) ;
@@ -187,12 +188,13 @@ elsif (defined $inputSpectra and -e $inputSpectra and defined $mzRes and defined
 
 }
 elsif (!defined $maxHits or !defined $maxIons or !defined $mzRes) { croak "Parameters mzRes or maxIons or maxHits are undefined\n"; } 
-elsif (!-f $inputSpectra) 										  { croak "$inputSpectra does not exist" ; }
+elsif (!-f $inputFile) 										  	  { croak "$inputFile does not exist" ; }
 
 ############# -------------- Send queries to Golm -------------- ############# :
 
+my $limited_hits ;
 foreach my $spectrum (@$encoded_spectra){
-	my ($limited_hits) = $oapi->LibrarySearch ($ri, $riWindow, $gcColumn, $spectrum, $maxHits, $JaccardDistanceThreshold,
+	($limited_hits) = $oapi->LibrarySearch ($ri, $riWindow, $gcColumn, $spectrum, $maxHits, $JaccardDistanceThreshold,
 																										  $s12GowerLegendreDistanceThreshold,
 																										  $DotproductDistanceThreshold,
 																										  $HammingDistanceThreshold,
