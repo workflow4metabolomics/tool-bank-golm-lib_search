@@ -6,7 +6,8 @@ use Exporter ;
 use Carp ;
 
 use Data::Dumper ;
-use SOAP::Lite +trace => [qw (debug)];
+#use SOAP::Lite +trace => [qw (debug)];
+use SOAP::Lite ;
 use JSON ;
 
 use vars qw($VERSION @ISA @EXPORT %EXPORT_TAGS);
