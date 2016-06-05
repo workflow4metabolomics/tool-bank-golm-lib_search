@@ -247,11 +247,9 @@ sub write_html_body {
     my $self = shift ;
     my ( $results, $tbody_entries, $html_file_name, $html_template, $default_entries ) = @_ ;
     
-    my $html_file = $html_file_name ;
-    
-    if (defined $html_file){
+    if (defined $html_file_name){
     	
-	    	open (HTML, '>', "output/".$html_file) or die "Failed to open filehandle: $!" ;
+	    	open (HTML, '>', $html_file_name) or die "Failed to open filehandle: $!" ;
 	    
 		    if (-e $html_template) {
 		    	
@@ -266,7 +264,7 @@ sub write_html_body {
 			close (HTML) ;
     }
     else {
-    	croak "Problem with the html output file: $html_file is not defined\n" ;
+    	croak "Problem with the html output file: $html_file_name is not defined\n" ;
     }
 }
 ## END of SUB
@@ -278,7 +276,7 @@ sub write_html_body {
 
 	## Description : create an excel XLS output of the results
 	## Input : $jsons, $excel_file
-	## Output :  excel file in output directory
+	## Output :  excel file
 	## Usage : $o_output->excel_output( $jsons, $excel_file ) ;
 =cut
 ## START of SUB
@@ -288,7 +286,7 @@ sub excel_output {
     my ( $excel_file, $jsons ) = @_ ;
         
     # Create a new workbook and add a worksheet
-    my $workbook  = Excel::Writer::XLSX->new( "output/".$excel_file ) ;
+    my $workbook  = Excel::Writer::XLSX->new( $excel_file ) ;
     my $worksheet = $workbook->add_worksheet() ;
     
     my $i = 0 ;
@@ -342,7 +340,7 @@ sub excel_output {
 
 	## Description : prepare and write json output file
 	## Input : $json_file, $scalar
-	## Output : json file in output directory
+	## Output : json file
 	## Usage : $o_output->write_json_skel( $csv_file, $scalar ) ;
 	
 =cut
@@ -353,7 +351,7 @@ sub write_json_skel {
     my ( $json_file, $json_obj ) = @_ ;
     
     my $utf8_encoded_json_text = encode_json $json_obj ;
-    open(JSON, '>:utf8', "output/".$$json_file) or die "Can't create the file $$json_file\n" ;
+    open(JSON, '>:utf8', $$json_file) or die "Can't create the file $$json_file\n" ;
     print JSON $utf8_encoded_json_text ;
     close(JSON) ;
     
@@ -366,7 +364,7 @@ sub write_json_skel {
 
 	## Description : write csv output file
 	## Input : $xlsx_file, $csv_file
-	## Output : csv file in output directory
+	## Output : csv file
 	## Usage : $o_output->write_csv( $xlsx_file, $csv_file ) ;
 	
 =cut
@@ -376,9 +374,7 @@ sub write_csv {
     my $self = shift ;
     my ( $csv_file, $jsons ) = @_ ;
     
-    my $csv_file_dir = "output/".$csv_file ;
-    
-    open (CSV , ">" , $csv_file_dir) or die "Can't create the file $csv_file_dir\n" ;
+    open (CSV , ">" , $csv_file) or die "Can't create the file $csv_file\n" ;
      
     print CSV "Num Spectre,Analyte Name,Spectrum Name,Retention Index,RI Discrepancy,DotproductDistance,EuclideanDistance,JaccardDistance,HammingDistance,s12GowerLegendreDistance,Spectrum ID,Metabolite ID\n";
 			   		

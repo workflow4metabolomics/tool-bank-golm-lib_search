@@ -207,8 +207,6 @@ foreach my $spectrum (@$encoded_spectra){
 
 
 ############# -------------- Build outputs -------------- ############# :
-
-if( ! -d "output/" ) { system "mkdir output" ; }
 	
 my $jsons_obj = $o_output->build_json_res_object(\@hits) ;
 $o_output->write_json_skel(\$json_file, $jsons_obj) ;
