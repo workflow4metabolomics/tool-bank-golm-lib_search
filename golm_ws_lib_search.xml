@@ -208,8 +208,8 @@ Parameters
 **Retention Index Window**
 
 	| This value is for the library search used only. A larger window size will increase the number of matches.
-	| At the same time the identification becomes less reliable due to false matching spectra without RI consensus. 
-    | The maximal number of hits returned from the data base is limited due to performance reasons.
+	| At the same time the identification becomes less reliable due to false matching spectra without RI consensus.
+	| The maximal number of hits returned from the data base is limited due to performance reasons.
 
 
 **Maximum Hits**
