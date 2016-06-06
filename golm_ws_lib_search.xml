@@ -11,7 +11,7 @@
 	    #end if
 	    -ri "$ri"
 		-riWindow "$riWindow"
-	    -mzRes "$mzResolution"
+	    -mzRes "$mzRes"
 	    -maxHits "$maxHits"
 	    -maxIons "$maxIons"
 		-JaccardDistanceThreshold "$JaccardDistanceThreshold" 
@@ -47,7 +47,7 @@
     	<param name="riWindow" type="integer" value="5" label="Retention Index Window" help="This value is for the library search used only. A larger window size will increase the number of matches.
       	 At the same time the identification becomes less reliable due to false matching spectra without RI consensus." />
         <param name="maxHits" type="integer" value="100" label="Maximum Hits" help="Maximum number of hits per queried spectra, default=all (0)." />
-        <param name="mzResolution" type="integer" value="0" label="Number of significant decimal" help="Number of significant decimals of your m/z." />
+        <param name="mzRes" type="integer" value="0" label="Number of significant decimal" help="Number of significant decimals of your m/z." />
         <param name="maxIons" type="integer" value="0" label="Maximum number of ions" help="Number of m/z per spectra you want to keep for the queries, default 0 = all of them." />
     	<param name="JaccardDistanceThreshold" type="float" value="0.9" label="JaccardDistance" help="Number of matches, divided by the sum of matches and mismatches." />
     	<param name="s12GowerLegendreDistanceThreshold" type="float" value="0.9" label="s12GowerLegendreDistanceThreshold" help="The distance measure S12GowLeg = sqrt(1 - s12) is derived from the S12 coefficient of Gower &amp; Legendre defined as s12 = a / sqrt((a + b)(a + c))." />
@@ -76,7 +76,7 @@
 	  		<param name="ri" value="1898"/>
 	  		<param name="riWindow" value="5"/>
 	  		<param name="maxHits" value="10"/>
-	  		<param name="mzResolution" value="0"/>
+	  		<param name="mzRes" value="0"/>
 	  		<param name="maxIons" value="0"/>
 	  		<param name="JaccardDistanceThreshold" value="0.9"/>
 	  		<param name="s12GowerLegendreDistanceThreshold" value="0.9"/>
@@ -97,7 +97,7 @@
 	  		<param name="ri" value="1898"/>
 	  		<param name="riWindow" value="5"/>
 	  		<param name="maxHits" value="10"/>
-	  		<param name="mzResolution" value="0"/>
+	  		<param name="mzRes" value="0"/>
 	  		<param name="maxIons" value="0"/>
 	  		<param name="JaccardDistanceThreshold" value="1"/>
 	  		<param name="s12GowerLegendreDistanceThreshold" value="1"/>
@@ -118,7 +118,7 @@
 	  		<param name="ri" value="1898"/>
 	  		<param name="riWindow" value="5"/>
 	  		<param name="maxHits" value="10"/>
-	  		<param name="mzResolution" value="0"/>
+	  		<param name="mzRes" value="0"/>
 	  		<param name="maxIons" value="0"/>
 	  		<param name="JaccardDistanceThreshold" value="0.9"/>
 	  		<param name="s12GowerLegendreDistanceThreshold" value="0.9"/>
@@ -135,10 +135,10 @@
 	 
 	 <help>
 
-
 .. class:: infomark	 
 
 **Authors**
+
   | Gabriel Cretin (for perl and Galaxy), Franck Giacomoni (for perl and Galaxy)
 
 ---------------------------------------------------
@@ -150,9 +150,7 @@
 for `Golm Metabolome Database &lt;http://gmd.mpimp-golm.mpg.de/&gt;`_ :
   `Hummel, J., Strehmel, N., Selbig, J., Walther, D. and Kopka, J. (2010) Decision tree supported substructure prediction of metabolites from GC-MS profiles, Metabolomics. &lt;http://dx.doi.org/10.1007/s11306-010-0198-7&gt;`_
 	 
-	
-	 
-	 
+
 -----------
 Description
 -----------
@@ -160,7 +158,6 @@ Description
 The Golm Metabolome Database (GMD) facilitates the search for and dissemination of reference mass spectra from biologically active metabolites quantified using gas chromatography (GC) coupled to mass spectrometry (MS).
 This tool intends to facilitate the annotation of masses from GC-MS by searching informations through GMD webservices.  
 
-	 
 -----------
 Input files
 -----------
@@ -171,6 +168,7 @@ Input files
 | 1 : inputSpectra        |    msp    |
 +-------------------------+-----------+
 
+
 File containing spectra in the msp format.
 Example of a spectra in msp format:
 
@@ -179,7 +177,7 @@ Example of a spectra in msp format:
 	| rt: 10.58
 	| Class: Unknown
 	| rt.sd: 0.003
-	| Num Peaks: 32
+	| Num Peaks: 19
 	| 73.0465  826983.38; 74.0481  70018.08; 75.0319  69475.73; 100.0573  37477.24; 103.0227  43054.28;
 	| 116.0884  1433179.62; 117.0905  151975.23; 118.0869  53105.64; 128.0526  26404.77; 131.0359  22647.44;
 	| 133.0438  22141.56; 147.0666  255488.28; 48.066  49965.66; 149.0551  37762.38; 190.1069  72568.23;
@@ -190,6 +188,7 @@ Parameters
 ----------
 
 Would you use a file
+
 	| Choose whether the masses are in a file or entered manually
 	| YES (default) : parameters **File of masses (format: msp)** is visible
 	| NO : parameter **Masses of the molecule (entered manually)** is visible
@@ -197,54 +196,66 @@ Would you use a file
 
 
 Column type
+
 	| VAR5 means a 5%-phenyl-95%-dimethylpolysiloxane column and MDN35 means a 35%-phenyl-65%-dimethylpolysiloxane column. If you don't know select 'None'.
 
 
 Alkane Retention Index
+
 	| If neither an alkane RIs for VAR5 nor MDN35 is available in your setup, please select 'none' in the input field above!
 
 
 Retention Index Window
+
 	| This value is for the library search used only. A larger window size will increase the number of matches.
     | At the same time the identification becomes less reliable due to false matching spectra without RI consensus. The maximal number of hits returned from the data base is limited due to performance reasons.
 
 
 Maximum Hits
+
 	| Maximum number of hits returned by Golm database, default = 0 (which means all of them are taken in account).
 
 
 Number of significant decimal
+
 	| Number of significant decimals of your m/z. 
 	| Example: m/z = 73.798 if mzRes = 4, m/z becomes 73.7980
 	| 		   m/z = 73.798 if mzRes = 0, m/z becomes 74
 
 
 Maximum number of ions
+
 	| Number of m/z and intensities per spectra you want to keep for the queries to Golm, default = 0 = all of them.
 
 
 JaccardDistanceThreshold
+
 	| Number of matches (a mass with appropriate intensity in both spectra) divided by the sum of matches and mismatches (a mass where only one of both spectra has a intensity).
 	| The jaccard distance is a binary distance.
 
 
 s12GowerLegendreDistanceThreshold
+
 	| The distance measure S12GowLeg = sqrt(1 - s12) is derived from the S12 coefficient of Gower &amp; Legendre defined as s12 = a / sqrt((a + b)(a + c)), with "a" representing the number of positions at which both spectra are in "on-state" and "b" respectively "c" representing the number of positions at which only the query spectrum or the hit spectrum are in "on-state".
 
 
 DotproductDistanceThreshold
+
 	| The Dotproduct distance is summing the multiplied intensities over all matching peaks within both spectra. Here, to satisfy the conditions of a metric I) non-negativity, II) identity of indiscernibles, III) symmetry and IV) subadditivity / triangle inequality, we use 1-Dotproduct. Both spectra are normalised prior to the spectral vector norm in that way, that the absolute value of the squared intensities is equal to 1.
 
 
 HammingDistanceThreshold
+
 	| In information theory, the Hamming distance between two strings of equal length is the number of positions for which the corresponding symbols are different. Put another way, it measures the minimum number of substitutions required to change one into the other, or the number of errors that transformed one string into the other.
 
 
 EuclideanDistanceThreshold
+
 	| The Euclid is the square root of the sum of the squared differences over all matching peaks.
 
 
 Type of intensities
+
 	| Use absolute or relative intensities.
 	| Example: relative = percentage (intensity * 100) / max(intensities), absolute = untouched
 
@@ -254,16 +265,11 @@ Output files
 ------------
 
 Three types of files
-	| html_output.html  : to view results on a webpage (HTML).
-	| 
-	| excel_output.xlsx : to export results in a tabular format.
-	| 
-	| csv_output.csv    : to export results in csv format.
-	|
-	| json_output.csv	: to use for other modules. 
-	
----------------------------------------------------
 
+	- html_output.html  : to view results on a webpage (HTML).
+	- excel_output.xlsx : to export results in a tabular format.
+	- csv_output.csv    : to export results in csv format.
+	- json_output.csv	: to use for other modules. 
 
 
  </help>
