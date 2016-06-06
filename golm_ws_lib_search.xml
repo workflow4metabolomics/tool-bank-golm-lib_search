@@ -187,7 +187,7 @@ Example of a spectra in msp format:
 Parameters
 ----------
 
-Would you use a file
+**Would you use a file**
 
 	| Choose whether the masses are in a file or entered manually
 	| YES (default) : parameters **File of masses (format: msp)** is visible
@@ -195,66 +195,67 @@ Would you use a file
 	| For both, all other parameters are available
 
 
-Column type
+**Column type**
 
 	| VAR5 means a 5%-phenyl-95%-dimethylpolysiloxane column and MDN35 means a 35%-phenyl-65%-dimethylpolysiloxane column. If you don't know select 'None'.
 
 
-Alkane Retention Index
+**Alkane Retention Index**
 
 	| If neither an alkane RIs for VAR5 nor MDN35 is available in your setup, please select 'none' in the input field above!
 
 
-Retention Index Window
+**Retention Index Window**
 
 	| This value is for the library search used only. A larger window size will increase the number of matches.
-    | At the same time the identification becomes less reliable due to false matching spectra without RI consensus. The maximal number of hits returned from the data base is limited due to performance reasons.
+	| At the same time the identification becomes less reliable due to false matching spectra without RI consensus. 
+    | The maximal number of hits returned from the data base is limited due to performance reasons.
 
 
-Maximum Hits
+**Maximum Hits**
 
 	| Maximum number of hits returned by Golm database, default = 0 (which means all of them are taken in account).
 
 
-Number of significant decimal
+**Number of significant decimal**
 
 	| Number of significant decimals of your m/z. 
 	| Example: m/z = 73.798 if mzRes = 4, m/z becomes 73.7980
 	| 		   m/z = 73.798 if mzRes = 0, m/z becomes 74
 
 
-Maximum number of ions
+**Maximum number of ions**
 
 	| Number of m/z and intensities per spectra you want to keep for the queries to Golm, default = 0 = all of them.
 
 
-JaccardDistanceThreshold
+**JaccardDistanceThreshold**
 
 	| Number of matches (a mass with appropriate intensity in both spectra) divided by the sum of matches and mismatches (a mass where only one of both spectra has a intensity).
 	| The jaccard distance is a binary distance.
 
 
-s12GowerLegendreDistanceThreshold
+**s12GowerLegendreDistanceThreshold**
 
 	| The distance measure S12GowLeg = sqrt(1 - s12) is derived from the S12 coefficient of Gower &amp; Legendre defined as s12 = a / sqrt((a + b)(a + c)), with "a" representing the number of positions at which both spectra are in "on-state" and "b" respectively "c" representing the number of positions at which only the query spectrum or the hit spectrum are in "on-state".
 
 
-DotproductDistanceThreshold
+**DotproductDistanceThreshold**
 
 	| The Dotproduct distance is summing the multiplied intensities over all matching peaks within both spectra. Here, to satisfy the conditions of a metric I) non-negativity, II) identity of indiscernibles, III) symmetry and IV) subadditivity / triangle inequality, we use 1-Dotproduct. Both spectra are normalised prior to the spectral vector norm in that way, that the absolute value of the squared intensities is equal to 1.
 
 
-HammingDistanceThreshold
+**HammingDistanceThreshold**
 
 	| In information theory, the Hamming distance between two strings of equal length is the number of positions for which the corresponding symbols are different. Put another way, it measures the minimum number of substitutions required to change one into the other, or the number of errors that transformed one string into the other.
 
 
-EuclideanDistanceThreshold
+**EuclideanDistanceThreshold**
 
 	| The Euclid is the square root of the sum of the squared differences over all matching peaks.
 
 
-Type of intensities
+**Type of intensities**
 
 	| Use absolute or relative intensities.
 	| Example: relative = percentage (intensity * 100) / max(intensities), absolute = untouched
@@ -264,7 +265,7 @@ Type of intensities
 Output files
 ------------
 
-Three types of files
+**Three types of files**
 
 	- html_output.html  : to view results on a webpage (HTML).
 	- excel_output.xlsx : to export results in a tabular format.
