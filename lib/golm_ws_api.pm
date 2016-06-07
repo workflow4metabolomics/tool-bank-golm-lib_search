@@ -200,34 +200,14 @@ sub LibrarySearch() {
             ## Limitate number of hits returned according to user's $maxHit
             ## and filter hits on specific values with thresholds
             my @results = @$results ;
-#            my %ajax = () ;
-#            my $i = 0 ;
-#            
-#            open (AJAX,">ajax.txt") or die "ERROR at opening file" ;
-#            
-#            foreach my $elt (@results){
-#            	
-#            	push ($ajax{ 'data' }[$i] , $i) ;
-#            	push ($ajax{ 'data' }[$i] , $elt->{spectrumName}) ;
-#            	push ($ajax{ 'data' }[$i] , $elt->{analyteName}) ;
-#            	push ($ajax{ 'data' }[$i] , $elt->{ri}) ;
-#            	push ($ajax{ 'data' }[$i] , $elt->{riDiscrepancy}) ;
-#            	push ($ajax{ 'data' }[$i] , $elt->{DotproductDistance}) ;
-#            	push ($ajax{ 'data' }[$i] , $elt->{EuclideanDistance}) ;
-#            	push ($ajax{ 'data' }[$i] , $elt->{JaccardDistance}) ;
-#            	push ($ajax{ 'data' }[$i] , $elt->{HammingDistance}) ;
-#            	push ($ajax{ 'data' }[$i] , $elt->{s12GowerLegendreDistance}) ;
-#            	push ($ajax{ 'data' }[$i] , $elt->{spectrumID}) ;
-#            	push ($ajax{ 'data' }[$i] , $elt->{metaboliteID}) ;
-#            	
-#            	$i++ ;
-#            }
-#            print AJAX Dumper %ajax ;
+            
             ### Return all hits
             my $oapi = lib::golm_ws_api->new() ;
             if ($maxHits == 100 && $status eq 'success') {
+            	
             	my $filtered_res = $oapi->filter_scores_golm_results(\@results,$JaccardDistanceThreshold,$s12GowerLegendreDistanceThreshold,
 																		$DotproductDistanceThreshold,$HammingDistanceThreshold,$EuclideanDistanceThreshold) ;
+            	
             	if(!@$filtered_res){ push (@$filtered_res , "no results") ; }
             	
             	return ($filtered_res) ;
@@ -282,7 +262,7 @@ sub filter_scores_golm_results() {
 	my @filtered_res = () ;
 	
 	foreach my $res (@results){
-		
+
 			if ($res->{'JaccardDistance'} <= $JaccardDistanceThreshold && $res->{'s12GowerLegendreDistance'} <= $s12GowerLegendreDistanceThreshold
 				&& $res->{'DotproductDistance' } <= $DotproductDistanceThreshold && $res->{'HammingDistance'} <= $HammingDistanceThreshold && 
 				$res->{'EuclideanDistance' } <= $EuclideanDistanceThreshold) {
