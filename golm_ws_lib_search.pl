@@ -16,6 +16,7 @@ use FindBin ; ## Allows you to locate the directory of original perl script
 ## Specific Perl Modules (PFEM)
 use lib $FindBin::Bin ;
 my $binPath = $FindBin::Bin ;
+use JSON ;
 
 ## Dedicate Perl Modules PFEM
 use lib::golm_ws_api qw( :ALL ) ;
@@ -203,13 +204,16 @@ foreach my $spectrum (@$encoded_spectra){
 																										  $default_ri, $default_ri_window, $default_gc_column) ;
 	push (@hits , $limited_hits) ;
 }
-
-
+			
 
 ############# -------------- Build outputs -------------- ############# :
 	
 my $jsons_obj = $o_output->build_json_res_object(\@hits) ;
 $o_output->write_json_skel(\$json_file, $jsons_obj) ;
+
+# Build the ajax data source for html view
+$o_output->write_ajax_data_source($jsons_obj) ;
+
 
 my $tbody_entries = $o_output->add_entries_to_tbody_object($jsons_obj) ;
 $o_output->write_html_body($jsons_obj, $tbody_entries, $html_file, $html_template, $default_entries) ;
@@ -228,19 +232,19 @@ sub help {
 golm_ws_lib_search.pl
 
 # golm_ws_lib_search.pl is a script to use SOAP Golm webservice and send specific queries about spectra searches. 
-# Input : a list of mzs and intensities.
-# Authors : Yann Guitton / Gabriel Cretin / Franck Giacomoni
+# Input : a list of masses (m/z) and their intensities.
+# Authors : Gabriel Cretin / Franck Giacomoni / Yann Guitton 
 # Emails : franck.giacomoni\@clermont.inra.fr
 #		   gabriel.cretin\@clermont.inra.fr
 #		   yann.guitton\@oniris-nantes.fr
 # Version : 1.0
-# Created : xx/xx/2016
+# Created : 07/06/2016
 USAGE :		 
 		golm_ws_lib_search.pl -help OR
 		
 		golm_ws_lib_search.pl 
 			-spectraFile [.msp file]	
-			-spectrumString [masses + intensities of an ion: 'mz1 int1 mz2 int2 mzx intx...']
+			-spectraMasses [masses + intensities of an ion: 'mz1 int1 mz2 int2 mzx intx...']
 			-ri [Rentention Index: float or integer]
 			-riWindow [Retention Index Window: 1500 or the value of your choice]
 			-gcColumn [AlkaneRetentionIndexGcColumnComposition: 'VAR5' or 'MDN35' or 'None']
@@ -256,6 +260,7 @@ USAGE :
 			-excelFile [name of the xls file in output: string]
 			-htmlFile [name of the html file in output: string]
 			-json_file [name of the json file in output: string]
+			-csv_file [name of the csv file in output: string]
 				
 ";
 	exit(1);
