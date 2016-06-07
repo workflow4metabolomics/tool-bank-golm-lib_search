@@ -154,6 +154,7 @@
 		}		
 		
 		select {
+			max-width: 150px;
 			white-space: nowrap;
 		    overflow: hidden;
 		    text-overflow: ellipsis;
@@ -253,9 +254,11 @@
 	                 } );
              		} );
 		         }
-
-
+				
+				
 		    } );
+		    
+		    
 		    
 		    $('div.toolbar').html("<button class='mdl-button mdl-js-button mdl-button--raised ripple mdl-button--accent' data-ripple-color='#b3b3b3' id='delete'>Delete selected rows</button>");
 		    
@@ -284,6 +287,10 @@
 			$('.buttons-collection').each(function() {
 			   $(this).attr("id", "mytooltip3");
 			})
+			
+			for(var i=0 ; i<12 ; i++){
+				$($($("table.display.stripe.dataTable")[2]).find("th")[i]).css('width',$($($("table.display.stripe.dataTable")[0]).find("th")[i]).css('width')) ;
+			}
 			
 		});
 		
