@@ -18,8 +18,8 @@ use vars qw($VERSION @ISA @EXPORT %EXPORT_TAGS);
 
 our $VERSION = "1.0";
 our @ISA = qw(Exporter);
-our @EXPORT = qw(build_json_res_object excel_output write_html_body add_entries_to_tbody_object write_json_skel);
-our %EXPORT_TAGS = ( ALL => [qw(build_json_res_object excel_output write_html_body add_entries_to_tbody_object write_json_skel)] );
+our @EXPORT = qw(build_json_res_object excel_output write_html_body add_entries_to_tbody_object write_json_skel write_ajax_data_source);
+our %EXPORT_TAGS = ( ALL => [qw(build_json_res_object excel_output write_html_body add_entries_to_tbody_object write_json_skel write_ajax_data_source)] );
 
 =head1 NAME
 My::Module - An example module
@@ -126,17 +126,17 @@ sub build_json_res_object {
 			
 			$json_results[$i]{'id'} = $spectrumID++ ;
 			$json_results[$i]{'nb_hits'} = $nb_hits ;
-			$hit_infos{'metaboliteID'} = "no results" ;
-			$hit_infos{'distance_scores'}{'EuclideanDistance'} = "no results (too restrictive)" ;
-			$hit_infos{'distance_scores'}{'DotproductDistance'} = "no results (too restrictive)" ;
-			$hit_infos{'distance_scores'}{'HammingDistance'} = "no results (too restrictive)" ;
-			$hit_infos{'distance_scores'}{'JaccardDistance'} = "no results (too restrictive)" ;
-			$hit_infos{'distance_scores'}{'s12GowerLegendreDistance'} = "no results (too restrictive)" ;
-			$hit_infos{'ri_infos'}{'ri'} = "no results" ;
-			$hit_infos{'ri_infos'}{'riDiscrepancy'} = "no results" ;
-			$hit_infos{'analyte'}{'id'} = "no results" ;
-			$hit_infos{'analyte'}{'name'} = "no results" ;
-			$hit_infos{'spectrum'}{'id'} = "no results" ;
+			$hit_infos{'metaboliteID'} = "" ;
+			$hit_infos{'distance_scores'}{'EuclideanDistance'} = "" ;
+			$hit_infos{'distance_scores'}{'DotproductDistance'} = "" ;
+			$hit_infos{'distance_scores'}{'HammingDistance'} = "" ;
+			$hit_infos{'distance_scores'}{'JaccardDistance'} = "" ;
+			$hit_infos{'distance_scores'}{'s12GowerLegendreDistance'} = "" ;
+			$hit_infos{'ri_infos'}{'ri'} = "" ;
+			$hit_infos{'ri_infos'}{'riDiscrepancy'} = "" ;
+			$hit_infos{'analyte'}{'id'} = "" ;
+			$hit_infos{'analyte'}{'name'} = "" ;
+			$hit_infos{'spectrum'}{'id'} = "" ;
 			$hit_infos{'spectrum'}{'name'} = "no results" ;
 			
 			push ( @{ $json_results[$i]{'searchResults'} } , \%hit_infos );
@@ -254,7 +254,6 @@ sub write_html_body {
 		    if (-e $html_template) {
 		    	
 		    	my $ohtml = HTML::Template->new(filename => $html_template) ;
-		    	$ohtml->param( GROUPS => $tbody_entries ) ;
 		    	$ohtml->param( DEFAULT_ENTRIES => $default_entries ) ;
 		    	print HTML $ohtml->output ;
 		    }	
@@ -394,6 +393,55 @@ sub write_csv {
     
 }
 ## END of SUB
+
+
+
+
+=head2 METHOD write_ajax_data_source
+
+	## Description : write csv output file
+	## Input : $jsons_obj
+	## Output : 
+	## Usage : $o_output->write_ajax_data_source( $jsons_obj ) ;
+	
+=cut
+## START of SUB
+sub write_ajax_data_source {
+	## Retrieve Values
+    my $self = shift ;
+    my ( $jsons_obj ) = @_ ;
+
+	my %ajax = () ;
+	my $i = 0 ;
+	            
+	open (AJAX,">ajax.txt") or die "ERROR at opening file" ;
+	            
+	foreach my $href_grp (@$jsons_obj) {
+			
+				foreach my $hit ( @{$href_grp->{'searchResults'}} ){
+		            	
+					push (@{$ajax{ 'data' }[$i]} , $href_grp->{id}) ;
+					push (@{$ajax{ 'data' }[$i]} , $hit->{spectrum}{name}) ;
+					push (@{$ajax{ 'data' }[$i]} , $hit->{analyte}{name}) ;
+					push (@{$ajax{ 'data' }[$i]} , $hit->{ri_infos}{ri}) ;
+					push (@{$ajax{ 'data' }[$i]} , $hit->{ri_infos}{riDiscrepancy}) ;
+					push (@{$ajax{ 'data' }[$i]} , $hit->{distance_scores}{DotproductDistance}) ;
+					push (@{$ajax{ 'data' }[$i]} , $hit->{distance_scores}{EuclideanDistance}) ;
+					push (@{$ajax{ 'data' }[$i]} , $hit->{distance_scores}{JaccardDistance}) ;
+					push (@{$ajax{ 'data' }[$i]} , $hit->{distance_scores}{HammingDistance}) ;
+					push (@{$ajax{ 'data' }[$i]} , $hit->{distance_scores}{s12GowerLegendreDistance}) ;
+					push (@{$ajax{ 'data' }[$i]} , $hit->{spectrum}{id}) ;
+					push (@{$ajax{ 'data' }[$i]} , $hit->{metaboliteID}) ;
+	
+					$i++ ;
+				}
+		}
+	
+	my $ajax = encode_json \%ajax ;
+	print AJAX $ajax ;
+
+}
+#END of SUB
 
 
 
