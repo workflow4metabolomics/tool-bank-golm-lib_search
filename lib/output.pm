@@ -245,7 +245,7 @@ sub add_entries_to_tbody_object {
 sub write_html_body {
 	## Retrieve Values
     my $self = shift ;
-    my ( $results, $tbody_entries, $html_file_name, $html_template, $default_entries ) = @_ ;
+    my ( $results, $tbody_entries, $html_file_name, $html_template, $default_entries, $jsons_obj ) = @_ ;
     
     if (defined $html_file_name){
     	
@@ -254,6 +254,8 @@ sub write_html_body {
 		    if (-e $html_template) {
 		    	
 		    	my $ohtml = HTML::Template->new(filename => $html_template) ;
+#		    	$ohtml->param( DATA => $jsons_obj ) ;
+				$ohtml->param( GROUPS => $tbody_entries ) ;
 		    	$ohtml->param( DEFAULT_ENTRIES => $default_entries ) ;
 		    	print HTML $ohtml->output ;
 		    }	
@@ -414,7 +416,7 @@ sub write_ajax_data_source {
 	my %ajax = () ;
 	my $i = 0 ;
 	            
-	open (AJAX,">ajax.txt") or die "ERROR at opening file" ;
+	#open (AJAX,">ajax.txt") or die "ERROR at opening file" ;
 	            
 	foreach my $href_grp (@$jsons_obj) {
 			
@@ -438,7 +440,8 @@ sub write_ajax_data_source {
 		}
 	
 	my $ajax = encode_json \%ajax ;
-	print AJAX $ajax ;
+	return $ajax ;
+	#print AJAX $ajax ;
 
 }
 #END of SUB

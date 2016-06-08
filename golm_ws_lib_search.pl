@@ -212,11 +212,11 @@ my $jsons_obj = $o_output->build_json_res_object(\@hits) ;
 $o_output->write_json_skel(\$json_file, $jsons_obj) ;
 
 # Build the ajax data source for html view
-$o_output->write_ajax_data_source($jsons_obj) ;
+#my $ajax = $o_output->write_ajax_data_source($jsons_obj) ;
 
 
 my $tbody_entries = $o_output->add_entries_to_tbody_object($jsons_obj) ;
-$o_output->write_html_body($jsons_obj, $tbody_entries, $html_file, $html_template, $default_entries) ;
+$o_output->write_html_body($jsons_obj, $tbody_entries, $html_file, $html_template, $default_entries, $jsons_obj) ;
 $o_output->excel_output($excel_file, $jsons_obj) ;
 $o_output->write_csv($csv_file , $jsons_obj) ;
 

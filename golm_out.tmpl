@@ -177,8 +177,6 @@
 	<script type='text/javascript' class='init'>
 		$(document).ready( function () {
 		    var table = $('#table_id').DataTable( {
-		    	'ajax': "ajax.txt",
-		        'deferRender': true,
 		    	'order': [ 0, 'asc' ],
 		    	'orderClasses': false,
 		    	'dom': 'B<"toolbar">frtilp',
@@ -229,7 +227,7 @@
 		                'visible': false
 		            }
 		        ],
-		        'scrollY': '50vh',
+		        'scrollY': '55vh',
 		    	'responsive': true,
 		    	'pagingType': 'full_numbers',
         		'scrollCollapse': true,
@@ -254,8 +252,7 @@
 	                 } );
              		} );
 		         }
-				
-				
+		         
 		    } );
 		    
 		    
@@ -292,6 +289,16 @@
 				$($($("table.display.stripe.dataTable")[2]).find("th")[i]).css('width',$($($("table.display.stripe.dataTable")[0]).find("th")[i]).css('width')) ;
 			}
 			
+			
+			/*var json_data = $.parseJSON(<TMPL_VAR NAME=DATA>) ;
+			
+			display = function(start,cpt){
+				var x=0, y=0 ;
+				$.each(json_data, function(i,v){
+					if(x >= start)
+				});
+			}*/
+			
 		});
 		
 		$(document).on('click', '.ripple', function(e) {
@@ -321,6 +328,7 @@
 		      $(this).remove();
 		    });
 		});
+		
 	</script>
 
 <title>Golm Search Results</title>
@@ -385,6 +393,22 @@
 								<th style='text-align:center'>Metabolite id</th>
 							</tr>
 						</tfoot>
+						<tbody>
+								<TMPL_LOOP NAME=GROUPS>
+									<tr><td><TMPL_VAR NAME=ID></td>
+									<td><TMPL_VAR NAME=SPECTRUM_NAME></td>
+									<td><TMPL_VAR NAME=ANALYTE_NAME></td>
+									<td><TMPL_VAR NAME=RI></td>
+									<td><TMPL_VAR NAME=RI_DISCREPANCY></td>
+									<td><TMPL_VAR NAME=DOT_PRODUCT_DISTANCE></td>
+									<td><TMPL_VAR NAME=EUCLIDEAN_DISTANCE></td>
+									<td><TMPL_VAR NAME=JACCARD_DISTANCE></td>
+									<td><TMPL_VAR NAME=HAMMING_DISTANCE></td>
+									<td><TMPL_VAR NAME=S12_GOWER_LEGENDRE_DISTANCE></td>
+									<td><TMPL_VAR NAME=SPECTRUM_ID></td>
+									<td><TMPL_VAR NAME=METABOLITE_ID></td></tr>
+								</TMPL_LOOP>
+						</tbody>
 					</table>
 			</div>
 		    <div class='mdl-tooltip mdl-tooltip--bottom' for='mytooltip1'>
