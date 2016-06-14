@@ -267,10 +267,10 @@ Output files
 
 **Three types of files**
 
-	- html_output.html  : to view results on a webpage (HTML).
-	- excel_output.xlsx : to export results in a tabular format.
-	- csv_output.csv    : to export results in csv format.
-	- json_output.csv	: to use for other modules. 
+- html_output.html  : to view results on a webpage (HTML).
+- excel_output.xlsx : to export results in a tabular format.
+- csv_output.csv    : to export results in csv format.
+- json_output.csv	: to use for other modules. 
 
 
  </help>
