@@ -354,7 +354,7 @@ sub excel_like_output {
 	
 	open (OUT , ">" , $excel_file) or die "Error at opening file $excel_file" ;
 	
-	print OUT "Num Spectre\tAnalyte Name\tSpectrum Name\tRetention Index\tRI Discrepancy\tDotproductDistance\tEuclideanDistance\tJaccardDistance\tHammingDistance\ts12GowerLegendreDistance\tSpectrum ID\tMetabolite ID\n" ;
+	print OUT "Num Spectre\tAnalyte Name\tSpectrum Name\tRetention Index\tRI Discrepancy\tDotproductDistance\tEuclideanDistance\tJaccardDistance\tHammingDistance\ts12GowerLegendreDistance\tSpectrum ID\tMetabolite ID\tAnalyte ID\n" ;
 	
 	foreach my $href_grp (@$jsons) {
 		
