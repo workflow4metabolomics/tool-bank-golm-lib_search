@@ -18,8 +18,8 @@ use vars qw($VERSION @ISA @EXPORT %EXPORT_TAGS);
 
 our $VERSION = "1.0";
 our @ISA = qw(Exporter);
-our @EXPORT = qw(build_json_res_object excel_output write_html_body add_entries_to_tbody_object write_json_skel write_ajax_data_source);
-our %EXPORT_TAGS = ( ALL => [qw(build_json_res_object excel_output write_html_body add_entries_to_tbody_object write_json_skel write_ajax_data_source)] );
+our @EXPORT = qw(build_json_res_object excel_output write_html_body add_entries_to_tbody_object write_json_skel write_ajax_data_source excel_like_output);
+our %EXPORT_TAGS = ( ALL => [qw(build_json_res_object excel_output write_html_body add_entries_to_tbody_object write_json_skel write_ajax_data_source excel_like_output)] );
 
 =head1 NAME
 My::Module - An example module
@@ -281,58 +281,90 @@ sub write_html_body {
 	## Usage : $o_output->excel_output( $jsons, $excel_file ) ;
 =cut
 ## START of SUB
-sub excel_output {
+#sub excel_output {
+#	## Retrieve Values
+#    my $self = shift ;
+#    my ( $excel_file, $jsons ) = @_ ;
+#        
+#    # Create a new workbook and add a worksheet
+#    my $workbook  = Excel::Writer::XLSX->new( $excel_file ) ;
+#    my $worksheet = $workbook->add_worksheet() ;
+#    
+#    my $i = 0 ;
+#    
+#    # Create a format for the headings
+#    my $format = $workbook->add_format() ;
+#    $format->set_bold() ;
+#    
+#   $worksheet->write( $i, 0, "Num Spectre" , $format);
+#	$worksheet->write( $i, 1, "Analyte Name" , $format);
+#	$worksheet->write( $i, 2, "Spectrum Name" , $format);
+#	$worksheet->write( $i, 3, "Retention Index" , $format);
+#	$worksheet->write( $i, 4, "RI Discrepancy" , $format);
+#	$worksheet->write( $i, 5, "DotproductDistance" , $format);
+#	$worksheet->write( $i, 6, "EuclideanDistance" , $format);
+#	$worksheet->write( $i, 7, "JaccardDistance" , $format);
+#	$worksheet->write( $i, 8, "HammingDistance" , $format);
+#	$worksheet->write( $i, 9, "s12GowerLegendreDistance" , $format);
+#	$worksheet->write( $i, 10, "Spectrum ID" , $format);
+#	$worksheet->write( $i, 11, "Metabolite ID" , $format);
+#   
+#   $i++;
+#    
+#   foreach my $href_grp (@$jsons) {
+#		
+#			foreach my $hit ( @{$href_grp->{'searchResults'}} ){
+#				
+#					$worksheet->write( $i, 0, $href_grp->{id} );
+#			   		$worksheet->write( $i, 1, $hit->{analyte}{name} );
+#			   		$worksheet->write( $i, 2, $hit->{spectrum}{name} );
+#			   		$worksheet->write( $i, 3, $hit->{ri_infos}{ri} );
+#			   		$worksheet->write( $i, 4, $hit->{ri_infos}{riDiscrepancy} );
+#			   		$worksheet->write( $i, 5, $hit->{distance_scores}{DotproductDistance} );
+#			   		$worksheet->write( $i, 6, $hit->{distance_scores}{EuclideanDistance} );
+#			   		$worksheet->write( $i, 7, $hit->{distance_scores}{JaccardDistance} );
+#			   		$worksheet->write( $i, 8, $hit->{distance_scores}{HammingDistance} );
+#			   		$worksheet->write( $i, 9, $hit->{distance_scores}{s12GowerLegendreDistance} );
+#			   		$worksheet->write( $i, 10, $hit->{spectrum}{id} );
+#			   		$worksheet->write( $i, 11, $hit->{metaboliteID} );
+#			   		
+#			   		$i++;
+#			}
+#	}
+#
+#   $workbook->close();
+#}
+## END of SUB
+
+
+
+
+=head2 METHOD excel_like_output
+
+	## Description : create an excel like output of the results
+	## Input : $jsons, $excel_file
+	## Output :  excel file
+	## Usage : $o_output->excel_like_output( $jsons, $excel_file ) ;
+=cut
+## START of SUB
+sub excel_like_output {
 	## Retrieve Values
     my $self = shift ;
     my ( $excel_file, $jsons ) = @_ ;
-        
-    # Create a new workbook and add a worksheet
-    my $workbook  = Excel::Writer::XLSX->new( $excel_file ) ;
-    my $worksheet = $workbook->add_worksheet() ;
-    
-    my $i = 0 ;
-    
-    # Create a format for the headings
-    my $format = $workbook->add_format() ;
-    $format->set_bold() ;
-    
-    $worksheet->write( $i, 0, "Num Spectre" , $format);
-	$worksheet->write( $i, 1, "Analyte Name" , $format);
-	$worksheet->write( $i, 2, "Spectrum Name" , $format);
-	$worksheet->write( $i, 3, "Retention Index" , $format);
-	$worksheet->write( $i, 4, "RI Discrepancy" , $format);
-	$worksheet->write( $i, 5, "DotproductDistance" , $format);
-	$worksheet->write( $i, 6, "EuclideanDistance" , $format);
-	$worksheet->write( $i, 7, "JaccardDistance" , $format);
-	$worksheet->write( $i, 8, "HammingDistance" , $format);
-	$worksheet->write( $i, 9, "s12GowerLegendreDistance" , $format);
-	$worksheet->write( $i, 10, "Spectrum ID" , $format);
-	$worksheet->write( $i, 11, "Metabolite ID" , $format);
-   
-    $i++;
-    
-   foreach my $href_grp (@$jsons) {
+	
+	open (OUT , ">" , $excel_file) or die "Error at opening file $excel_file" ;
+	
+	print OUT "Num Spectre\tAnalyte Name\tSpectrum Name\tRetention Index\tRI Discrepancy\tDotproductDistance\tEuclideanDistance\tJaccardDistance\tHammingDistance\ts12GowerLegendreDistance\tSpectrum ID\tMetabolite ID\n" ;
+	
+	foreach my $href_grp (@$jsons) {
 		
 			foreach my $hit ( @{$href_grp->{'searchResults'}} ){
 				
-					$worksheet->write( $i, 0, $href_grp->{id} );
-			   		$worksheet->write( $i, 1, $hit->{analyte}{name} );
-			   		$worksheet->write( $i, 2, $hit->{spectrum}{name} );
-			   		$worksheet->write( $i, 3, $hit->{ri_infos}{ri} );
-			   		$worksheet->write( $i, 4, $hit->{ri_infos}{riDiscrepancy} );
-			   		$worksheet->write( $i, 5, $hit->{distance_scores}{DotproductDistance} );
-			   		$worksheet->write( $i, 6, $hit->{distance_scores}{EuclideanDistance} );
-			   		$worksheet->write( $i, 7, $hit->{distance_scores}{JaccardDistance} );
-			   		$worksheet->write( $i, 8, $hit->{distance_scores}{HammingDistance} );
-			   		$worksheet->write( $i, 9, $hit->{distance_scores}{s12GowerLegendreDistance} );
-			   		$worksheet->write( $i, 10, $hit->{spectrum}{id} );
-			   		$worksheet->write( $i, 11, $hit->{metaboliteID} );
-			   		
-			   		$i++;
+					print OUT "$href_grp->{id}\t$hit->{analyte}{name}\t$hit->{spectrum}{name}\t$hit->{ri_infos}{ri}\t$hit->{ri_infos}{riDiscrepancy}\t$hit->{distance_scores}{DotproductDistance}\t$hit->{distance_scores}{EuclideanDistance}\t$hit->{distance_scores}{JaccardDistance}\t$hit->{distance_scores}{HammingDistance}\t$hit->{distance_scores}{s12GowerLegendreDistance}\t$hit->{spectrum}{id}\t$hit->{metaboliteID}\t$hit->{analyte}{id}\n";
 			}
 	}
-
-   $workbook->close();
+	close (OUT) ;
+	
 }
 ## END of SUB
 
