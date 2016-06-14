@@ -162,8 +162,8 @@ This tool intends to facilitate the annotation of masses from GC-MS by searching
 Input files
 -----------
 
-Parameter: inputSpectra
-Format   : msp
+	| **Parameter**: inputSpectra
+	| **Format**   : msp
 
 
 A file containing spectra in the msp format.
