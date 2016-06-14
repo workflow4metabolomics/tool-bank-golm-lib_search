@@ -67,7 +67,7 @@ sub new {
 	## Usage : my ( \@json_results ) = build_json_res_object( $results ) ;
 	## JSON structure: [
 #							{
-#								'id' : 'Unknown 1',
+#								'id' : 'int',
 #								'nb_hits' : int, 
 #								'searchResults'	:	[
 #														{
@@ -221,6 +221,7 @@ sub add_entries_to_tbody_object {
 						S12_GOWER_LEGENDRE_DISTANCE => $hit->{distance_scores}{s12GowerLegendreDistance} ,
 						SPECTRUM_ID => $hit->{spectrum}{id} ,
 						METABOLITE_ID => $hit->{metaboliteID} ,
+						ANALYTE_ID => $hit->{analyte}{id}
 					) ;
 					push (@tbody_entries , \%grp_res) ;
 				}
@@ -269,7 +270,6 @@ sub write_html_body {
     }
 }
 ## END of SUB
-
 
 
 
@@ -409,18 +409,13 @@ sub write_csv {
     
     open (CSV , ">" , $csv_file) or die "Can't create the file $csv_file\n" ;
      
-    print CSV "Num Spectre,Analyte Name,Spectrum Name,Retention Index,RI Discrepancy,DotproductDistance,EuclideanDistance,JaccardDistance,HammingDistance,s12GowerLegendreDistance,Spectrum ID,Metabolite ID\n";
+    print CSV "\"Num Spectre\"\t\"Analyte Name\"\t\"Spectrum Name\"\t\"Retention Index\"\t\"RI Discrepancy\"\t\"DotproductDistance\"\t\"EuclideanDistance\"\t\"JaccardDistance\"\t\"HammingDistance\"\t\"s12GowerLegendreDistance\"\t\"Spectrum ID\"\t\"Metabolite ID\"\t\"Analyte ID\n" ;
 			   		
-    my $i = 0 ;
     foreach my $href_grp (@$jsons) {
 		
 			foreach my $hit ( @{$href_grp->{'searchResults'}} ){
 				
-					print CSV $href_grp->{id}.",".$hit->{analyte}{name}.",".$hit->{spectrum}{name}.",".$hit->{ri_infos}{ri}.",".$hit->{ri_infos}{riDiscrepancy}.",".
-			   		$hit->{distance_scores}{DotproductDistance}.",".$hit->{distance_scores}{EuclideanDistance}.",".$hit->{distance_scores}{JaccardDistance}.",".
-			   		$hit->{distance_scores}{HammingDistance}.",".$hit->{distance_scores}{s12GowerLegendreDistance}.",".$hit->{spectrum}{id}.",".$hit->{metaboliteID}."\n" ;
-			   		
-			   		$i++;
+					print CSV "\"$href_grp->{id}\"\t\"$hit->{analyte}{name}\"\t\"$hit->{spectrum}{name}\"\t\"$hit->{ri_infos}{ri}\"\t\"$hit->{ri_infos}{riDiscrepancy}\"\t\"$hit->{distance_scores}{DotproductDistance}\"\t\"$hit->{distance_scores}{EuclideanDistance}\"\t\"$hit->{distance_scores}{JaccardDistance}\"\t\"$hit->{distance_scores}{HammingDistance}\"\t\"$hit->{distance_scores}{s12GowerLegendreDistance}\"\t\"$hit->{spectrum}{id}\"\t\"$hit->{metaboliteID}\n" ;
 			}
 	}
     close(CSV) ;
@@ -466,7 +461,7 @@ sub write_ajax_data_source {
 					push (@{$ajax{ 'data' }[$i]} , $hit->{distance_scores}{s12GowerLegendreDistance}) ;
 					push (@{$ajax{ 'data' }[$i]} , $hit->{spectrum}{id}) ;
 					push (@{$ajax{ 'data' }[$i]} , $hit->{metaboliteID}) ;
-	
+					push (@{$ajax{ 'data' }[$i]} , $hit->{analyte}{ID}) ;
 					$i++ ;
 				}
 		}
