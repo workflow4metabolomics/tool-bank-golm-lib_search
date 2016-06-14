@@ -38,10 +38,10 @@
       	<param name="mass" size="30" area="true" type="text" label="Masses and intensities (entered manually)"  help="For a list of masses + intensities write : mz1 int1 mz2 int2 mzx intx..."/>	
 	  </when>
 	</conditional>
-    	<param name="columnType" label="Column type" type="select" display="radio" value="VAR5" help="5%-phenyl-95%-dimethylpolysiloxane (VAR5), 35%-phenyl-65%-dimethylpolysiloxane (MDN35), if you don't know select 'None'.">
-          <option value="none">None</option>
+    	<param name="columnType" label="Column" type="select" display="radio" help="5%-phenyl-95%-dimethylpolysiloxane (VAR5), 35%-phenyl-65%-dimethylpolysiloxane (MDN35), if you don't know select 'None'.">
           <option value="VAR5">VAR5</option>
           <option value="MDN35">MDN35</option>
+          <option value="none">None</option>
         </param>
         <param name="ri" type="integer" value="1898" label="Alkane Retention Index" help="If neither an alkane RIs for VAR5 nor MDN35 is available in your setup, please select 'none' in the input field above!" />
     	<param name="riWindow" type="integer" value="5" label="Retention Index Window" help="This value is for the library search used only. A larger window size will increase the number of matches.
