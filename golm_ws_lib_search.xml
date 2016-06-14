@@ -1,0 +1,279 @@
+<tool id="golm_ws_lib_search" name="Golm Metabolome Database search spectrum" version="2016-06-03">
+  <description>
+       : GC-MS Mass Spectral Database.
+  </description>
+  <command interpreter="perl">
+    golm_ws_lib_search.pl
+		#if str($input_type.choice) == "YES":
+	    	-inputFile "${input_type.masses}"
+	    #else:
+	    	-inputMasses "${input_type.mass}"
+	    #end if
+	    -ri "$ri"
+		-riWindow "$riWindow"
+	    -mzRes "$mzRes"
+	    -maxHits "$maxHits"
+	    -maxIons "$maxIons"
+		-JaccardDistanceThreshold "$JaccardDistanceThreshold" 
+		-s12GowerLegendreDistanceThreshold "$s12GowerLegendreDistanceThreshold" 
+		-DotproductDistanceThreshold "$DotproductDistanceThreshold" 
+		-HammingDistanceThreshold "$HammingDistanceThreshold"
+		-EuclideanDistanceThreshold "$EuclideanDistanceThreshold"
+		-relative "$intensity_type"
+		-htmlFile "$GolmResHTML"
+		-csvFile "$GolmResCSV"
+		-jsonFile "$GolmResJSON"
+		-excelFile "$GolmResEXCEL"
+  </command>
+  <inputs>
+  	<conditional name="input_type">
+      <param name="choice" type="select" label="Would you use a file" help="If 'NO' is selected then one or more mass(es) must be entered manually.">
+        <option value="YES">YES</option>
+        <option value="NO">NO</option>
+      </param>
+      <when value="YES">
+      	<param name="masses" label="File of masses (format: msp)" format="msp,txt" type="data" help=".msp output file from metaMS.runGC function, or any msp file." />
+      </when>
+      <when value="NO">
+      	<param name="mass" size="30" area="true" type="text" label="Masses and intensities (entered manually)"  help="For a list of masses + intensities write : mz1 int1 mz2 int2 mzx intx..."/>	
+	  </when>
+	</conditional>
+    	<param name="columnType" label="Column type" type="select" display="radio" help="5%-phenyl-95%-dimethylpolysiloxane (VAR5), 35%-phenyl-65%-dimethylpolysiloxane (MDN35), if you don't know select 'None'.">
+          <option value="none">None</option>
+          <option value="VAR5">VAR5</option>
+          <option value="MDN35">MDN35</option>
+        </param>
+        <param name="ri" type="integer" value="1898" label="Alkane Retention Index" help="If neither an alkane RIs for VAR5 nor MDN35 is available in your setup, please select 'none' in the input field above!" />
+    	<param name="riWindow" type="integer" value="5" label="Retention Index Window" help="This value is for the library search used only. A larger window size will increase the number of matches.
+      	 At the same time the identification becomes less reliable due to false matching spectra without RI consensus." />
+        <param name="maxHits" type="integer" value="100" label="Maximum Hits" help="Maximum number of hits per queried spectra, default=all (0)." />
+        <param name="mzRes" type="integer" value="0" label="Number of significant decimal" help="Number of significant decimals of your m/z." />
+        <param name="maxIons" type="integer" value="0" label="Maximum number of ions" help="Number of m/z per spectra you want to keep for the queries, default 0 = all of them." />
+    	<param name="JaccardDistanceThreshold" type="float" value="0.9" label="JaccardDistance" help="Number of matches, divided by the sum of matches and mismatches." />
+    	<param name="s12GowerLegendreDistanceThreshold" type="float" value="0.9" label="s12GowerLegendreDistanceThreshold" help="The distance measure S12GowLeg = sqrt(1 - s12) is derived from the S12 coefficient of Gower &amp; Legendre defined as s12 = a / sqrt((a + b)(a + c))." />
+    	<param name="DotproductDistanceThreshold" type="float" value="0.5" label="DotproductDistanceThreshold" help="The Dotproduct distance is summing the multiplied intensities over all matching peaks within both spectra. Here, to satisfy the conditions of a metric I) non-negativity, II) identity of indiscernibles, III) symmetry and IV) subadditivity / triangle inequality, we use 1-Dotproduct. Both spectra are normalised prior to the spectral vector norm in that way, that the absolute value of the squared intensities is equal to 1." />
+    	<param name="HammingDistanceThreshold" type="float" value="500" label="HammingDistanceThreshold" help="In information theory, the Hamming distance between two strings of equal length is the number of positions for which the corresponding symbols are different. Put another way, it measures the minimum number of substitutions required to change one into the other, or the number of errors that transformed one string into the other." />
+    	<param name="EuclideanDistanceThreshold" type="float" value="0.5" label="EuclideanDistanceThreshold" help="The Euclid is the square root of the sum of the squared differences over all matching peaks." />
+    	<param name="intensity_type" label="Type of intensities" type="select" display="radio" help="Would you work with relative or absolute intensities? Example: relative = percentage, absolute = untouched. Relative is preferred">
+          <option value="true">YES</option>
+          <option value="false">NO</option>
+        </param>
+	</inputs>
+	
+	<outputs>
+	    <data name="GolmResEXCEL" label="excel_output" format="tabular" />
+	    <data name="GolmResHTML" label="html_output" format="html" />
+	    <data name="GolmResJSON" label="json_output" format="vjson" />
+	    <data name="GolmResCSV" label="csv_output" format="txt" />
+	</outputs>
+	 
+	<tests>
+	  	<test>
+	  		<!--test 1 few results - too restrictive thresholds -->
+	  		<param name="choice" value="YES"/>
+	  		<param name="masses" value="peakspectra_test.msp"/>
+	  		<param name="columnType" value="VAR5"/>
+	  		<param name="ri" value="1898"/>
+	  		<param name="riWindow" value="5"/>
+	  		<param name="maxHits" value="10"/>
+	  		<param name="mzRes" value="0"/>
+	  		<param name="maxIons" value="0"/>
+	  		<param name="JaccardDistanceThreshold" value="0.9"/>
+	  		<param name="s12GowerLegendreDistanceThreshold" value="0.9"/>
+	  		<param name="DotproductDistanceThreshold" value="0.5"/>
+	  		<param name="EuclideanDistanceThreshold" value="0.5"/>
+	  		<param name="HammingDistanceThreshold" value="500"/>
+	  		<param name="intensity_type" value="YES"/>
+	  		<output name="GolmResEXCEL" file="excel_output1.xlsx"/>
+	  		<output name="GolmResHTML" file="html_output1.html"/>
+	  		<output name="GolmResJSON" file="json_output1.json"/>
+	  		<output name="GolmResCSV" file="csv_output1.csv"/>
+	  	</test>
+	  	<test>
+	  		<!--test 2 results - high/large thresholds -->
+	  		<param name="choice" value="YES"/>
+	  		<param name="masses" value="peakspectra_test.msp"/>
+	  		<param name="columnType" value="VAR5"/>
+	  		<param name="ri" value="1898"/>
+	  		<param name="riWindow" value="5"/>
+	  		<param name="maxHits" value="10"/>
+	  		<param name="mzRes" value="0"/>
+	  		<param name="maxIons" value="0"/>
+	  		<param name="JaccardDistanceThreshold" value="1"/>
+	  		<param name="s12GowerLegendreDistanceThreshold" value="1"/>
+	  		<param name="DotproductDistanceThreshold" value="0.9"/>
+	  		<param name="EuclideanDistanceThreshold" value="0.9"/>
+	  		<param name="HammingDistanceThreshold" value="700"/>
+	  		<param name="intensity_type" value="YES"/>
+	  		<output name="GolmResEXCEL" file="excel_output2.xlsx"/>
+	  		<output name="GolmResHTML" file="html_output2.html"/>
+	  		<output name="GolmResJSON" file="json_output2.json"/>
+	  		<output name="GolmResCSV" file="csv_output2.csv"/>
+	  	</test>
+	  	<test>
+	  		<!--test 3 results - default thresholds -->
+	  		<param name="choice" value="NO"/>
+	  		<param name="mass" value="70 3 71 3 72 16 73 999 74 87 75 78 76 4 77 5 81 1 82 6 83 13 84 4 85 3 86 4 87 5 88 4 89 52 90 4 91 2 97 2 98 1 99 4 100 12 101 16 102 9 103 116 104 11 105 26 106 2 107 1 111 1 112 1 113 4 114 11 115 7 116 5 117 93 118 9 119 8 126 1 127 3 128 3 129 101 130 19 131 25 132 4 133 60 134 8 135 4 140 1 141 1 142 4 143 13 144 2 145 6 146 1 147 276 148 44 149 27 150 3 151 1 156 1 157 70 158 12 159 5 160 148 161 26 162 7 163 8 164 1 168 1 169 2 170 1 172 3 173 4 174 1 175 4 177 4 186 2 187 1 189 28 190 7 191 13 192 2 193 1 201 5 202 1 203 3 204 23 205 162 206 31 207 16 208 2 210 2 214 1 215 2 216 8 217 88 218 18 219 8 220 1 221 6 222 1 229 23 230 6 231 11 232 3 233 4 234 3 235 1 243 1 244 2 245 1 246 2 247 1 256 1 262 3 263 1 269 2 270 1 274 4 275 1 277 4 278 1 291 7 292 2 293 1 300 1 305 4 306 1 307 4 308 1 318 1 319 122 320 37 321 17 322 3 323 1 343 1 364 2 365 1"/>
+	  		<param name="columnType" value="VAR5"/>
+	  		<param name="ri" value="1898"/>
+	  		<param name="riWindow" value="5"/>
+	  		<param name="maxHits" value="10"/>
+	  		<param name="mzRes" value="0"/>
+	  		<param name="maxIons" value="0"/>
+	  		<param name="JaccardDistanceThreshold" value="0.9"/>
+	  		<param name="s12GowerLegendreDistanceThreshold" value="0.9"/>
+	  		<param name="DotproductDistanceThreshold" value="0.5"/>
+	  		<param name="EuclideanDistanceThreshold" value="0.5"/>
+	  		<param name="HammingDistanceThreshold" value="500"/>
+	  		<param name="intensity_type" value="YES"/>
+	  		<output name="GolmResEXCEL" file="excel_output3.xlsx"/>
+	  		<output name="GolmResHTML" file="html_output3.html"/>
+	  		<output name="GolmResJSON" file="json_output3.json"/>
+	  		<output name="GolmResCSV" file="csv_output3.csv"/>
+	  	</test>
+	  </tests>
+	 
+	 <help>
+
+.. class:: infomark	 
+
+**Authors**
+
+  | Gabriel Cretin (for perl and Galaxy), Franck Giacomoni (for perl and Galaxy)
+
+---------------------------------------------------
+
+.. class:: infomark
+
+**If you use this tool, please cite MassBank**
+
+for `Golm Metabolome Database &lt;http://gmd.mpimp-golm.mpg.de/&gt;`_ :
+  `Hummel, J., Strehmel, N., Selbig, J., Walther, D. and Kopka, J. (2010) Decision tree supported substructure prediction of metabolites from GC-MS profiles, Metabolomics. &lt;http://dx.doi.org/10.1007/s11306-010-0198-7&gt;`_
+	 
+
+-----------
+Description
+-----------
+
+The Golm Metabolome Database (GMD) facilitates the search for and dissemination of reference mass spectra from biologically active metabolites quantified using gas chromatography (GC) coupled to mass spectrometry (MS).
+This tool intends to facilitate the annotation of masses from GC-MS by searching informations through GMD webservices.  
+
+-----------
+Input files
+-----------
+
++-------------------------+-----------+
+| Parameter : num + label |  Format   |
++=========================+===========+
+| 1 : inputSpectra        |    msp    |
++-------------------------+-----------+
+
+
+File containing spectra in the msp format.
+Example of a spectra in msp format:
+
+	| Name: Unknown1
+	| DB.idx: -1
+	| rt: 10.58
+	| Class: Unknown
+	| rt.sd: 0.003
+	| Num Peaks: 19
+	| 73.0465  826983.38; 74.0481  70018.08; 75.0319  69475.73; 100.0573  37477.24; 103.0227  43054.28;
+	| 116.0884  1433179.62; 117.0905  151975.23; 118.0869  53105.64; 128.0526  26404.77; 131.0359  22647.44;
+	| 133.0438  22141.56; 147.0666  255488.28; 48.066  49965.66; 149.0551  37762.38; 190.1069  72568.23;
+	| 191.1063  18017.34; 192.1023  6460.8; 207.0333  35435.81; 218.1028  30528.82; 
+
+----------
+Parameters
+----------
+
+**Would you use a file**
+
+	| Choose whether the masses are in a file or entered manually
+	| YES (default) : parameters **File of masses (format: msp)** is visible
+	| NO : parameter **Masses of the molecule (entered manually)** is visible
+	| For both, all other parameters are available
+
+
+**Column type**
+
+	| VAR5 means a 5%-phenyl-95%-dimethylpolysiloxane column and MDN35 means a 35%-phenyl-65%-dimethylpolysiloxane column. If you don't know select 'None'.
+
+
+**Alkane Retention Index**
+
+	| If neither an alkane RIs for VAR5 nor MDN35 is available in your setup, please select 'none' in the input field above!
+
+
+**Retention Index Window**
+
+	| This value is for the library search used only. A larger window size will increase the number of matches.
+	| At the same time the identification becomes less reliable due to false matching spectra without RI consensus.
+	| The maximal number of hits returned from the data base is limited due to performance reasons.
+
+
+**Maximum Hits**
+
+	| Maximum number of hits returned by Golm database, default = 0 (which means all of them are taken in account).
+
+
+**Number of significant decimal**
+
+	| Number of significant decimals of your m/z. 
+	| Example: m/z = 73.798 if mzRes = 4, m/z becomes 73.7980
+	| 		   m/z = 73.798 if mzRes = 0, m/z becomes 74
+
+
+**Maximum number of ions**
+
+	| Number of m/z and intensities per spectra you want to keep for the queries to Golm, default = 0 = all of them.
+
+
+**JaccardDistanceThreshold**
+
+	| Number of matches (a mass with appropriate intensity in both spectra) divided by the sum of matches and mismatches (a mass where only one of both spectra has a intensity).
+	| The jaccard distance is a binary distance.
+
+
+**s12GowerLegendreDistanceThreshold**
+
+	| The distance measure S12GowLeg = sqrt(1 - s12) is derived from the S12 coefficient of Gower &amp; Legendre defined as s12 = a / sqrt((a + b)(a + c)), with "a" representing the number of positions at which both spectra are in "on-state" and "b" respectively "c" representing the number of positions at which only the query spectrum or the hit spectrum are in "on-state".
+
+
+**DotproductDistanceThreshold**
+
+	| The Dotproduct distance is summing the multiplied intensities over all matching peaks within both spectra. Here, to satisfy the conditions of a metric I) non-negativity, II) identity of indiscernibles, III) symmetry and IV) subadditivity / triangle inequality, we use 1-Dotproduct. Both spectra are normalised prior to the spectral vector norm in that way, that the absolute value of the squared intensities is equal to 1.
+
+
+**HammingDistanceThreshold**
+
+	| In information theory, the Hamming distance between two strings of equal length is the number of positions for which the corresponding symbols are different. Put another way, it measures the minimum number of substitutions required to change one into the other, or the number of errors that transformed one string into the other.
+
+
+**EuclideanDistanceThreshold**
+
+	| The Euclid is the square root of the sum of the squared differences over all matching peaks.
+
+
+**Type of intensities**
+
+	| Use absolute or relative intensities.
+	| Example: relative = percentage (intensity * 100) / max(intensities), absolute = untouched
+
+
+------------
+Output files
+------------
+
+**Three types of files**
+
+	- html_output.html  : to view results on a webpage (HTML).
+	- excel_output.xlsx : to export results in a tabular format.
+	- csv_output.csv    : to export results in csv format.
+	- json_output.csv	: to use for other modules. 
+
+
+ </help>
+
+</tool>
+	 

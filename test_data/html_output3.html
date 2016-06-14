@@ -1,0 +1,582 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset='UTF-8'>
+	<link rel='stylesheet' type='text/css' href='https://cdn.datatables.net/1.10.11/css/jquery.dataTables.min.css'>
+	<link rel='stylesheet' type='text/css' href='https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.4.0/css/font-awesome.min.css'>
+	<link rel='stylesheet' type='text/css' href='https://cdn.datatables.net/buttons/1.1.2/css/buttons.dataTables.min.css'>
+	<link rel='stylesheet' type='text/css' href='https://cdn.datatables.net/r/dt/jq-2.1.4,jszip-2.5.0,pdfmake-0.1.18,dt-1.10.9,af-2.0.0,b-1.0.3,b-colvis-1.0.3,b-html5-1.0.3,b-print-1.0.3,se-1.0.1/datatables.min.css'/>
+	<link rel='stylesheet' href='https://code.getmdl.io/1.1.3/material.light_green-orange.min.css' /> 
+	<link rel='stylesheet' href='https://fonts.googleapis.com/icon?family=Material+Icons'>
+	<style type='text/css' class='init'>
+		.card-wide.mdl-card {
+		  width: 900px;
+		  height: 550px;
+		}
+		.card-wide > .mdl-card__menu {
+		  color: #fff;
+		}
+	
+		.list-icon {
+		  width: 800px;
+		}
+		/*Force css to prevent a shift of the table when sorting*/
+		#table_id_wrapper { 
+			overflow-x: auto;
+		    margin-left: 100px;
+		    margin-right: 100px;
+		    padding-top:20px;
+		}
+				
+		.toolbar {
+		    float: left;
+		}
+		
+		.dt-buttons {
+			padding-right: 10px ;	
+			margin-bottom: 20px;
+		}
+		
+		table.dataTable thead th, table.dataTable thead td {
+		    border-bottom: 1px solid #A7A7A7;
+		}
+		
+		div.dt-button-collection {
+		    width: 140px;
+		    margin-top: 7px;
+		    padding: 6px 6px 3px 6px;
+		    border: 1px solid rgba(0,0,0,0.4);
+		    background-color: rgba(171, 171, 171, 0.8);
+		    border-radius: 10px;
+		    box-shadow: 0px 0px 100px rgba(255, 255, 255, 0.3);
+		}
+		
+		div.dt-button-collection a.dt-button.active:not(.disabled) {
+		    box-shadow: inset 1px 1px 6px rgba(102, 102, 102, 0.69);
+		}
+		
+		.buttons-copy, .buttons-print, .buttons-collection {
+			height: 40px;
+		    margin-right: 10px;
+		    padding-right: 0px;
+		    padding-left: 0px;
+		    margin-left: 10px;
+		}
+		
+		.mdl-button--accent.mdl-button--accent.mdl-button--raised, .mdl-button--accent.mdl-button--accent.mdl-button--fab {
+		    background-color: #E3E3E3;
+		}
+
+		.mdl-button {
+			height: 40px;
+			line-height:40px;
+		}
+		
+		.mdl-button:hover {
+		    transform: translateY(-3px);
+		    box-shadow: 0px 6px 15px #c1c1c1;
+		}
+		
+		.ripple{
+		  overflow:hidden;
+		  position: relative;
+		  box-sizing: border-box;
+		  transform: translate3d(0, 0, 0);
+		}
+		
+		.ripple-effect{
+		  position: absolute;
+		  border-radius: 50%;
+		  background-color: rgba(255,255,255,0.5);
+		  user-select: none;
+		  pointer-events: none;
+		  padding: 0;
+		  margin: 0;
+		  opacity: 0.6;
+		  transform: translate3d(-50%,-50%,0);
+		}
+
+		.mdl-shadow--3dp {
+		    box-shadow: 0 25px 150px rgba(0,0,0,.33),0 3px 3px -2px rgba(0,0,0,.2),0 1px 8px 0 rgba(0,0,0,.12);
+		}
+		
+		.mdl-tooltip.is-active {
+			animation: pulse 1000ms cubic-bezier(0,0,.2,1)forwards;
+			z-index: 1000;
+		}
+		
+		.mdl-tooltip {
+			border-radius: 20px;
+			line-height: 18px;
+		}
+		
+		.mdl-list__item {
+    		line-height: 1.25 ;
+		}
+		
+		.mdl-list__item-icon {
+    		font-size: 35px;
+		}
+		
+		#large_card {
+			height: 850px;
+		}
+		
+		#dist_table th, td {
+		    padding: 15px;
+		    text-align: left;
+		}
+		
+		.mdl-card__supporting-text {
+		    color: rgba(0,0,0,.87);
+		    font-size: 16px;
+		    line-height: 22px;
+		}
+		
+		.dataTables_wrapper .dataTables_length {
+		    float: left;
+		    padding-top: 11px;
+		    padding-left: 30px;
+		}
+		
+		.dataTables_wrapper {
+			text-align: center;
+		}
+		
+		table.display tbody tr:hover td {
+		    background-color: #B9DBD5 !important;
+		}
+		
+		.selected {
+		    background-color: #96ADA6 !important ;
+		 }
+		 
+		.buttons-colvis {
+		 	padding-left: 15px; 
+		 	padding-right: 15px;	
+		}		
+	</style>
+	
+	
+	<script type='text/javascript' language='javascript' src='https://cdnjs.cloudflare.com/ajax/libs/jszip/2.5.0/jszip.min.js'></script>
+	<script type='text/javascript' language='javascript' src='https://cdn.rawgit.com/bpampuch/pdfmake/0.1.18/build/pdfmake.min.js'></script>
+	<script type='text/javascript' language='javascript' src='https://code.jquery.com/jquery-1.12.0.min.js'></script>
+	<script type='text/javascript' language='javascript' src='https://cdn.datatables.net/buttons/1.2.0/js/buttons.colVis.min.js'></script>
+	<script type='text/javascript' language='javascript' src='https://cdn.rawgit.com/bpampuch/pdfmake/0.1.18/build/vfs_fonts.js'></script>
+	<script type='text/javascript' language='javascript' src='https://cdn.datatables.net/select/1.1.2/js/dataTables.select.min.js'></script>
+	<script type='text/javascript' language='javascript' src='https://cdn.datatables.net/buttons/1.1.2/js/dataTables.buttons.min.js'></script>
+	<script type='text/javascript' language='javascript' src='https://cdn.datatables.net/buttons/1.1.2/js/buttons.html5.min.js'></script>
+	<script type='text/javascript' language='javascript' src='https://cdn.datatables.net/buttons/1.1.2/js/buttons.print.min.js'></script>
+	<script type='text/javascript' language='javascript' src='https://cdn.datatables.net/1.10.11/js/jquery.dataTables.min.js'></script>
+	<script type='text/javascript' src='https://cdn.datatables.net/r/dt/jq-2.1.4,jszip-2.5.0,pdfmake-0.1.18,dt-1.10.9,af-2.0.0,b-1.0.3,b-colvis-1.0.3,b-html5-1.0.3,b-print-1.0.3,se-1.0.1/datatables.min.js'></script>
+	<script defer src='https://code.getmdl.io/1.1.3/material.min.js'></script>
+	<script type='text/javascript' class='init'>
+		$(document).ready( function () {
+		    var table = $('#table_id').DataTable( {
+		    	order: [ 0, 'asc' ],
+		    	'orderClasses': false,
+		    	'dom': 'B<"toolbar">frtilp',
+		        buttons: [
+		            {
+		                extend:    'copyHtml5',
+		                exportOptions: {
+		                    columns: [ 0, ':visible' ]
+		                },
+		                text:      '<i class="material-icons" style="height:25px">content_copy</i>',
+		                titleAttr: 'Copy'
+		            },
+		            {
+		                extend: 'print',
+		                text:      '<i class="material-icons" style="height:25px ;">print</i>',
+		                titleAttr: 'Print',
+		                exportOptions: {
+		                    columns: ':visible'
+		                }
+		            },
+		            {
+		                extend: 'collection',
+		                text:		'<i class="material-icons" style="height:25px">file_download</i>',
+		                titleAttr: 'Export',
+		                buttons: [
+		                    {
+				                extend: 'excelHtml5',
+				                exportOptions: {
+				                    columns: ':visible'
+				                }
+				            },
+		            		'csvHtml5'
+		                ]
+		            },
+		            {
+		            	text: 'SHOW MORE',
+		                extend: 'colvis',
+		                postfixButtons: [ 'colvisRestore' ]
+		            }
+		        ],
+		        'columnDefs': [
+		            {
+		                'targets': [ 10 ],
+		                'visible': false,
+		            },
+		            {
+		                'targets': [ 11 ],
+		                'visible': false
+		            }
+		        ],
+		        'scrollY': '50vh',
+		    	'responsive': true,
+		    	'paginationType': 'full_numbers',
+        		'scrollCollapse': true,
+        		'lengthMenu': [[10, 15, 20, 25, 50, -1], [10, 15, 20, 25, 50, 'All']],
+		     	initComplete: function () {
+		             this.api().columns().every( function () {
+		                 var column = this;
+		                 var select = $('<select><option value="">Search</option></select>')
+		                     .appendTo( $(column.footer()).empty() )
+		                     .on( 'change', function () {
+		                         var val = $.fn.dataTable.util.escapeRegex(
+		                             $(this).val()
+		                         );
+		 
+		                         column
+		                             .search( val ? '^'+val+'$' : '', true, false )
+		                             .draw();
+		                     } );
+ 
+	                 column.data().unique().sort().each( function ( d, j ) {
+	                    select.append( '<option value="'+d+'">'+d+'</option>' )
+	                 } );
+             		} );
+		         }
+
+
+		    } );
+		    
+		    $('div.toolbar').html("<button class='mdl-button mdl-js-button mdl-button--raised ripple mdl-button--accent' data-ripple-color='#b3b3b3' id='delete'>Delete selected rows</button>");
+		    
+			$('#table_id tbody').on( 'click', 'tr', function () {
+		        $(this).toggleClass('selected');
+		    } );
+		     
+		    /* Add a click handler for the delete button */
+		    $('#delete').click( function() {
+		        table.rows( '.selected' ).remove().draw();
+		    } );
+		    
+		    $('.buttons-copy, .buttons-print, .buttons-collection, .buttons-colvis, .buttons-columnVisibility').each(function() {
+			   $(this).removeClass('dt-button').addClass('mdl-button mdl-js-button mdl-button--raised ripple mdl-button--accent');
+			   $(this).attr("data-ripple-color", "#b3b3b3");
+			})
+		});
+		
+		
+		$(document).on('click', '.ripple', function(e) {
+		  var $rippleElement = $('<span class="ripple-effect" />'),
+		    $buttonElement = $(this),
+		    btnOffset = $buttonElement.offset(),
+		    xPos = e.pageX - btnOffset.left,
+		    yPos = e.pageY - btnOffset.top,
+		    size = parseInt(Math.min($buttonElement.height(), $buttonElement.width()) * 0.5),
+		    animateSize = parseInt(Math.max($buttonElement.width(), $buttonElement.height()) * Math.PI);
+		
+		  $rippleElement
+		    .css({
+		      top: yPos,
+		      left: xPos,
+		      width: size,
+		      height: size,
+		
+		      backgroundColor: $buttonElement.data("ripple-color")
+		    })
+		    .appendTo($buttonElement)
+		    .animate({
+		      width: animateSize,
+		      height: animateSize,
+		      opacity: 0
+		    }, 700, function() {
+		      $(this).remove();
+		    });
+		});
+		
+		
+	</script>
+
+<title>Golm Search Results</title>
+
+</head>
+
+<body>
+
+
+<div class='mdl-layout mdl-js-layout mdl-layout--fixed-header'>
+  <header class='mdl-layout__header'>
+    <div class='mdl-layout__header-row'>
+      <!-- Title -->
+      <span class='mdl-layout-title'><h3><b>Visualization of Golm Database Results</b></h3></span>
+    </div>
+      <!-- Tabs -->
+    <div class='mdl-layout__tab-bar mdl-js-ripple-effect'>
+      <a href='#fixed-tab-1' class='mdl-layout__tab is-active'><b>Table</b></a>
+      <a href='#fixed-tab-2' class='mdl-layout__tab'><b>Help</b></a>
+    </div>
+  </header>
+  <main class='mdl-layout__content'>
+  	<section class='mdl-layout__tab-panel is-active' id='fixed-tab-1'>
+		      <div class='page-content'>
+		      		</br></br></br></br>
+					<table id='table_id' class='display stripe' cellspacing='0' width='100%' >
+						<thead>
+							<tr>
+					            <th colspan='1'></th>
+					            <th colspan='2' style='text-align:center'>NAMES</th>
+					            <th colspan='2' style='text-align:center'>RETENTION INFOS</th>
+					            <th colspan='5' style='text-align:center'>DISTANCE SCORES</th>
+					            <th colspan='2' style='text-align:center'>IDs</th>
+					        </tr>
+							<tr>
+								<th style='text-align:center;border-left: 1px solid #A7A7A7;'>N° Spectres</th>
+								<th style='text-align:center;border-left: 1px solid #A7A7A7;'>Spectrum</th>
+								<th id='mytooltip6' style='text-align:center;border-right: 1px solid #A7A7A7;'>Analyte</th>
+								<th style='text-align:center'>Retention Index</th>
+								<th style='text-align:center;border-right: 1px solid #A7A7A7;'>RI Discrepancy</th>
+								<th style='text-align:center'>Dot product</th>
+								<th style='text-align:center'>Euclidean</th>
+								<th style='text-align:center'>Jaccard</th>
+								<th style='text-align:center'>Hamming</th>
+								<th style='text-align:center;border-right: 1px solid #A7A7A7;'>s12 Gower-Legendre</th>
+								<th style='text-align:center'>Spectrum id</th>
+								<th style='text-align:center;border-right: 1px solid #A7A7A7;'>Metabolite id</th>
+							</tr>
+						</thead>
+						<tfoot>
+							<tr>
+								<th style='text-align:center'>N° Spectre</th>
+								<th style='text-align:center'>Spectrum</th>
+								<th style='text-align:center'>Analyte</th>
+								<th style='text-align:center'>Retention Index</th>
+								<th style='text-align:center'>RI Discrepancy</th>
+								<th style='text-align:center'>Dot product</th>
+								<th style='text-align:center'>Euclidean</th>
+								<th style='text-align:center'>Jaccard</th>
+								<th style='text-align:center'>Hamming</th>
+								<th style='text-align:center'>s12 Gower-Legendre</th>
+								<th style='text-align:center'>Spectrum id</th>
+								<th style='text-align:center'>Metabolite id</th>
+							</tr>
+						</tfoot>
+							<tbody>
+								
+									<tr><td>1</td>
+									<td>Glucose (1MEOX) (5TMS) BP [A191001-ambient-na-23]</td>
+									<td>Glucose (1MEOX) (5TMS) BP</td>
+									<td>1899.05493</td>
+									<td>1.054953</td>
+									<td>0.00376573671</td>
+									<td>0.00648652157</td>
+									<td>0.2849162</td>
+									<td>51</td>
+									<td>0.404159725</td>
+									<td>dd5bb721-ce4f-4cec-99ff-de2cb818304d</td>
+									<td>68513255-fc44-4041-bc4b-4fd2fae7541d</td></tr>
+								
+									<tr><td>1</td>
+									<td>Idose (1MEOX) (5TMS) BP [A191005-ambient-na-1]</td>
+									<td>Idose (1MEOX) (5TMS) BP</td>
+									<td>1897.25439</td>
+									<td>0.745605469</td>
+									<td>0.00416102447</td>
+									<td>0.007327365</td>
+									<td>0.238709673</td>
+									<td>37</td>
+									<td>0.367506444</td>
+									<td>d00de57d-6fab-49d0-9aee-25e259da9180</td>
+									<td>ab025068-f464-4bc6-9c92-994c29387db2</td></tr>
+								
+									<tr><td>1</td>
+									<td>Galactose (1MEOX) (5TMS) BP [A191002-ambient-DL--9]</td>
+									<td>Galactose (1MEOX) (5TMS) BP</td>
+									<td>1902.42212</td>
+									<td>4.422119</td>
+									<td>0.004838637</td>
+									<td>0.007118009</td>
+									<td>0.31937173</td>
+									<td>61</td>
+									<td>0.428936034</td>
+									<td>c1226b8e-944e-4d32-ae01-8a9d12465d34</td>
+									<td>dd3ea070-54a6-4ea7-b99b-a6e975fdd204</td></tr>
+								
+									<tr><td>1</td>
+									<td>Glucuronic acid-3,6-lactone (1MEOX) (3TMS) MP [A189014-ambient-na-1]</td>
+									<td>Glucuronic acid-3,6-lactone (1MEOX) (3TMS) MP</td>
+									<td>1893.44385</td>
+									<td>4.55619574</td>
+									<td>0.048192542</td>
+									<td>0.02056068</td>
+									<td>0.4473684</td>
+									<td>102</td>
+									<td>0.5224351</td>
+									<td>2b364030-9fa7-4066-b685-52d7946110a6</td>
+									<td>00ce759f-d1f9-492e-89f7-b7400a34c72d</td></tr>
+								
+									<tr><td>1</td>
+									<td>Glucose, U-13C- (1MEOX) (5TMS) BP [A191001-13C-na-2]</td>
+									<td>Glucose, U-13C- (1MEOX) (5TMS) BP</td>
+									<td>1901.63</td>
+									<td>3.63</td>
+									<td>0.0682447553</td>
+									<td>0.027927408</td>
+									<td>0.514285743</td>
+									<td>90</td>
+									<td>0.586345</td>
+									<td>27d4dcdd-d351-4976-8ef9-76a0cc53f631</td>
+									<td>441faccb-2631-4e7d-b6ca-99437265ccb8</td></tr>
+								
+									<tr><td>1</td>
+									<td>Allantoin (5TMS) [A188009-ambient-na-6]</td>
+									<td>Allantoin (5TMS)</td>
+									<td>1896.99829</td>
+									<td>1.001709</td>
+									<td>0.07800486</td>
+									<td>0.02792935</td>
+									<td>0.615</td>
+									<td>123</td>
+									<td>0.6662978</td>
+									<td>063fa226-ed62-4d9f-9d5c-ee52c0974e55</td>
+									<td>a999f0d6-0285-41d9-a6ba-b705987b663c</td></tr>
+								
+									<tr><td>1</td>
+									<td>Erythrose-4-phosphate (1MEOX) (4TMS) MP [A191009-ambient-na-1]</td>
+									<td>Erythrose-4-phosphate (1MEOX) (4TMS) MP</td>
+									<td>1895.98438</td>
+									<td>2.01558065</td>
+									<td>0.0896345749</td>
+									<td>0.0207340773</td>
+									<td>0.6666667</td>
+									<td>278</td>
+									<td>0.6522111</td>
+									<td>85927200-53a4-492a-ad57-0a7b1d8a6e85</td>
+									<td>d4f07f67-d45b-43b6-bd4c-d08708d1a7ad</td></tr>
+								
+									<tr><td>1</td>
+									<td>Pyruvic acid, 4-hydroxyphenyl- (1MEOX) (2TMS) MP [A190013-ambient-no-9]</td>
+									<td>Pyruvic acid, 4-hydroxyphenyl- (1MEOX) (2TMS) MP</td>
+									<td>1902.77417</td>
+									<td>4.77417</td>
+									<td>0.111977287</td>
+									<td>0.0264962576</td>
+									<td>0.6551724</td>
+									<td>209</td>
+									<td>0.673893869</td>
+									<td>8bbd7202-8794-4486-8b16-61d8dff4c5bd</td>
+									<td>87e988c4-f26c-4e03-9a40-1b0c0b36ca67</td></tr>
+								
+							</tbody>
+					</table>
+			</div>
+		    <div class='mdl-tooltip mdl-tooltip--large mdl-tooltip--top' for='mytooltip6'>
+		  		Is the derivatised metabolite that is measured by GC-MS
+		    </div>
+		</section>
+		<section class='mdl-layout__tab-panel' id='fixed-tab-2'>
+			<div class='page-content'>
+				<br/>
+				<div class='mdl-grid'>
+					    <div class='card-wide mdl-card mdl-cell mdl-cell--4-col mdl-shadow--3dp'>
+					    	<figure class='mdl-card__media' style='background-color: white'>
+					    		<img src='http://m.hiapphere.com/data/icon/201506/HiAppHere_com_com.javiersantos.materialid.png' style='height: 60px; width: 60px;'>
+					    	</figure>
+					    	<div class='mdl-card__title'>
+							    <h1 class='mdl-card__title-text'>What can the table do ?</h1>
+							</div>
+							<div class='mdl-card__supporting-text'>
+				      		<ul class='list-icon mdl-list'>
+									  <li class='mdl-list__item'>
+									    <span class='mdl-list__item-primary-content'>
+										    <i class='material-icons mdl-list__item-icon'>filter_list</i>
+										    By default, the spectra numbers (N° Spectra) are ordered by ascending values.
+										    You can manage your data ordering as you wish. You can even order data according to multiple columns:
+										    	SHIFT + LEFT CLICK on column headers. This will order by the first culumn clicked, then the second, etc.
+										    You can sort data specifically by clicking on any entry in boxes under each columns.
+										</span>
+									  </li>
+									  <li class='mdl-list__item'>
+									    <span class='mdl-list__item-primary-content'>
+										    <i class='material-icons mdl-list__item-icon'>delete_sweep</i>
+										    You can delete multiple lines selected:
+										    Select lines and click on the button DELETE SELECTED ROWS.
+									  	</span>
+									  </li>
+									  <li class='mdl-list__item'>
+									    <span class='mdl-list__item-primary-content'>
+										    <i class='material-icons mdl-list__item-icon'>remove_red_eye</i>
+										    You have the possibility to toggle columns by clicking on SHOW MORE.
+									  </span>
+									  </li>
+									  <li class='mdl-list__item'>
+									    <span class='mdl-list__item-primary-content'>
+										    <i class='material-icons mdl-list__item-icon'>get_app</i>
+										    You can print, copy, or export to excel and csv the table with the buttons above the table.
+									  </span>
+									  </li>
+							</ul>
+						</div>
+					</div>
+					<div id="large_card" class='card-wide mdl-card mdl-cell mdl-cell--4-col mdl-shadow--3dp'>
+					    	<figure class='mdl-card__media' style='background-color: white'>
+					    		<img src='http://image005.flaticon.com/1/svg/125/125279.svg' style='height: 60px; width: 60px;'>
+					    	</figure>
+					    	<div class='mdl-card__title'>
+							    <h1 class='mdl-card__title-text'>Distances scores</h1>
+							</div>
+							<div class='mdl-card__supporting-text'>
+							<table id="dist_table" style="color: rgba(0,0,0,.87);">
+								<tr>
+									<td style="padding-right:10px;"><b style="white-space: nowrap;">S12Gower-Legendre Distance</b></td>
+									<td> 
+										 The distance measure S12GowLeg = sqrt(1 - s12) is derived from the S12 coefficient of Gower & Legendre
+									     defined as s12 = a / sqrt((a + b)(a + c)), with "a" representing the number of positions at which both 
+									     spectra are in "on-state" and "b" respectively "c" representing the number of positions at which only the 
+									     query spectrum or the hit spectrum are in "on-state".
+								     </td>
+								</tr>
+								<tr>
+									<td style="padding-right:10px;"><b style="white-space: nowrap;">Hamming Distance</b></td>
+									<td>
+									    In information theory, the Hamming distance between two strings of equal length is the number of positions for which the corresponding
+									     symbols are different. Put another way, it measures the minimum number of substitutions required to change one into the other, or the number 
+									     of errors that transformed one string into the other. 
+								  	</td>
+							  	</tr>
+							  	<tr>
+							  		<td style="padding-right:10px;"><b style="white-space: nowrap;">Jaccard Distance</b></td>
+							  		
+									<td>Number of matches (a mass with appropriate intensity in both spectra) divided by the sum of matches and mismatches (a mass where only one of both 
+									    spectra has a intensity). The jaccard distance is a binary distance.
+									</td>
+								</tr>
+							  <tr>
+							  	<td style="padding-right:10px;"><b style="white-space: nowrap;padding-right:60px;">Dotproduct Distance</b></td>
+								<td>The Dotproduct distance is summing the multiplied intensities over all matching peaks within both spectra. Here, to satisfy the conditions
+								     of a metric I) non-negativity, II) identity of indiscernibles, III) symmetry and IV) subadditivity / triangle inequality, we use 1-Dotproduct.
+								      Both spectra are normalised prior to the spectral vector norm in that way, that the absolute value of the squared intensities is equal to 1.
+								</td>
+						
+							  </tr>
+							  <tr>
+								  <td style="padding-right:10px;"><b style="white-space: nowrap;padding-right:60px;">Euclidean Distance</b></td>
+								  <td>The Euclid is the square root of the sum of the squared differences over all matching peaks.</td>
+							  </tr>
+						</div>
+					</div>
+				</div>
+			</div>
+	    </section>
+	
+  </main>
+  
+</div>
+
+</body>
+
+
+</html>

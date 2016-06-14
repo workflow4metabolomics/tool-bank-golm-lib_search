@@ -1,9 +1,9 @@
 ## ****** MON_MODULE environnemnt : ****** ##
-# version XXX 201X M Landi / F Giacomoni
+# version 1.0 XX.XX.2016 G Cretin / F Giacomoni / Y Guitton
 
 ## --- PERL compilator / libraries : --- ##
 $ perl -v
-This is perl, v5.10.1 (*) built for x86_64-linux-thread-multi
+This is perl, v5.18.2 built for x86_64-linux-gnu-thread-multi
 
 # libs CORE PERL : 
 use strict ;
@@ -15,33 +15,38 @@ use Getopt::Long ;
 use FindBin ;
 
 # libs CPAN PERL : 
-$ perl -e 'use XX::XX'
-$ sudo perl -MCPAN -e shell
-cpan> install XX::XX
+$ perl -e 'use SOAP::Lite +trace => [qw (debug)] ;'
+$ perl -e 'use Excel::Writer::XLSX ;'
+$ perl -e 'use JSON ;'
+$ perl -e 'use HTML::Template ;'
+
 
 # libs pfem PERL : 
-No dependency with pfem lib
+use lib::golm_ws_api qw( :ALL ) ;
+use lib::msp qw( :ALL ) ;
+use lib::output qw( :ALL ) ;
 --
 
 ## --- R bin and Packages : --- ##
-$ R --version
-R version 3.0.1 (2013-05-16) -- "Good Sport"
-Platform: x86_64-redhat-linux-gnu (64-bit)
 
 No interaction with R
+
 -- 
 
 ## --- Binary dependencies --- ##
-Install folowing binaries :
+
+NA
+
 --
 
 ## --- Config : --- ##
-Edit the config file : /path/*.conf
+Edit the following lines in the config file :
+HTML_TEMPLATE=absolute_path_to_/golm_out.tmpl
 
 --
 
 ## --- XML HELP PART --- ##
-Copy the following images in ~/static/images/metabolomics : 
+ 
 --
 
 ## --- DATASETS --- ##
