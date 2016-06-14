@@ -162,14 +162,11 @@ This tool intends to facilitate the annotation of masses from GC-MS by searching
 Input files
 -----------
 
-+-------------------------+-----------+
-| Parameter : num + label |  Format   |
-+=========================+===========+
-| 1 : inputSpectra        |    msp    |
-+-------------------------+-----------+
+Parameter: inputSpectra
+Format   : msp
 
 
-File containing spectra in the msp format.
+A file containing spectra in the msp format.
 Example of a spectra in msp format:
 
 	| Name: Unknown1
@@ -265,12 +262,12 @@ Parameters
 Output files
 ------------
 
-**Three types of files**
+**Four types of files**
 
-- html_output.html  : to view results on a webpage (HTML).
-- excel_output.xlsx : to export results in a tabular format.
-- csv_output.csv    : to export results in csv format.
-- json_output.csv	: to use for other modules. 
+	| html_output.html  : to view results on a webpage (HTML).
+	| excel_output.xlsx : to export results in a tabular format.
+	| csv_output.csv    : to export results in csv format.
+	| json_output.csv	: to use for other modules. 
 
 
  </help>
