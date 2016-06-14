@@ -308,7 +308,7 @@ sub write_html_body {
 #	$worksheet->write( $i, 9, "s12GowerLegendreDistance" , $format);
 #	$worksheet->write( $i, 10, "Spectrum ID" , $format);
 #	$worksheet->write( $i, 11, "Metabolite ID" , $format);
-#   
+#   $worksheet->write( $i, 12, "Analyte ID" , $format);
 #   $i++;
 #    
 #   foreach my $href_grp (@$jsons) {
@@ -327,7 +327,7 @@ sub write_html_body {
 #			   		$worksheet->write( $i, 9, $hit->{distance_scores}{s12GowerLegendreDistance} );
 #			   		$worksheet->write( $i, 10, $hit->{spectrum}{id} );
 #			   		$worksheet->write( $i, 11, $hit->{metaboliteID} );
-#			   		
+#			   		$worksheet->write( $i, 12, $hit->{analyte}{id});
 #			   		$i++;
 #			}
 #	}
@@ -409,13 +409,13 @@ sub write_csv {
     
     open (CSV , ">" , $csv_file) or die "Can't create the file $csv_file\n" ;
      
-    print CSV "\"Num Spectre\"\t\"Analyte Name\"\t\"Spectrum Name\"\t\"Retention Index\"\t\"RI Discrepancy\"\t\"DotproductDistance\"\t\"EuclideanDistance\"\t\"JaccardDistance\"\t\"HammingDistance\"\t\"s12GowerLegendreDistance\"\t\"Spectrum ID\"\t\"Metabolite ID\"\t\"Analyte ID\n" ;
+    print CSV "\"Num Spectre\"\t\"Analyte Name\"\t\"Spectrum Name\"\t\"Retention Index\"\t\"RI Discrepancy\"\t\"DotproductDistance\"\t\"EuclideanDistance\"\t\"JaccardDistance\"\t\"HammingDistance\"\t\"s12GowerLegendreDistance\"\t\"Spectrum ID\"\t\"Metabolite ID\"\t\"Analyte ID\"\n" ;
 			   		
     foreach my $href_grp (@$jsons) {
 		
 			foreach my $hit ( @{$href_grp->{'searchResults'}} ){
 				
-					print CSV "\"$href_grp->{id}\"\t\"$hit->{analyte}{name}\"\t\"$hit->{spectrum}{name}\"\t\"$hit->{ri_infos}{ri}\"\t\"$hit->{ri_infos}{riDiscrepancy}\"\t\"$hit->{distance_scores}{DotproductDistance}\"\t\"$hit->{distance_scores}{EuclideanDistance}\"\t\"$hit->{distance_scores}{JaccardDistance}\"\t\"$hit->{distance_scores}{HammingDistance}\"\t\"$hit->{distance_scores}{s12GowerLegendreDistance}\"\t\"$hit->{spectrum}{id}\"\t\"$hit->{metaboliteID}\n" ;
+					print CSV "\"$href_grp->{id}\"\t\"$hit->{analyte}{name}\"\t\"$hit->{spectrum}{name}\"\t\"$hit->{ri_infos}{ri}\"\t\"$hit->{ri_infos}{riDiscrepancy}\"\t\"$hit->{distance_scores}{DotproductDistance}\"\t\"$hit->{distance_scores}{EuclideanDistance}\"\t\"$hit->{distance_scores}{JaccardDistance}\"\t\"$hit->{distance_scores}{HammingDistance}\"\t\"$hit->{distance_scores}{s12GowerLegendreDistance}\"\t\"$hit->{spectrum}{id}\"\t\"$hit->{metaboliteID}\"\t\"$hit->{analyte}{id}\"\n" ;
 			}
 	}
     close(CSV) ;

@@ -1,4 +1,4 @@
-Num Spectre	Analyte Name	Spectrum Name	Retention Index	RI Discrepancy	DotproductDistance	EuclideanDistance	JaccardDistance	HammingDistance	s12GowerLegendreDistance	Spectrum ID	Metabolite ID
+Num Spectre	Analyte Name	Spectrum Name	Retention Index	RI Discrepancy	DotproductDistance	EuclideanDistance	JaccardDistance	HammingDistance	s12GowerLegendreDistance	Spectrum ID	Metabolite ID	Analyte ID
 1	Glucose (1MEOX) (5TMS) BP	Glucose (1MEOX) (5TMS) BP [A191001-ambient-na-23]	1899.05493	1.054953	0.00376573671	0.00648652157	0.2849162	51	0.404159725	dd5bb721-ce4f-4cec-99ff-de2cb818304d	68513255-fc44-4041-bc4b-4fd2fae7541d	0a2b3536-2245-4c0e-bdbc-495766eeec67
 1	Idose (1MEOX) (5TMS) BP	Idose (1MEOX) (5TMS) BP [A191005-ambient-na-1]	1897.25439	0.745605469	0.00416102447	0.007327365	0.238709673	37	0.367506444	d00de57d-6fab-49d0-9aee-25e259da9180	ab025068-f464-4bc6-9c92-994c29387db2	6f4e926f-d7ef-47b6-a52c-91ff88ca567a
 1	Galactose (1MEOX) (5TMS) BP	Galactose (1MEOX) (5TMS) BP [A191002-ambient-DL--9]	1902.42212	4.422119	0.004838637	0.007118009	0.31937173	61	0.428936034	c1226b8e-944e-4d32-ae01-8a9d12465d34	dd3ea070-54a6-4ea7-b99b-a6e975fdd204	1c3ad0aa-ee78-4542-93b3-aa9fdf07add1
