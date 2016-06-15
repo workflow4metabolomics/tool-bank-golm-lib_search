@@ -63,7 +63,6 @@
 	<outputs>
 	    <data name="GolmResEXCEL" label="excel_output" format="tabular" />
 	    <data name="GolmResHTML" label="html_output" format="html" />
-	    <data name="GolmResJSON" label="json_output" format="vjson" />
 	    <data name="GolmResCSV" label="csv_output" format="txt" />
 	</outputs>
 	 
@@ -86,7 +85,6 @@
 	  		<param name="intensity_type" value="YES"/>
 	  		<output name="GolmResEXCEL" file="excel_output1.xlsx"/>
 	  		<output name="GolmResHTML" file="html_output1.html"/>
-	  		<output name="GolmResJSON" file="json_output1.json"/>
 	  		<output name="GolmResCSV" file="csv_output1.csv"/>
 	  	</test>
 	  	<test>
@@ -107,7 +105,6 @@
 	  		<param name="intensity_type" value="YES"/>
 	  		<output name="GolmResEXCEL" file="excel_output2.xlsx"/>
 	  		<output name="GolmResHTML" file="html_output2.html"/>
-	  		<output name="GolmResJSON" file="json_output2.json"/>
 	  		<output name="GolmResCSV" file="csv_output2.csv"/>
 	  	</test>
 	  	<test>
@@ -128,7 +125,6 @@
 	  		<param name="intensity_type" value="YES"/>
 	  		<output name="GolmResEXCEL" file="excel_output3.xlsx"/>
 	  		<output name="GolmResHTML" file="html_output3.html"/>
-	  		<output name="GolmResJSON" file="json_output3.json"/>
 	  		<output name="GolmResCSV" file="csv_output3.csv"/>
 	  	</test>
 	  </tests>
