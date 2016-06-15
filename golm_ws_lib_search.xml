@@ -22,7 +22,6 @@
 		-relative "$intensity_type"
 		-htmlFile "$GolmResHTML"
 		-csvFile "$GolmResCSV"
-		-jsonFile "$GolmResJSON"
 		-excelFile "$GolmResEXCEL"
   </command>
   <inputs>
