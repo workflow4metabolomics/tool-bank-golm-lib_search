@@ -437,42 +437,42 @@ sub write_csv {
 	
 =cut
 ## START of SUB
-sub write_ajax_data_source {
-	## Retrieve Values
-    my $self = shift ;
-    my ( $jsons_obj ) = @_ ;
-
-	my %ajax = () ;
-	my $i = 0 ;
-	            
-	#open (AJAX,">ajax.txt") or die "ERROR at opening file" ;
-	            
-	foreach my $href_grp (@$jsons_obj) {
-			
-				foreach my $hit ( @{$href_grp->{'searchResults'}} ){
-		            	
-					push (@{$ajax{ 'data' }[$i]} , $href_grp->{id}) ;
-					push (@{$ajax{ 'data' }[$i]} , $hit->{spectrum}{name}) ;
-					push (@{$ajax{ 'data' }[$i]} , $hit->{analyte}{name}) ;
-					push (@{$ajax{ 'data' }[$i]} , $hit->{ri_infos}{ri}) ;
-					push (@{$ajax{ 'data' }[$i]} , $hit->{ri_infos}{riDiscrepancy}) ;
-					push (@{$ajax{ 'data' }[$i]} , $hit->{distance_scores}{DotproductDistance}) ;
-					push (@{$ajax{ 'data' }[$i]} , $hit->{distance_scores}{EuclideanDistance}) ;
-					push (@{$ajax{ 'data' }[$i]} , $hit->{distance_scores}{JaccardDistance}) ;
-					push (@{$ajax{ 'data' }[$i]} , $hit->{distance_scores}{HammingDistance}) ;
-					push (@{$ajax{ 'data' }[$i]} , $hit->{distance_scores}{s12GowerLegendreDistance}) ;
-					push (@{$ajax{ 'data' }[$i]} , $hit->{spectrum}{id}) ;
-					push (@{$ajax{ 'data' }[$i]} , $hit->{metaboliteID}) ;
-					push (@{$ajax{ 'data' }[$i]} , $hit->{analyte}{ID}) ;
-					$i++ ;
-				}
-		}
-	
-	my $ajax = encode_json \%ajax ;
-	return $ajax ;
-	#print AJAX $ajax ;
-
-}
+#sub write_ajax_data_source {
+#	## Retrieve Values
+#    my $self = shift ;
+#    my ( $jsons_obj ) = @_ ;
+#
+#	my %ajax = () ;
+#	my $i = 0 ;
+#	            
+#	#open (AJAX,">ajax.txt") or die "ERROR at opening file" ;
+#	            
+#	foreach my $href_grp (@$jsons_obj) {
+#			
+#				foreach my $hit ( @{$href_grp->{'searchResults'}} ){
+#		            	
+#					push (@{$ajax{ 'data' }[$i]} , $href_grp->{id}) ;
+#					push (@{$ajax{ 'data' }[$i]} , $hit->{spectrum}{name}) ;
+#					push (@{$ajax{ 'data' }[$i]} , $hit->{analyte}{name}) ;
+#					push (@{$ajax{ 'data' }[$i]} , $hit->{ri_infos}{ri}) ;
+#					push (@{$ajax{ 'data' }[$i]} , $hit->{ri_infos}{riDiscrepancy}) ;
+#					push (@{$ajax{ 'data' }[$i]} , $hit->{distance_scores}{DotproductDistance}) ;
+#					push (@{$ajax{ 'data' }[$i]} , $hit->{distance_scores}{EuclideanDistance}) ;
+#					push (@{$ajax{ 'data' }[$i]} , $hit->{distance_scores}{JaccardDistance}) ;
+#					push (@{$ajax{ 'data' }[$i]} , $hit->{distance_scores}{HammingDistance}) ;
+#					push (@{$ajax{ 'data' }[$i]} , $hit->{distance_scores}{s12GowerLegendreDistance}) ;
+#					push (@{$ajax{ 'data' }[$i]} , $hit->{spectrum}{id}) ;
+#					push (@{$ajax{ 'data' }[$i]} , $hit->{metaboliteID}) ;
+#					push (@{$ajax{ 'data' }[$i]} , $hit->{analyte}{ID}) ;
+#					$i++ ;
+#				}
+#		}
+#	
+#	my $ajax = encode_json \%ajax ;
+#	return $ajax ;
+#	#print AJAX $ajax ;
+#
+#}
 #END of SUB
 
 
