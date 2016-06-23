@@ -77,6 +77,10 @@
 		    box-shadow: 0px 6px 15px #c1c1c1;
 		}
 		
+		a {
+		    color: rgb(87, 132, 34);
+		}
+		
 		.ripple{
 		  overflow:hidden;
 		  position: relative;
@@ -160,8 +164,6 @@
 		    text-overflow: ellipsis;
 		}
 	</style>
-	
-	
 	<script type='text/javascript' language='javascript' src='https://cdnjs.cloudflare.com/ajax/libs/jszip/2.5.0/jszip.min.js'></script>
 	<script type='text/javascript' language='javascript' src='https://cdn.rawgit.com/bpampuch/pdfmake/0.1.18/build/pdfmake.min.js'></script>
 	<script type='text/javascript' language='javascript' src='https://code.jquery.com/jquery-1.12.3.min.js'></script>
@@ -231,7 +233,7 @@
 		                'visible': false
 		            }
 		        ],
-		        'scrollY': '55vh',
+		        'scrollY': '50vh',
 		    	'responsive': true,
 		    	'pagingType': 'full_numbers',
         		'scrollCollapse': true,
@@ -294,14 +296,6 @@
 			}
 			
 			
-			/*var json_data = $.parseJSON(<TMPL_VAR NAME=DATA>) ;
-			
-			display = function(start,cpt){
-				var x=0, y=0 ;
-				$.each(json_data, function(i,v){
-					if(x >= start)
-				});
-			}*/
 			
 		});
 		
@@ -403,7 +397,7 @@
 								<TMPL_LOOP NAME=GROUPS>
 									<tr><td><TMPL_VAR NAME=ID></td>
 									<td><TMPL_VAR NAME=SPECTRUM_NAME></td>
-									<td><TMPL_VAR NAME=ANALYTE_NAME></td>
+									<td><a href='<TMPL_VAR NAME=ANALYTE_REF>'><TMPL_VAR NAME=ANALYTE_NAME></a></td>
 									<td><TMPL_VAR NAME=RI></td>
 									<td><TMPL_VAR NAME=RI_DISCREPANCY></td>
 									<td><TMPL_VAR NAME=DOT_PRODUCT_DISTANCE></td>
@@ -412,7 +406,7 @@
 									<td><TMPL_VAR NAME=HAMMING_DISTANCE></td>
 									<td><TMPL_VAR NAME=S12_GOWER_LEGENDRE_DISTANCE></td>
 									<td><TMPL_VAR NAME=SPECTRUM_ID></td>
-									<td><TMPL_VAR NAME=METABOLITE_ID></td>
+									<td><a href='<TMPL_VAR NAME=METABOLITE_REF>'><TMPL_VAR NAME=METABOLITE_ID></a></td>
 									<td><TMPL_VAR NAME=ANALYTE_ID></td></tr>
 								</TMPL_LOOP>
 						</tbody>

@@ -4,7 +4,6 @@ use strict;
 use warnings ;
 use Exporter ;
 use Carp ;
-#use Excel::Writer::XLSX ;
 use HTML::Template ;
 use JSON ;
 
@@ -200,7 +199,7 @@ sub build_json_res_object {
 sub add_entries_to_tbody_object {
 	## Retrieve Values
     my $self = shift ;
-    my ( $results ) = @_ ;
+    my ( $results , $analyte_ref , $metabolite_ref ) = @_ ;
     
     my @tbody_entries = () ;
 								
@@ -221,7 +220,9 @@ sub add_entries_to_tbody_object {
 						S12_GOWER_LEGENDRE_DISTANCE => $hit->{distance_scores}{s12GowerLegendreDistance} ,
 						SPECTRUM_ID => $hit->{spectrum}{id} ,
 						METABOLITE_ID => $hit->{metaboliteID} ,
-						ANALYTE_ID => $hit->{analyte}{id}
+						ANALYTE_ID => $hit->{analyte}{id},
+						ANALYTE_REF => $analyte_ref . $hit->{analyte}{id} . ".aspx",
+						METABOLITE_REF => $metabolite_ref . $hit->{metaboliteID} . ".aspx",
 					) ;
 					push (@tbody_entries , \%grp_res) ;
 				}

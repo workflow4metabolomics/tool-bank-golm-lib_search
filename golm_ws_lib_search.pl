@@ -97,6 +97,8 @@ my $default_ri = $CONF->{'RI'} ;
 my $default_ri_window = $CONF->{'RI_WINDOW'} ;
 my $default_gc_column = $CONF->{'GC_COLUMN'} ;
 my $default_entries = $CONF->{'DEFAULT_ENTRIES'} ;
+my $analyte_ref = $CONF->{'ANALYTE_REF'} ;
+my $metabolite_ref = $CONF->{'METABOLITE_REF'} ;
 
 ############# -------------- Test the Golm web service -------------- ############# :
 
@@ -209,13 +211,13 @@ foreach my $spectrum (@$encoded_spectra){
 ############# -------------- Build outputs -------------- ############# :
 	
 my $jsons_obj = $o_output->build_json_res_object(\@hits) ;
-$o_output->write_json_skel(\$json_file, $jsons_obj) ;
+#$o_output->write_json_skel(\$json_file, $jsons_obj) ;
 
 # Build the ajax data source for html view
 #my $ajax = $o_output->write_ajax_data_source($jsons_obj) ;
 
 
-my $tbody_entries = $o_output->add_entries_to_tbody_object($jsons_obj) ;
+my $tbody_entries = $o_output->add_entries_to_tbody_object($jsons_obj,$analyte_ref,$metabolite_ref) ;
 $o_output->write_html_body($jsons_obj, $tbody_entries, $html_file, $html_template, $default_entries, $jsons_obj) ;
 $o_output->excel_like_output($excel_file, $jsons_obj) ;
 $o_output->write_csv($csv_file , $jsons_obj) ;
