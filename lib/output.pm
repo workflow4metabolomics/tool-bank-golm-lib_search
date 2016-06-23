@@ -199,7 +199,7 @@ sub build_json_res_object {
 sub add_entries_to_tbody_object {
 	## Retrieve Values
     my $self = shift ;
-    my ( $results , $analyte_ref , $metabolite_ref ) = @_ ;
+    my ( $results , $analyte_ref , $metabolite_ref, $spectrum_ref ) = @_ ;
     
     my @tbody_entries = () ;
 								
@@ -223,6 +223,7 @@ sub add_entries_to_tbody_object {
 						ANALYTE_ID => $hit->{analyte}{id},
 						ANALYTE_REF => $analyte_ref . $hit->{analyte}{id} . ".aspx",
 						METABOLITE_REF => $metabolite_ref . $hit->{metaboliteID} . ".aspx",
+						SPECTRUM_REF => $spectrum_ref . $hit->{spectrum}{id} . ".aspx"
 					) ;
 					push (@tbody_entries , \%grp_res) ;
 				}

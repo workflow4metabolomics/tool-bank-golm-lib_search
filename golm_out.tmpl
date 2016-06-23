@@ -78,7 +78,7 @@
 		}
 		
 		a {
-		    color: rgb(87, 132, 34);
+		    color: rgb(0, 0, 0);
 		}
 		
 		.ripple{
@@ -396,7 +396,7 @@
 						<tbody>
 								<TMPL_LOOP NAME=GROUPS>
 									<tr><td><TMPL_VAR NAME=ID></td>
-									<td><TMPL_VAR NAME=SPECTRUM_NAME></td>
+									<td><a href='<TMPL_VAR NAME=SPECTRUM_REF>' target='_blank'><TMPL_VAR NAME=SPECTRUM_NAME></a></td>
 									<td><a href='<TMPL_VAR NAME=ANALYTE_REF>' target='_blank'><TMPL_VAR NAME=ANALYTE_NAME></a></td>
 									<td><TMPL_VAR NAME=RI></td>
 									<td><TMPL_VAR NAME=RI_DISCREPANCY></td>
