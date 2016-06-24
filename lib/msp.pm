@@ -548,6 +548,63 @@ sub remove_redundants {
 ## END of SUB
 
 
+#********************************************************************************************************
+#	FONCTION DU SEUIL POUR LE BRUIT, A DECOMMENTER SI FINALEMENT CE N'EST PAS GERE DANS LA BRIQUE MetaMS
+#********************************************************************************************************
+
+
+=head2 METHOD keep_ions_above_threshold
+
+	## Description : keep only ions which intensities are above the threshold
+	## Input : $mzs_res_sorted, $ints_res_sorted, $noiseThreshold
+	## Output : $mzs_res_noise_threshold, $ints_res_noise_threshold
+	## Usage : my ( $mzs_res_noise_threshold, $ints_res_noise_threshold ) = keep_ions_above_threshold( $mzs_res_sorted, $ints_res_sorted, $noiseThreshold ) ;
+	
+=cut
+## START of SUB 
+#sub keep_ions_above_threshold {
+#	## Retrieve Values
+#	my $self = shift ;
+#    my ($mzs_res_sorted, $ints_res_sorted, $noiseThreshold) = @_ ;
+#    
+#    my (@mzs_res_noise_threshold, @ints_res_noise_threshold) = ( (),() ) ;
+#    my (@mzs_res_noise_threshold_temp, @ints_res_noise_threshold_temp) = ( (),() ) ;
+#    my $i = 0 ;
+#    my $j = 0 ;
+#    # Case when we have only one array of masses (input is a string of masses and not a file)
+#    if ( ref(@$mzs_res_sorted[0]) ne "ARRAY") {
+#    	
+#		while( @$ints_res_sorted[$i] > $noiseThreshold && $i < scalar @$mzs_res_sorted) {
+#    	
+#	    	push ( @mzs_res_noise_threshold , @$mzs_res_sorted[$i] ) ;
+#	    	push ( @ints_res_noise_threshold , @$ints_res_sorted[$i] ) ;
+#	    	$i++ ;
+#	    }
+#	}
+#    else {
+#    	while( $i < @$ints_res_sorted ) {
+#    		
+#    		while( $$ints_res_sorted[$i][$j] > $noiseThreshold && $j < scalar @$ints_res_sorted[$i]) {
+#    			
+#    			push ( @mzs_res_noise_threshold_temp , $$mzs_res_sorted[$i][$j] ) ;
+#		    	push ( @ints_res_noise_threshold_temp , $$ints_res_sorted[$i][$j] ) ;
+#		    	$j++ ;
+#    		}		
+#    		push ( @mzs_res_noise_threshold , \@mzs_res_noise_threshold_temp ) ;
+#		    push ( @ints_res_noise_threshold , \@ints_res_noise_threshold_temp ) ;
+#    		$i++ ;
+#    	}
+#	}
+#	
+#	return (\@mzs_res_noise_threshold, \@ints_res_noise_threshold) ;
+#}  
+## END of SUB
+
+
+#********************************************************************************************************
+#********************************************************************************************************
+#********************************************************************************************************
+
 
 1 ;
 
