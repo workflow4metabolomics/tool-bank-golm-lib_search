@@ -105,6 +105,7 @@ sub get_mzs {
 		    				}
 		    				# Check that $mzRes is not greater than the number of digits after comma
 		    				elsif ($mzRes > 0) {
+		    					if ($mz !~ /^\d+\.\d+$/) { croak "*********\n\nYou are trying to specify $mzRes significant decimals, but one or more masses in the input file are unitary masses.\nYou should try again with mzRes = 0\n\n\n"; }
 		    					if($mzRes > length(( $mz =~ /.+\.(.*)/)[0] )) {
 		    						$mz = sprintf("%.".$mzRes."f" , $mz) ;
 		    					}
