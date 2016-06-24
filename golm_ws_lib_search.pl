@@ -25,8 +25,10 @@ use lib::output qw( :ALL ) ;
 use lib::conf qw( :ALL ) ;
 
 ## Initialized values
-my ($OptHelp,$ri,$riWindow,$gcColumn,$inputFile,$inputMasses,$maxHits,$mzRes,$maxIons,$threshold,$relative) = (undef,undef,undef,undef,undef,undef,undef,undef,undef,undef,undef) ;
-my ( $JaccardDistanceThreshold,$s12GowerLegendreDistanceThreshold,$DotproductDistanceThreshold,$HammingDistanceThreshold,$EuclideanDistanceThreshold ) = (undef,undef,undef,undef,undef) ;
+my ($OptHelp,$ri,$riWindow,$gcColumn,$inputFile,$inputMasses) = (undef,undef,undef,undef,undef,undef) ;
+my ($maxHits,$mzRes,$maxIons,$threshold,$relative,$noise_threshold) = (undef,undef,undef,undef,undef,undef) ;
+my ($JaccardDistanceThreshold,$s12GowerLegendreDistanceThreshold) = (undef,undef,undef,undef,undef) ;
+my ($DotproductDistanceThreshold,$HammingDistanceThreshold,$EuclideanDistanceThreshold) = (undef,undef,undef) ;
 my ($excel_file,$html_file,$html_template,$json_file,$csv_file) = (undef,undef,undef,undef,undef) ;
 my (@hits, @ojson) = ( () , () ) ;
 my $encoded_spectra ;
@@ -47,6 +49,7 @@ if (!@ARGV){ &help ; }
 				"maxHits:i"		=> \$maxHits,
 				"mzRes:i"		=> \$mzRes,
 				"maxIons:i"		=> \$maxIons,
+				#"noiseThreshold:f" => \$noise_threshold,
 				"JaccardDistanceThreshold:f"		=> \$JaccardDistanceThreshold,
 				"s12GowerLegendreDistanceThreshold:f"		=> \$s12GowerLegendreDistanceThreshold,
 				"DotproductDistanceThreshold:f"		=> \$DotproductDistanceThreshold,
@@ -62,7 +65,7 @@ if (!@ARGV){ &help ; }
             die "maxHits must be >= 0\n" unless ($maxHits >= 0) ;
             die "mzRes must be >= 0 \n" unless ($mzRes >= 0) ;
             die "maxIons must be >= 0\n" unless ($maxIons >= 0) ;
-            
+            die "noiseThreshold must be > 0\n" unless ($noise_threshold > 0) ;
          
 ## if you put the option -help or -h function help is started         
 if(defined($OptHelp)){ &help ; }
@@ -123,9 +126,23 @@ if (defined $inputMasses && !defined $inputFile) {
 	## Sorting intensities
 	my ($mzs_res_sorted, $ints_res_sorted) = $omsp->sorting_descending_intensities($ref_mzs_res, $ref_ints_res) ;
 	
+	#************************
+	# Noise threshold: uncomment if it is not managed in MetaMS 
+	#************************
+	
+	## Apply noise threshold
+	#my ($mzs_res_noise_threshold, $ints_res_noise_threshold) = $omsp->keep_ions_above_threshold($mzs_res_sorted, $ints_res_sorted) ;
+	
+	#************************
+	
 	## Keep a limited number of ions according to $maxIons
 	if($maxIons > 0){
 		
+		## To uncomment if "Apply noise threshold is used"
+		#$ref_mzs_res = $omsp->keep_only_max_masses( $mzs_res_noise_threshold, $maxIons ) ;
+		#$ref_ints_res = $omsp->keep_only_max_intensities( $ints_res_noise_threshold, $maxIons ) ;
+		
+		## To uncomment if "Apply noise threshold is used"
 		$ref_mzs_res = $omsp->keep_only_max_masses( $mzs_res_sorted, $maxIons ) ;
 		$ref_ints_res = $omsp->keep_only_max_intensities( $ints_res_sorted, $maxIons ) ;
 	}
@@ -160,10 +177,26 @@ elsif (defined $inputFile and -e $inputFile and !defined $inputMasses and define
 	## Sorting intensities
 	my ($mzs_res_sorted, $ints_res_sorted) = $omsp->sorting_descending_intensities($ref_mzs_res, $ref_ints_res) ;
 	
+	#************************
+	# Noise threshold: uncomment if it is not managed in MetaMS 
+	#************************
+	
+	## Apply noise threshold if exists
+	#my ($mzs_res_noise_threshold, $ints_res_noise_threshold) = $omsp->keep_ions_above_threshold($mzs_res_sorted, $ints_res_sorted) ;
+	
+	#************************
+	
+	
 	## Keep only $maxIons ions
 	if($maxIons > 0){
-		( $mzs_res_sorted ) = $omsp->keep_only_max_masses( $mzs_res_sorted, $maxIons ) ;
-		( $ints_res_sorted ) = $omsp->keep_only_max_intensities( $ints_res_sorted, $maxIons ) ;
+		
+		## To uncomment if "Apply noise threshold is used"
+		#$ref_mzs_res = $omsp->keep_only_max_masses( $mzs_res_noise_threshold, $maxIons ) ;
+		#$ref_ints_res = $omsp->keep_only_max_intensities( $ints_res_noise_threshold, $maxIons ) ;
+		
+		## To uncomment if "Apply noise threshold is used"
+		$mzs_res_sorted = $omsp->keep_only_max_masses( $mzs_res_sorted, $maxIons ) ;
+		$ints_res_sorted = $omsp->keep_only_max_intensities( $ints_res_sorted, $maxIons ) ;
 	}
 	
 	## Remove redundant masses
