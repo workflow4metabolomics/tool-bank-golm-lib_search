@@ -499,7 +499,6 @@ You can find documentation for this module with the perldoc command.
 =head1 AUTHOR
 
 Gabriel Cretin E<lt>gabriel.cretin@clermont.inra.frE<gt>
-Franck Giacomoni E<lt>franck.giacomoni@clermont.inra.frE<gt>
 
 =head1 LICENSE
 
