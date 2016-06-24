@@ -65,7 +65,7 @@ if (!@ARGV){ &help ; }
             die "maxHits must be >= 0\n" unless ($maxHits >= 0) ;
             die "mzRes must be >= 0 \n" unless ($mzRes >= 0) ;
             die "maxIons must be >= 0\n" unless ($maxIons >= 0) ;
-            die "noiseThreshold must be > 0\n" unless ($noise_threshold > 0) ;
+            #die "noiseThreshold must be > 0\n" unless ($noise_threshold > 0) ;
          
 ## if you put the option -help or -h function help is started         
 if(defined($OptHelp)){ &help ; }
