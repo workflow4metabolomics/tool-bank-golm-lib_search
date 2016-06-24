@@ -635,6 +635,8 @@ This program is free software; you can redistribute it and/or modify it under th
 
 =head1 VERSION
 
-version 1 : ??
+version 1 : 03 / 06 / 2016
+
+version 2 : 24 / 06 / 2016
 
 =cut

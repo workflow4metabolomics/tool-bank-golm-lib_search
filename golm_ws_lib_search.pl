@@ -241,7 +241,7 @@ golm_ws_lib_search.pl
 #		   gabriel.cretin\@clermont.inra.fr
 #		   yann.guitton\@oniris-nantes.fr
 # Version : 1.0
-# Created : 07/06/2016
+# Created : 03/06/2016
 USAGE :		 
 		golm_ws_lib_search.pl -help OR
 		
@@ -254,6 +254,7 @@ USAGE :
 			-maxHits [Maximum hits per queried spectra: integer >= 1 (100 for all of them)]
 			-mzRes [Number of digits after the decimal point for m/z values: integer (0 if none)]
 			-maxIons [Number of m/z per spectra you want to keep for the queries, default 0 for all detected ions]
+			-noiseThreshold [Ions having intensity values less than this value are ignored]
 			-JaccardDistanceThreshold...............[
 			-s12GowerLegendreDistanceThreshold......[  Threshold for each score. Hits with greater scores are ignored: 0 (perfect match) < threshlold <= 1 (mismatch) ]
 			-DotproductDistanceThreshold............[
@@ -279,8 +280,28 @@ __END__
 
 =head1 USAGE
 
- XXX.pl -precursors -arg1 [-arg2] 
- or XXX.pl -help
+ golm_ws_lib_search.pl -help OR
+		
+		golm_ws_lib_search.pl 
+			-spectraFile [.msp file]	
+			-spectraMasses [masses + intensities of an ion: 'mz1 int1 mz2 int2 mzx intx...']
+			-ri [Rentention Index: float or integer]
+			-riWindow [Retention Index Window: 1500 or the value of your choice]
+			-gcColumn [AlkaneRetentionIndexGcColumnComposition: 'VAR5' or 'MDN35' or 'None']
+			-maxHits [Maximum hits per queried spectra: integer >= 1 (100 for all of them)]
+			-mzRes [Number of digits after the decimal point for m/z values: integer (0 if none)]
+			-maxIons [Number of m/z per spectra you want to keep for the queries, default 0 for all detected ions]
+			-noiseThreshold [Ions having intensity values less than this value are ignored]
+			-JaccardDistanceThreshold...............[
+			-s12GowerLegendreDistanceThreshold......[  Threshold for each score. Hits with greater scores are ignored: 0 (perfect match) < threshlold <= 1 (mismatch) ]
+			-DotproductDistanceThreshold............[
+			-EuclideanDistanceThreshold.............[
+			-HammingDistanceThreshold[Threshold for hamming score. Hits with greater scores are ignored: 0 - perfect match to higher values indicating a mismatch]
+			-relative [Transforms absolute intensities in the msp file into relative intensities: (intensity * 100)/ max(intensitiess), otherwise, leave them absolute: true or false]
+			-excelFile [name of the xls file in output: string]
+			-htmlFile [name of the html file in output: string]
+			-json_file [name of the json file in output: string]
+			-csv_file [name of the csv file in output: string]
 
 =head1 SYNOPSIS
 
@@ -309,8 +330,8 @@ This program is free software; you can redistribute it and/or modify it under th
 
 =head1 VERSION
 
-version 1 : xx / xx / 2016
+version 1 : 03 / 06 / 2016
 
-version 2 : ??
+version 2 : 24 / 06 / 2016
 
 =cut

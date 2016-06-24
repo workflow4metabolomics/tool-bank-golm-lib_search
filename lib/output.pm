@@ -492,7 +492,7 @@ You can find documentation for this module with the perldoc command.
 
 =over 4
 
-=item :ALL is get_spectra
+=item :ALL is build_json_res_object excel_output write_html_body add_entries_to_tbody_object write_json_skel write_ajax_data_source excel_like_output
 
 =back
 
@@ -507,6 +507,8 @@ This program is free software; you can redistribute it and/or modify it under th
 
 =head1 VERSION
 
-version 1 : ??
+version 1 : 03 / 06 / 2016
+
+version 2 : 24 / 06 / 2016
 
 =cut
