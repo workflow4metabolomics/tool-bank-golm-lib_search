@@ -25,8 +25,10 @@ use lib::output qw( :ALL ) ;
 use lib::conf qw( :ALL ) ;
 
 ## Initialized values
-my ($OptHelp,$ri,$riWindow,$gcColumn,$inputFile,$inputMasses,$maxHits,$mzRes,$maxIons,$threshold,$relative) = (undef,undef,undef,undef,undef,undef,undef,undef,undef,undef,undef) ;
-my ( $JaccardDistanceThreshold,$s12GowerLegendreDistanceThreshold,$DotproductDistanceThreshold,$HammingDistanceThreshold,$EuclideanDistanceThreshold ) = (undef,undef,undef,undef,undef) ;
+my ($OptHelp,$ri,$riWindow,$gcColumn,$inputFile,$inputMasses) = (undef,undef,undef,undef,undef,undef) ;
+my ($maxHits,$mzRes,$maxIons,$threshold,$relative,$noise_threshold) = (undef,undef,undef,undef,undef,undef) ;
+my ($JaccardDistanceThreshold,$s12GowerLegendreDistanceThreshold) = (undef,undef,undef,undef,undef) ;
+my ($DotproductDistanceThreshold,$HammingDistanceThreshold,$EuclideanDistanceThreshold) = (undef,undef,undef) ;
 my ($excel_file,$html_file,$html_template,$json_file,$csv_file) = (undef,undef,undef,undef,undef) ;
 my (@hits, @ojson) = ( () , () ) ;
 my $encoded_spectra ;
@@ -47,6 +49,7 @@ if (!@ARGV){ &help ; }
 				"maxHits:i"		=> \$maxHits,
 				"mzRes:i"		=> \$mzRes,
 				"maxIons:i"		=> \$maxIons,
+				#"noiseThreshold:f" => \$noise_threshold,
 				"JaccardDistanceThreshold:f"		=> \$JaccardDistanceThreshold,
 				"s12GowerLegendreDistanceThreshold:f"		=> \$s12GowerLegendreDistanceThreshold,
 				"DotproductDistanceThreshold:f"		=> \$DotproductDistanceThreshold,
@@ -62,7 +65,7 @@ if (!@ARGV){ &help ; }
             die "maxHits must be >= 0\n" unless ($maxHits >= 0) ;
             die "mzRes must be >= 0 \n" unless ($mzRes >= 0) ;
             die "maxIons must be >= 0\n" unless ($maxIons >= 0) ;
-            
+            #die "noiseThreshold must be > 0\n" unless ($noise_threshold > 0) ;
          
 ## if you put the option -help or -h function help is started         
 if(defined($OptHelp)){ &help ; }
@@ -97,6 +100,9 @@ my $default_ri = $CONF->{'RI'} ;
 my $default_ri_window = $CONF->{'RI_WINDOW'} ;
 my $default_gc_column = $CONF->{'GC_COLUMN'} ;
 my $default_entries = $CONF->{'DEFAULT_ENTRIES'} ;
+my $analyte_ref = $CONF->{'ANALYTE_REF'} ;
+my $metabolite_ref = $CONF->{'METABOLITE_REF'} ;
+my $spectrum_ref = $CONF->{'SPECTRUM_REF'} ;
 
 ############# -------------- Test the Golm web service -------------- ############# :
 
@@ -120,9 +126,23 @@ if (defined $inputMasses && !defined $inputFile) {
 	## Sorting intensities
 	my ($mzs_res_sorted, $ints_res_sorted) = $omsp->sorting_descending_intensities($ref_mzs_res, $ref_ints_res) ;
 	
+	#************************
+	# Noise threshold: uncomment if it is not managed in MetaMS 
+	#************************
+	
+	## Apply noise threshold
+	#my ($mzs_res_noise_threshold, $ints_res_noise_threshold) = $omsp->keep_ions_above_threshold($mzs_res_sorted, $ints_res_sorted) ;
+	
+	#************************
+	
 	## Keep a limited number of ions according to $maxIons
 	if($maxIons > 0){
 		
+		## To uncomment if "Apply noise threshold is used"
+		#$ref_mzs_res = $omsp->keep_only_max_masses( $mzs_res_noise_threshold, $maxIons ) ;
+		#$ref_ints_res = $omsp->keep_only_max_intensities( $ints_res_noise_threshold, $maxIons ) ;
+		
+		## To uncomment if "Apply noise threshold is used"
 		$ref_mzs_res = $omsp->keep_only_max_masses( $mzs_res_sorted, $maxIons ) ;
 		$ref_ints_res = $omsp->keep_only_max_intensities( $ints_res_sorted, $maxIons ) ;
 	}
@@ -157,10 +177,26 @@ elsif (defined $inputFile and -e $inputFile and !defined $inputMasses and define
 	## Sorting intensities
 	my ($mzs_res_sorted, $ints_res_sorted) = $omsp->sorting_descending_intensities($ref_mzs_res, $ref_ints_res) ;
 	
+	#************************
+	# Noise threshold: uncomment if it is not managed in MetaMS 
+	#************************
+	
+	## Apply noise threshold if exists
+	#my ($mzs_res_noise_threshold, $ints_res_noise_threshold) = $omsp->keep_ions_above_threshold($mzs_res_sorted, $ints_res_sorted) ;
+	
+	#************************
+	
+	
 	## Keep only $maxIons ions
 	if($maxIons > 0){
-		( $mzs_res_sorted ) = $omsp->keep_only_max_masses( $mzs_res_sorted, $maxIons ) ;
-		( $ints_res_sorted ) = $omsp->keep_only_max_intensities( $ints_res_sorted, $maxIons ) ;
+		
+		## To uncomment if "Apply noise threshold is used"
+		#$ref_mzs_res = $omsp->keep_only_max_masses( $mzs_res_noise_threshold, $maxIons ) ;
+		#$ref_ints_res = $omsp->keep_only_max_intensities( $ints_res_noise_threshold, $maxIons ) ;
+		
+		## To uncomment if "Apply noise threshold is used"
+		$mzs_res_sorted = $omsp->keep_only_max_masses( $mzs_res_sorted, $maxIons ) ;
+		$ints_res_sorted = $omsp->keep_only_max_intensities( $ints_res_sorted, $maxIons ) ;
 	}
 	
 	## Remove redundant masses
@@ -215,7 +251,7 @@ my $jsons_obj = $o_output->build_json_res_object(\@hits) ;
 #my $ajax = $o_output->write_ajax_data_source($jsons_obj) ;
 
 
-my $tbody_entries = $o_output->add_entries_to_tbody_object($jsons_obj) ;
+my $tbody_entries = $o_output->add_entries_to_tbody_object($jsons_obj,$analyte_ref,$metabolite_ref,$spectrum_ref) ;
 $o_output->write_html_body($jsons_obj, $tbody_entries, $html_file, $html_template, $default_entries, $jsons_obj) ;
 $o_output->excel_like_output($excel_file, $jsons_obj) ;
 $o_output->write_csv($csv_file , $jsons_obj) ;
@@ -238,7 +274,7 @@ golm_ws_lib_search.pl
 #		   gabriel.cretin\@clermont.inra.fr
 #		   yann.guitton\@oniris-nantes.fr
 # Version : 1.0
-# Created : 07/06/2016
+# Created : 03/06/2016
 USAGE :		 
 		golm_ws_lib_search.pl -help OR
 		
@@ -251,6 +287,7 @@ USAGE :
 			-maxHits [Maximum hits per queried spectra: integer >= 1 (100 for all of them)]
 			-mzRes [Number of digits after the decimal point for m/z values: integer (0 if none)]
 			-maxIons [Number of m/z per spectra you want to keep for the queries, default 0 for all detected ions]
+			-noiseThreshold [Ions having intensity values less than this value are ignored]
 			-JaccardDistanceThreshold...............[
 			-s12GowerLegendreDistanceThreshold......[  Threshold for each score. Hits with greater scores are ignored: 0 (perfect match) < threshlold <= 1 (mismatch) ]
 			-DotproductDistanceThreshold............[
@@ -276,8 +313,28 @@ __END__
 
 =head1 USAGE
 
- XXX.pl -precursors -arg1 [-arg2] 
- or XXX.pl -help
+ golm_ws_lib_search.pl -help OR
+		
+		golm_ws_lib_search.pl 
+			-spectraFile [.msp file]	
+			-spectraMasses [masses + intensities of an ion: 'mz1 int1 mz2 int2 mzx intx...']
+			-ri [Rentention Index: float or integer]
+			-riWindow [Retention Index Window: 1500 or the value of your choice]
+			-gcColumn [AlkaneRetentionIndexGcColumnComposition: 'VAR5' or 'MDN35' or 'None']
+			-maxHits [Maximum hits per queried spectra: integer >= 1 (100 for all of them)]
+			-mzRes [Number of digits after the decimal point for m/z values: integer (0 if none)]
+			-maxIons [Number of m/z per spectra you want to keep for the queries, default 0 for all detected ions]
+			-noiseThreshold [Ions having intensity values less than this value are ignored]
+			-JaccardDistanceThreshold...............[
+			-s12GowerLegendreDistanceThreshold......[  Threshold for each score. Hits with greater scores are ignored: 0 (perfect match) < threshlold <= 1 (mismatch) ]
+			-DotproductDistanceThreshold............[
+			-EuclideanDistanceThreshold.............[
+			-HammingDistanceThreshold[Threshold for hamming score. Hits with greater scores are ignored: 0 - perfect match to higher values indicating a mismatch]
+			-relative [Transforms absolute intensities in the msp file into relative intensities: (intensity * 100)/ max(intensitiess), otherwise, leave them absolute: true or false]
+			-excelFile [name of the xls file in output: string]
+			-htmlFile [name of the html file in output: string]
+			-json_file [name of the json file in output: string]
+			-csv_file [name of the csv file in output: string]
 
 =head1 SYNOPSIS
 
@@ -306,8 +363,8 @@ This program is free software; you can redistribute it and/or modify it under th
 
 =head1 VERSION
 
-version 1 : xx / xx / 2016
+version 1 : 03 / 06 / 2016
 
-version 2 : ??
+version 2 : 24 / 06 / 2016
 
 =cut
