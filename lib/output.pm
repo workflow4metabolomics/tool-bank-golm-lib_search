@@ -199,7 +199,7 @@ sub build_json_res_object {
 sub add_entries_to_tbody_object {
 	## Retrieve Values
     my $self = shift ;
-    my ( $results , $analyte_ref , $metabolite_ref, $spectrum_ref ) = @_ ;
+    my ( $results ) = @_ ;
     
     my @tbody_entries = () ;
 								
@@ -220,10 +220,7 @@ sub add_entries_to_tbody_object {
 						S12_GOWER_LEGENDRE_DISTANCE => $hit->{distance_scores}{s12GowerLegendreDistance} ,
 						SPECTRUM_ID => $hit->{spectrum}{id} ,
 						METABOLITE_ID => $hit->{metaboliteID} ,
-						ANALYTE_ID => $hit->{analyte}{id},
-						ANALYTE_REF => $analyte_ref . $hit->{analyte}{id} . ".aspx",
-						METABOLITE_REF => $metabolite_ref . $hit->{metaboliteID} . ".aspx",
-						SPECTRUM_REF => $spectrum_ref . $hit->{spectrum}{id} . ".aspx"
+						ANALYTE_ID => $hit->{analyte}{id}
 					) ;
 					push (@tbody_entries , \%grp_res) ;
 				}
@@ -437,42 +434,42 @@ sub write_csv {
 	
 =cut
 ## START of SUB
-#sub write_ajax_data_source {
-#	## Retrieve Values
-#    my $self = shift ;
-#    my ( $jsons_obj ) = @_ ;
-#
-#	my %ajax = () ;
-#	my $i = 0 ;
-#	            
-#	#open (AJAX,">ajax.txt") or die "ERROR at opening file" ;
-#	            
-#	foreach my $href_grp (@$jsons_obj) {
-#			
-#				foreach my $hit ( @{$href_grp->{'searchResults'}} ){
-#		            	
-#					push (@{$ajax{ 'data' }[$i]} , $href_grp->{id}) ;
-#					push (@{$ajax{ 'data' }[$i]} , $hit->{spectrum}{name}) ;
-#					push (@{$ajax{ 'data' }[$i]} , $hit->{analyte}{name}) ;
-#					push (@{$ajax{ 'data' }[$i]} , $hit->{ri_infos}{ri}) ;
-#					push (@{$ajax{ 'data' }[$i]} , $hit->{ri_infos}{riDiscrepancy}) ;
-#					push (@{$ajax{ 'data' }[$i]} , $hit->{distance_scores}{DotproductDistance}) ;
-#					push (@{$ajax{ 'data' }[$i]} , $hit->{distance_scores}{EuclideanDistance}) ;
-#					push (@{$ajax{ 'data' }[$i]} , $hit->{distance_scores}{JaccardDistance}) ;
-#					push (@{$ajax{ 'data' }[$i]} , $hit->{distance_scores}{HammingDistance}) ;
-#					push (@{$ajax{ 'data' }[$i]} , $hit->{distance_scores}{s12GowerLegendreDistance}) ;
-#					push (@{$ajax{ 'data' }[$i]} , $hit->{spectrum}{id}) ;
-#					push (@{$ajax{ 'data' }[$i]} , $hit->{metaboliteID}) ;
-#					push (@{$ajax{ 'data' }[$i]} , $hit->{analyte}{ID}) ;
-#					$i++ ;
-#				}
-#		}
-#	
-#	my $ajax = encode_json \%ajax ;
-#	return $ajax ;
-#	#print AJAX $ajax ;
-#
-#}
+sub write_ajax_data_source {
+	## Retrieve Values
+    my $self = shift ;
+    my ( $jsons_obj ) = @_ ;
+
+	my %ajax = () ;
+	my $i = 0 ;
+	            
+	#open (AJAX,">ajax.txt") or die "ERROR at opening file" ;
+	            
+	foreach my $href_grp (@$jsons_obj) {
+			
+				foreach my $hit ( @{$href_grp->{'searchResults'}} ){
+		            	
+					push (@{$ajax{ 'data' }[$i]} , $href_grp->{id}) ;
+					push (@{$ajax{ 'data' }[$i]} , $hit->{spectrum}{name}) ;
+					push (@{$ajax{ 'data' }[$i]} , $hit->{analyte}{name}) ;
+					push (@{$ajax{ 'data' }[$i]} , $hit->{ri_infos}{ri}) ;
+					push (@{$ajax{ 'data' }[$i]} , $hit->{ri_infos}{riDiscrepancy}) ;
+					push (@{$ajax{ 'data' }[$i]} , $hit->{distance_scores}{DotproductDistance}) ;
+					push (@{$ajax{ 'data' }[$i]} , $hit->{distance_scores}{EuclideanDistance}) ;
+					push (@{$ajax{ 'data' }[$i]} , $hit->{distance_scores}{JaccardDistance}) ;
+					push (@{$ajax{ 'data' }[$i]} , $hit->{distance_scores}{HammingDistance}) ;
+					push (@{$ajax{ 'data' }[$i]} , $hit->{distance_scores}{s12GowerLegendreDistance}) ;
+					push (@{$ajax{ 'data' }[$i]} , $hit->{spectrum}{id}) ;
+					push (@{$ajax{ 'data' }[$i]} , $hit->{metaboliteID}) ;
+					push (@{$ajax{ 'data' }[$i]} , $hit->{analyte}{ID}) ;
+					$i++ ;
+				}
+		}
+	
+	my $ajax = encode_json \%ajax ;
+	return $ajax ;
+	#print AJAX $ajax ;
+
+}
 #END of SUB
 
 
@@ -492,13 +489,14 @@ You can find documentation for this module with the perldoc command.
 
 =over 4
 
-=item :ALL is build_json_res_object excel_output write_html_body add_entries_to_tbody_object write_json_skel write_ajax_data_source excel_like_output
+=item :ALL is get_spectra
 
 =back
 
 =head1 AUTHOR
 
 Gabriel Cretin E<lt>gabriel.cretin@clermont.inra.frE<gt>
+Franck Giacomoni E<lt>franck.giacomoni@clermont.inra.frE<gt>
 
 =head1 LICENSE
 
@@ -506,8 +504,6 @@ This program is free software; you can redistribute it and/or modify it under th
 
 =head1 VERSION
 
-version 1 : 03 / 06 / 2016
-
-version 2 : 24 / 06 / 2016
+version 1 : ??
 
 =cut
