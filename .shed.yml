@@ -1,0 +1,8 @@
+name: golm_ws_lib_search
+owner: yguitton
+description: '[W4M][Metabolomics][GC-MS] Golm Metabolome Database search spectrum'
+homepage_url: http://workflow4metabolomics.org
+long_description: 'Tool using the Golm Library Search WS. Part of the W4M project: http://workflow4metabolomics.org'
+remote_repository_url: https://github.com/workflow4metabolomics/tool-bank-golm-lib_search.git
+categories:
+- Metabolomics
