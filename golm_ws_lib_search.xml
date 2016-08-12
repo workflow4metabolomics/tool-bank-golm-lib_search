@@ -1,9 +1,22 @@
-<tool id="golm_ws_lib_search" name="Golm Metabolome Database search spectrum" version="2016-06-03">
+<tool id="golm_ws_lib_search" name="Golm Metabolome Database search spectrum" version="1.1.0">
   <description>
        : GC-MS Mass Spectral Database.
   </description>
-  <command interpreter="perl">
-    golm_ws_lib_search.pl
+  
+  <requirements>
+      <requirement type="package" version="0.413">perl-list-moreutils</requirement>
+      <requirement type="package" version="1.19">perl-soap-lite</requirement>
+      <!--<requirement type="package" version="0.95">perl-excel-writer-xlsx</requirement>-->
+      <requirement type="package" version="2.90">perl-json</requirement>
+      <requirement type="package" version="2.95">perl-html-template</requirement>
+  </requirements>
+  
+  <stdio>
+      <exit_code range="1" level="fatal" />
+  </stdio>
+  
+  <command>
+    perl $__tool_directory__/golm_ws_lib_search.pl
 		#if str($input_type.choice) == "YES":
 	    	-inputFile "${input_type.masses}"
 	    #else:
@@ -86,8 +99,8 @@
 	  		<output name="GolmResHTML" file="html_output1.html"/>
 	  		<output name="GolmResCSV" file="csv_output1.csv"/>
 	  	</test>
-	  	<test>
-	  		<!--test 2 results - high/large thresholds -->
+	  	<!--<test>
+	  		test 2 results - high/large thresholds
 	  		<param name="choice" value="YES"/>
 	  		<param name="masses" value="peakspectra_test.msp"/>
 	  		<param name="columnType" value="VAR5"/>
@@ -107,7 +120,7 @@
 	  		<output name="GolmResCSV" file="csv_output2.csv"/>
 	  	</test>
 	  	<test>
-	  		<!--test 3 results - default thresholds -->
+	  		test 3 results - default thresholds
 	  		<param name="choice" value="NO"/>
 	  		<param name="mass" value="70 3 71 3 72 16 73 999 74 87 75 78 76 4 77 5 81 1 82 6 83 13 84 4 85 3 86 4 87 5 88 4 89 52 90 4 91 2 97 2 98 1 99 4 100 12 101 16 102 9 103 116 104 11 105 26 106 2 107 1 111 1 112 1 113 4 114 11 115 7 116 5 117 93 118 9 119 8 126 1 127 3 128 3 129 101 130 19 131 25 132 4 133 60 134 8 135 4 140 1 141 1 142 4 143 13 144 2 145 6 146 1 147 276 148 44 149 27 150 3 151 1 156 1 157 70 158 12 159 5 160 148 161 26 162 7 163 8 164 1 168 1 169 2 170 1 172 3 173 4 174 1 175 4 177 4 186 2 187 1 189 28 190 7 191 13 192 2 193 1 201 5 202 1 203 3 204 23 205 162 206 31 207 16 208 2 210 2 214 1 215 2 216 8 217 88 218 18 219 8 220 1 221 6 222 1 229 23 230 6 231 11 232 3 233 4 234 3 235 1 243 1 244 2 245 1 246 2 247 1 256 1 262 3 263 1 269 2 270 1 274 4 275 1 277 4 278 1 291 7 292 2 293 1 300 1 305 4 306 1 307 4 308 1 318 1 319 122 320 37 321 17 322 3 323 1 343 1 364 2 365 1"/>
 	  		<param name="columnType" value="VAR5"/>
@@ -125,7 +138,7 @@
 	  		<output name="GolmResEXCEL" file="excel_output3.xlsx"/>
 	  		<output name="GolmResHTML" file="html_output3.html"/>
 	  		<output name="GolmResCSV" file="csv_output3.csv"/>
-	  	</test>
+	  	</test>-->
 	  </tests>
 	 
 	 <help>
@@ -266,6 +279,10 @@ Output files
 
 
  </help>
+     
+    <citations>
+        <citation type="doi">10.1093/bioinformatics/btu813</citation>
+    </citations>
 
 </tool>
 	 
