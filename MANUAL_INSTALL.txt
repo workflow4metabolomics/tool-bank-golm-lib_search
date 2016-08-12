@@ -40,8 +40,7 @@ NA
 --
 
 ## --- Config : --- ##
-Edit the following lines in the config file :
-HTML_TEMPLATE=absolute_path_to_/golm_out.tmpl
+NA
 
 --
 
