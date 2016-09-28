@@ -3,13 +3,13 @@
        : GC-MS Mass Spectral Database.
   </description>
   
-  <requirements>
+  <!--<requirements>
       <requirement type="package" version="0.413">perl-list-moreutils</requirement>
       <requirement type="package" version="1.19">perl-soap-lite</requirement>
-      <!--<requirement type="package" version="0.95">perl-excel-writer-xlsx</requirement>-->
+      <requirement type="package" version="0.95">perl-excel-writer-xlsx</requirement>
       <requirement type="package" version="2.90">perl-json</requirement>
       <requirement type="package" version="2.95">perl-html-template</requirement>
-  </requirements>
+  </requirements>-->
   
   <stdio>
       <exit_code range="1" level="fatal" />
