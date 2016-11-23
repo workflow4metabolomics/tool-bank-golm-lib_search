@@ -56,10 +56,10 @@ if (!@ARGV){ &help ; }
 				"HammingDistanceThreshold:f"		=> \$HammingDistanceThreshold,
 				"EuclideanDistanceThreshold:f"		=> \$EuclideanDistanceThreshold,
 				"relative:s"			=> \$relative,
-				"excelFile:s"			=> \$excel_file,
-				"htmlFile:s"		=> \$html_file,
+				"output_xls:s"			=> \$excel_file,
+				"output_html:s"		=> \$html_file,
 				"jsonFile:s"		=> \$json_file,
-				"csvFile:s"		=> \$csv_file,
+				"output_tabular:s"		=> \$csv_file,
             ) ;
             
             die "maxHits must be >= 0\n" unless ($maxHits >= 0) ;
