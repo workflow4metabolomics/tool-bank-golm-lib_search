@@ -206,22 +206,49 @@ sub add_entries_to_tbody_object {
 		foreach my $href_grp (@$results) {
 			
 				foreach my $hit ( @{$href_grp->{'searchResults'}} ){
-						
-					my %grp_res = (	
-						ID => $href_grp->{id} ,
-						ANALYTE_NAME => $hit->{analyte}{name} ,
-						SPECTRUM_NAME => $hit->{spectrum}{name} ,
-						RI => $hit->{ri_infos}{ri} ,
-						RI_DISCREPANCY => $hit->{ri_infos}{riDiscrepancy} ,
-						DOT_PRODUCT_DISTANCE => $hit->{distance_scores}{DotproductDistance} ,
-						EUCLIDEAN_DISTANCE => $hit->{distance_scores}{EuclideanDistance} ,
-						JACCARD_DISTANCE => $hit->{distance_scores}{JaccardDistance} ,
-						HAMMING_DISTANCE => $hit->{distance_scores}{HammingDistance} ,
-						S12_GOWER_LEGENDRE_DISTANCE => $hit->{distance_scores}{s12GowerLegendreDistance} ,
-						SPECTRUM_ID => $hit->{spectrum}{id} ,
-						METABOLITE_ID => $hit->{metaboliteID} ,
-						ANALYTE_ID => $hit->{analyte}{id}
-					) ;
+					my %grp_res = () ;
+					
+					## Add hyperlinks
+					if ( $hit->{'spectrum'}{'name'} ne 'no results') {
+						%grp_res = (
+							ID => $href_grp->{id} ,
+							ANALYTE_NAME => $hit->{analyte}{name} ,
+							SPECTRUM_NAME => $hit->{spectrum}{name} ,
+							RI => $hit->{ri_infos}{ri} ,
+							RI_DISCREPANCY => $hit->{ri_infos}{riDiscrepancy} ,
+							DOT_PRODUCT_DISTANCE => $hit->{distance_scores}{DotproductDistance} ,
+							EUCLIDEAN_DISTANCE => $hit->{distance_scores}{EuclideanDistance} ,
+							JACCARD_DISTANCE => $hit->{distance_scores}{JaccardDistance} ,
+							HAMMING_DISTANCE => $hit->{distance_scores}{HammingDistance} ,
+							S12_GOWER_LEGENDRE_DISTANCE => $hit->{distance_scores}{s12GowerLegendreDistance} ,
+							SPECTRUM_ID => $hit->{spectrum}{id} ,
+							METABOLITE_ID => $hit->{metaboliteID} ,
+							ANALYTE_ID => $hit->{analyte}{id},
+							ANALYTE_REF => 'http://gmd.mpimp-golm.mpg.de/Analytes/'.$hit->{analyte}{id}.'.aspx',
+							SPECTRUM_REF => 'http://gmd.mpimp-golm.mpg.de/Spectrums/'.$hit->{spectrum}{id}.'.aspx',
+							METABOLITE_REF => 'http://gmd.mpimp-golm.mpg.de/Metabolites/'.$hit->{metaboliteID}.'.aspx',
+						) ;
+					}
+					else {
+						%grp_res = (
+							ID => $href_grp->{id} ,
+							ANALYTE_NAME => $hit->{analyte}{name} ,
+							SPECTRUM_NAME => $hit->{spectrum}{name} ,
+							RI => $hit->{ri_infos}{ri} ,
+							RI_DISCREPANCY => $hit->{ri_infos}{riDiscrepancy} ,
+							DOT_PRODUCT_DISTANCE => $hit->{distance_scores}{DotproductDistance} ,
+							EUCLIDEAN_DISTANCE => $hit->{distance_scores}{EuclideanDistance} ,
+							JACCARD_DISTANCE => $hit->{distance_scores}{JaccardDistance} ,
+							HAMMING_DISTANCE => $hit->{distance_scores}{HammingDistance} ,
+							S12_GOWER_LEGENDRE_DISTANCE => $hit->{distance_scores}{s12GowerLegendreDistance} ,
+							SPECTRUM_ID => $hit->{spectrum}{id} ,
+							METABOLITE_ID => $hit->{metaboliteID} ,
+							ANALYTE_ID => $hit->{analyte}{id},
+							ANALYTE_REF => 'http://gmd.mpimp-golm.mpg.de/',
+							SPECTRUM_REF => 'http://gmd.mpimp-golm.mpg.de/',
+							METABOLITE_REF => 'http://gmd.mpimp-golm.mpg.de/',
+						) ;
+					}
 					push (@tbody_entries , \%grp_res) ;
 				}
 		}
