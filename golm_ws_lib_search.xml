@@ -79,7 +79,7 @@
 	    <data name="GolmOutWeb" label="${input_type.masses.name[:-6]}.GOLM_WEB.html" format="html">
 	    	<filter>input_type['choice'] == "YES"</filter>
 	    </data>
-	    <data name="GolmOutXlsx" label="${input_type.masses.name[:-6]}.GOLM.xlsx" format="tabular">
+	    <data name="GolmOutXlsx" label="${input_type.masses.name[:-6]}.GOLM.txt" format="tabular">
 	    	<filter>input_type['choice'] == "YES"</filter>
 	    </data>
 	    <data name="GolmOutTab2" label="GOLM.tabular" format="tabular" >
@@ -88,7 +88,7 @@
 	    <data name="GolmOutWeb2" label="HMDB_WEB.html" format="html">
 	    	<filter>input_type['choice'] == "NO"</filter>
    		</data
-	    <data name="GolmOutXlsx2" label="HMDB.xlsx" format="tabular">
+	    <data name="GolmOutXlsx2" label="HMDB.txt" format="tabular">
 	    	<filter>input_type['choice'] == "NO"</filter>
    		</data
 	</outputs>
@@ -110,7 +110,7 @@
 	  		<param name="EuclideanDistanceThreshold" value="0.5"/>
 	  		<param name="HammingDistanceThreshold" value="500"/>
 	  		<param name="intensity_type" value="YES"/>
-	  		<output name="GolmOutXlsx" file="output01.xlsx"/>
+	  		<output name="GolmOutXlsx" file="output01.txt"/>
 	  		<output name="GolmOutWeb" file="output01.html"/>
 	  		<output name="GolmOutTab" file="output01.tabular"/>
 	  	</test>
@@ -130,7 +130,7 @@
 	  		<param name="EuclideanDistanceThreshold" value="0.5"/>
 	  		<param name="HammingDistanceThreshold" value="500"/>
 	  		<param name="intensity_type" value="YES"/>
-	  		<output name="GolmOutXlsx2" file="output02.xlsx"/>
+	  		<output name="GolmOutXlsx2" file="output02.txt"/>
 	  		<output name="GolmOutWeb2" file="output02.html"/>
 	  		<output name="GolmOutTab2" file="output02.tabular"/>
 	  	</test>
@@ -150,7 +150,7 @@
 	  		<param name="EuclideanDistanceThreshold" value="0.5"/>
 	  		<param name="HammingDistanceThreshold" value="500"/>
 	  		<param name="intensity_type" value="YES"/>
-	  		<output name="GolmOutXlsx" file="output03.xlsx"/>
+	  		<output name="GolmOutXlsx" file="output03.txt"/>
 	  		<output name="GolmOutWeb" file="output03.html"/>
 	  		<output name="GolmOutTab" file="output03.tabular"/>
 	  	</test>
