@@ -56,10 +56,10 @@ if (!@ARGV){ &help ; }
 				"HammingDistanceThreshold:f"		=> \$HammingDistanceThreshold,
 				"EuclideanDistanceThreshold:f"		=> \$EuclideanDistanceThreshold,
 				"relative:s"			=> \$relative,
-				"excelFile:s"			=> \$excel_file,
-				"htmlFile:s"		=> \$html_file,
-				"jsonFile:s"		=> \$json_file,
-				"csvFile:s"		=> \$csv_file,
+				"output_xls:s"			=> \$excel_file,
+				"output_html:s"		=> \$html_file,
+				"output_json:s"		=> \$json_file,
+				"output_tabular:s"		=> \$csv_file,
             ) ;
             
             die "maxHits must be >= 0\n" unless ($maxHits >= 0) ;
@@ -69,6 +69,8 @@ if (!@ARGV){ &help ; }
          
 ## if you put the option -help or -h function help is started         
 if(defined($OptHelp)){ &help ; }
+
+if( (!defined ($inputFile)) and (!defined($inputMasses) )){ warn "The input data is not defined (File or mass/intensity list AS string)\n" ; &help ; }
 
 #=============================================================================
 #                                MAIN SCRIPT
@@ -273,8 +275,9 @@ golm_ws_lib_search.pl
 # Emails : franck.giacomoni\@clermont.inra.fr
 #		   gabriel.cretin\@clermont.inra.fr
 #		   yann.guitton\@oniris-nantes.fr
-# Version : 1.0
+# Version : 1.2
 # Created : 03/06/2016
+# Updated : 28/11/2016
 USAGE :		 
 		golm_ws_lib_search.pl -help OR
 		
@@ -294,10 +297,10 @@ USAGE :
 			-EuclideanDistanceThreshold.............[
 			-HammingDistanceThreshold[Threshold for hamming score. Hits with greater scores are ignored: 0 - perfect match to higher values indicating a mismatch]
 			-relative [Transforms absolute intensities in the msp file into relative intensities: (intensity * 100)/ max(intensitiess), otherwise, leave them absolute: true or false]
-			-excelFile [name of the xls file in output: string]
-			-htmlFile [name of the html file in output: string]
-			-json_file [name of the json file in output: string]
-			-csv_file [name of the csv file in output: string]
+			-output_xls [name of the xls file in output: string]
+			-output_html [name of the html file in output: string]
+			-output_json [name of the json file in output: string]
+			-output_tabular [name of the csv file in output: string]
 				
 ";
 	exit(1);
@@ -331,10 +334,10 @@ __END__
 			-EuclideanDistanceThreshold.............[
 			-HammingDistanceThreshold[Threshold for hamming score. Hits with greater scores are ignored: 0 - perfect match to higher values indicating a mismatch]
 			-relative [Transforms absolute intensities in the msp file into relative intensities: (intensity * 100)/ max(intensitiess), otherwise, leave them absolute: true or false]
-			-excelFile [name of the xls file in output: string]
-			-htmlFile [name of the html file in output: string]
-			-json_file [name of the json file in output: string]
-			-csv_file [name of the csv file in output: string]
+			-output_xls [name of the xls file in output: string]
+			-output_html [name of the html file in output: string]
+			-output_json [name of the json file in output: string]
+			-output_tabular [name of the csv file in output: string]
 
 =head1 SYNOPSIS
 
@@ -363,8 +366,10 @@ This program is free software; you can redistribute it and/or modify it under th
 
 =head1 VERSION
 
-version 1 : 03 / 06 / 2016
+version 1.0 : 03 / 06 / 2016
 
-version 2 : 24 / 06 / 2016
+version 1.1 : 24 / 06 / 2016
+
+version 1.2 : 28 / 11 / 2016
 
 =cut

@@ -1,4 +1,4 @@
-<tool id="golm_ws_lib_search" name="Golm Metabolome Database search spectrum" version="1.1.0">
+<tool id="golm_ws_lib_search" name="Golm Metabolome Database search spectrum" version="2016-11-28">
   <description>
        : GC-MS Mass Spectral Database.
   </description>
@@ -15,15 +15,18 @@
       <exit_code range="1" level="fatal" />
   </stdio>
   
-  <command>
+  <command><![CDATA[
     perl $__tool_directory__/golm_ws_lib_search.pl
 		#if str($input_type.choice) == "YES":
 	    	-inputFile "${input_type.masses}"
+	    	-output_tabular "$GolmOutTab" -output_html "$GolmOutWeb" -output_xls "$GolmOutXlsx"
 	    #else:
 	    	-inputMasses "${input_type.mass}"
+	    	-output_tabular "$GolmOutTab2" -output_html "$GolmOutWeb2" -output_xls "$GolmResXlsx2"
 	    #end if
 	    -ri "$ri"
 		-riWindow "$riWindow"
+		-gcColumn "columnType"
 	    -mzRes "$mzRes"
 	    -maxHits "$maxHits"
 	    -maxIons "$maxIons"
@@ -33,10 +36,8 @@
 		-HammingDistanceThreshold "$HammingDistanceThreshold"
 		-EuclideanDistanceThreshold "$EuclideanDistanceThreshold"
 		-relative "$intensity_type"
-		-htmlFile "$GolmResHTML"
-		-csvFile "$GolmResCSV"
-		-excelFile "$GolmResEXCEL"
-  </command>
+		
+  ]]></command>
   <inputs>
   	<conditional name="input_type">
       <param name="choice" type="select" label="Would you use a file" help="If 'NO' is selected then one or more mass(es) must be entered manually.">
@@ -50,10 +51,9 @@
       	<param name="mass" size="30" area="true" type="text" label="Masses and intensities (entered manually)"  help="For a list of masses + intensities write : mz1 int1 mz2 int2 mzx intx..."/>	
 	  </when>
 	</conditional>
-    	<param name="columnType" label="Column" type="select" display="radio" help="5%-phenyl-95%-dimethylpolysiloxane (VAR5), 35%-phenyl-65%-dimethylpolysiloxane (MDN35), if you don't know select 'None'.">
+    	<param name="columnType" label="Column" type="select" display="radio" help="5%-phenyl-95%-dimethylpolysiloxane (VAR5), 35%-phenyl-65%-dimethylpolysiloxane (MDN35).">
           <option value="VAR5">VAR5</option>
           <option value="MDN35">MDN35</option>
-          <option value="none">None</option>
         </param>
         <param name="ri" type="integer" value="1898" label="Alkane Retention Index" help="If neither an alkane RIs for VAR5 nor MDN35 is available in your setup, please select 'none' in the input field above!" />
     	<param name="riWindow" type="integer" value="5" label="Retention Index Window" help="This value is for the library search used only. A larger window size will increase the number of matches.
@@ -73,16 +73,31 @@
 	</inputs>
 	
 	<outputs>
-	    <data name="GolmResEXCEL" label="excel_output" format="tabular" />
-	    <data name="GolmResHTML" label="html_output" format="html" />
-	    <data name="GolmResCSV" label="csv_output" format="txt" />
+	    <data name="GolmOutTab" label="${input_type.masses.name[:-6]}.GOLM.tabular" format="tabular">
+	    	<filter>input_type['choice'] == "YES"</filter>
+	    </data>
+	    <data name="GolmOutWeb" label="${input_type.masses.name[:-6]}.GOLM_WEB.html" format="html">
+	    	<filter>input_type['choice'] == "YES"</filter>
+	    </data>
+	    <data name="GolmOutXlsx" label="${input_type.masses.name[:-6]}.GOLM.txt" format="tabular">
+	    	<filter>input_type['choice'] == "YES"</filter>
+	    </data>
+	    <data name="GolmOutTab2" label="GOLM.tabular" format="tabular" >
+	    	<filter>input_type['choice'] == "NO"</filter>
+   		</data
+	    <data name="GolmOutWeb2" label="HMDB_WEB.html" format="html">
+	    	<filter>input_type['choice'] == "NO"</filter>
+   		</data
+	    <data name="GolmOutXlsx2" label="HMDB.txt" format="tabular">
+	    	<filter>input_type['choice'] == "NO"</filter>
+   		</data
 	</outputs>
 	 
 	<tests>
 	  	<test>
 	  		<!--test 1 few results - too restrictive thresholds -->
 	  		<param name="choice" value="YES"/>
-	  		<param name="masses" value="peakspectra_test.msp"/>
+	  		<param name="masses" value="input01_peakspectra_test.msp"/>
 	  		<param name="columnType" value="VAR5"/>
 	  		<param name="ri" value="1898"/>
 	  		<param name="riWindow" value="5"/>
@@ -95,32 +110,12 @@
 	  		<param name="EuclideanDistanceThreshold" value="0.5"/>
 	  		<param name="HammingDistanceThreshold" value="500"/>
 	  		<param name="intensity_type" value="YES"/>
-	  		<output name="GolmResEXCEL" file="excel_output1.xlsx"/>
-	  		<output name="GolmResHTML" file="html_output1.html"/>
-	  		<output name="GolmResCSV" file="csv_output1.csv"/>
-	  	</test>
-	  	<!--<test>
-	  		test 2 results - high/large thresholds
-	  		<param name="choice" value="YES"/>
-	  		<param name="masses" value="peakspectra_test.msp"/>
-	  		<param name="columnType" value="VAR5"/>
-	  		<param name="ri" value="1898"/>
-	  		<param name="riWindow" value="5"/>
-	  		<param name="maxHits" value="10"/>
-	  		<param name="mzRes" value="0"/>
-	  		<param name="maxIons" value="0"/>
-	  		<param name="JaccardDistanceThreshold" value="1"/>
-	  		<param name="s12GowerLegendreDistanceThreshold" value="1"/>
-	  		<param name="DotproductDistanceThreshold" value="0.9"/>
-	  		<param name="EuclideanDistanceThreshold" value="0.9"/>
-	  		<param name="HammingDistanceThreshold" value="700"/>
-	  		<param name="intensity_type" value="YES"/>
-	  		<output name="GolmResEXCEL" file="excel_output2.xlsx"/>
-	  		<output name="GolmResHTML" file="html_output2.html"/>
-	  		<output name="GolmResCSV" file="csv_output2.csv"/>
+	  		<output name="GolmOutXlsx" file="output01.txt"/>
+	  		<output name="GolmOutWeb" file="output01.html"/>
+	  		<output name="GolmOutTab" file="output01.tabular"/>
 	  	</test>
 	  	<test>
-	  		test 3 results - default thresholds
+	  		<!--test 2 results - default thresholds -->
 	  		<param name="choice" value="NO"/>
 	  		<param name="mass" value="70 3 71 3 72 16 73 999 74 87 75 78 76 4 77 5 81 1 82 6 83 13 84 4 85 3 86 4 87 5 88 4 89 52 90 4 91 2 97 2 98 1 99 4 100 12 101 16 102 9 103 116 104 11 105 26 106 2 107 1 111 1 112 1 113 4 114 11 115 7 116 5 117 93 118 9 119 8 126 1 127 3 128 3 129 101 130 19 131 25 132 4 133 60 134 8 135 4 140 1 141 1 142 4 143 13 144 2 145 6 146 1 147 276 148 44 149 27 150 3 151 1 156 1 157 70 158 12 159 5 160 148 161 26 162 7 163 8 164 1 168 1 169 2 170 1 172 3 173 4 174 1 175 4 177 4 186 2 187 1 189 28 190 7 191 13 192 2 193 1 201 5 202 1 203 3 204 23 205 162 206 31 207 16 208 2 210 2 214 1 215 2 216 8 217 88 218 18 219 8 220 1 221 6 222 1 229 23 230 6 231 11 232 3 233 4 234 3 235 1 243 1 244 2 245 1 246 2 247 1 256 1 262 3 263 1 269 2 270 1 274 4 275 1 277 4 278 1 291 7 292 2 293 1 300 1 305 4 306 1 307 4 308 1 318 1 319 122 320 37 321 17 322 3 323 1 343 1 364 2 365 1"/>
 	  		<param name="columnType" value="VAR5"/>
@@ -135,19 +130,39 @@
 	  		<param name="EuclideanDistanceThreshold" value="0.5"/>
 	  		<param name="HammingDistanceThreshold" value="500"/>
 	  		<param name="intensity_type" value="YES"/>
-	  		<output name="GolmResEXCEL" file="excel_output3.xlsx"/>
-	  		<output name="GolmResHTML" file="html_output3.html"/>
-	  		<output name="GolmResCSV" file="csv_output3.csv"/>
-	  	</test>-->
+	  		<output name="GolmOutXlsx2" file="output02.txt"/>
+	  		<output name="GolmOutWeb2" file="output02.html"/>
+	  		<output name="GolmOutTab2" file="output02.tabular"/>
+	  	</test>
+	  	<test>
+	  		<!--test 3 lot of results - restrictive thresholds -->
+	  		<param name="choice" value="YES"/>
+	  		<param name="masses" value="input03_peakspectra_full.msp"/>
+	  		<param name="columnType" value="VAR5"/>
+	  		<param name="ri" value="1898"/>
+	  		<param name="riWindow" value="5"/>
+	  		<param name="maxHits" value="10"/>
+	  		<param name="mzRes" value="0"/>
+	  		<param name="maxIons" value="0"/>
+	  		<param name="JaccardDistanceThreshold" value="0.9"/>
+	  		<param name="s12GowerLegendreDistanceThreshold" value="0.9"/>
+	  		<param name="DotproductDistanceThreshold" value="0.5"/>
+	  		<param name="EuclideanDistanceThreshold" value="0.5"/>
+	  		<param name="HammingDistanceThreshold" value="500"/>
+	  		<param name="intensity_type" value="YES"/>
+	  		<output name="GolmOutXlsx" file="output03.txt"/>
+	  		<output name="GolmOutWeb" file="output03.html"/>
+	  		<output name="GolmOutTab" file="output03.tabular"/>
+	  	</test>
 	  </tests>
 	 
-	 <help>
+	 <help><![CDATA[
 
 .. class:: infomark	 
 
 **Authors**
 
-  | Gabriel Cretin (for perl and Galaxy), Franck Giacomoni (for perl and Galaxy)
+  | Gabriel Cretin (for perl and Galaxy), Yann Guitton (for R version and tests) and Franck Giacomoni (for perl and Galaxy)
 
 ---------------------------------------------------
 
@@ -270,15 +285,28 @@ Parameters
 Output files
 ------------
 
-**Four types of files**
+**Tree types of files**
 
-	| html_output.html  : to view results on a webpage (HTML).
-	| excel_output.xlsx : to export results in a tabular format.
-	| csv_output.csv    : to export results in csv format.
-	| json_output.csv	: to use for other modules. 
+	| GOLM.html  : to view results on a webpage (HTML).
+	| GOLM.xlsx : to get results in a excel like format.
+	| GOLM.tabular    : to get results in tabular format.
+
+---------------------------------------------------
 
 
- </help>
+---------------
+Working example
+---------------
+
+
+.. class:: warningmark
+
+Refer to the corresponding W4M HowTo section: http://workflow4metabolomics.org/howto
+ | Format Data For Postprocessing
+ | Perform GCMS Annotations
+ 
+
+ ]]></help>
      
     <citations>
         <citation type="doi">10.1093/bioinformatics/btu813</citation>
