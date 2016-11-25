@@ -133,7 +133,27 @@
 	  		<output name="GolmOutXlsx2" file="output02.xlsx"/>
 	  		<output name="GolmOutWeb2" file="output02.html"/>
 	  		<output name="GolmOutTab2" file="output02.tabular"/>
-	  	</test>-->
+	  	</test>
+	  	<test>
+	  		<!--test 3 lot of results - restrictive thresholds -->
+	  		<param name="choice" value="YES"/>
+	  		<param name="masses" value="input03_peakspectra_full.msp"/>
+	  		<param name="columnType" value="VAR5"/>
+	  		<param name="ri" value="1898"/>
+	  		<param name="riWindow" value="5"/>
+	  		<param name="maxHits" value="10"/>
+	  		<param name="mzRes" value="0"/>
+	  		<param name="maxIons" value="0"/>
+	  		<param name="JaccardDistanceThreshold" value="0.9"/>
+	  		<param name="s12GowerLegendreDistanceThreshold" value="0.9"/>
+	  		<param name="DotproductDistanceThreshold" value="0.5"/>
+	  		<param name="EuclideanDistanceThreshold" value="0.5"/>
+	  		<param name="HammingDistanceThreshold" value="500"/>
+	  		<param name="intensity_type" value="YES"/>
+	  		<output name="GolmOutXlsx" file="output03.xlsx"/>
+	  		<output name="GolmOutWeb" file="output03.html"/>
+	  		<output name="GolmOutTab" file="output03.tabular"/>
+	  	</test>
 	  </tests>
 	 
 	 <help><![CDATA[
