@@ -128,9 +128,9 @@ sub test_query_golm() {
 			## Get the hits + status of the query
 			my $results = $som->result->{Results} ;
 			my $status = $som->result->{Status} ;
-			
+
 			if ($status eq 'success' && $results ne '') {
-				print "\n\n\nThe test request succeeded.\n\n\n" ;
+				print "\n\n\nThe test request succeeded - Golm Service available.\n\n\n" ;
 				return 1 ;
 			}
 			else { croak "\n\n\nSomething went wrong with the test request. Status delivered by Golm = ".$status."\n\n" ; }
