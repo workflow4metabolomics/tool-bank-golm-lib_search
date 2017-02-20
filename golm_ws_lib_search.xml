@@ -84,13 +84,13 @@
 	    </data>
 	    <data name="GolmOutTab2" label="GOLM.tabular" format="tabular" >
 	    	<filter>input_type['choice'] == "NO"</filter>
-   		</data
+   		</data>
 	    <data name="GolmOutWeb2" label="HMDB_WEB.html" format="html">
 	    	<filter>input_type['choice'] == "NO"</filter>
-   		</data
+   		</data>
 	    <data name="GolmOutXlsx2" label="HMDB.txt" format="tabular">
 	    	<filter>input_type['choice'] == "NO"</filter>
-   		</data
+   		</data>
 	</outputs>
 	 
 	<tests>
