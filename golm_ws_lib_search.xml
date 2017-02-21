@@ -1,4 +1,4 @@
-<tool id="golm_ws_lib_search" name="Golm Metabolome Database search spectrum" version="2016-11-28">
+<tool id="golm_ws_lib_search" name="Golm Metabolome Database search spectrum" version="2016-12-05">
   <description>
        : GC-MS Mass Spectral Database.
   </description>
