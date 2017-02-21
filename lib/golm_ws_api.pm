@@ -200,7 +200,7 @@ sub LibrarySearch() {
             ## Limitate number of hits returned according to user's $maxHit
             ## and filter hits on specific values with thresholds
             my @results = @$results ;
-            
+
             ### Return all hits
             my $oapi = lib::golm_ws_api->new() ;
             if ($maxHits == 100 && $status eq 'success') {
@@ -235,7 +235,7 @@ sub LibrarySearch() {
     }
     else { carp "The spectrum for query is undef, Golm soap will stop.\n" ; }
 	
-	return \@filtered_limited_res ;
+#	return \@filtered_limited_res ;
 }
 ### END of SUB
 
@@ -261,12 +261,25 @@ sub filter_scores_golm_results() {
 	my @results = @$results ;
 	my @filtered_res = () ;
 	
+	## Adjust threshold
+	$JaccardDistanceThreshold = sprintf("%.6f", $JaccardDistanceThreshold) ;
+	$s12GowerLegendreDistanceThreshold = sprintf("%.6f", $s12GowerLegendreDistanceThreshold) ;
+	$DotproductDistanceThreshold = sprintf("%.6f", $DotproductDistanceThreshold) ;
+#	$HammingDistanceThreshold = sprintf("%.6f", $HammingDistanceThreshold);
+	$EuclideanDistanceThreshold =  sprintf("%.6f", $EuclideanDistanceThreshold);
+	
 	foreach my $res (@results){
+		
+			$res->{'JaccardDistance'} = sprintf("%.6f", $res->{'JaccardDistance'}) ;
+			$res->{'s12GowerLegendreDistance'} = sprintf("%.6f", $res->{'s12GowerLegendreDistance'}) ;
+			$res->{'DotproductDistance'} = sprintf("%.6f", $res->{'DotproductDistance'}) ;
+#			$res->{'HammingDistance'} = sprintf("%.6f", $res->{'HammingDistance'}) ;
+			$res->{'EuclideanDistance'} = sprintf("%.6f", $res->{'EuclideanDistance'}) ;
 
 			if ($res->{'JaccardDistance'} <= $JaccardDistanceThreshold && $res->{'s12GowerLegendreDistance'} <= $s12GowerLegendreDistanceThreshold
-				&& $res->{'DotproductDistance' } <= $DotproductDistanceThreshold && $res->{'HammingDistance'} <= $HammingDistanceThreshold && 
-				$res->{'EuclideanDistance' } <= $EuclideanDistanceThreshold) {
-					
+				&& $res->{'DotproductDistance'} <= $DotproductDistanceThreshold && $res->{'HammingDistance'} <= $HammingDistanceThreshold && 
+				$res->{'EuclideanDistance'} <= $EuclideanDistanceThreshold) {
+
 				push (@filtered_res , $res) ;
 			}
 	}

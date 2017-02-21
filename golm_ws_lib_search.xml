@@ -3,13 +3,13 @@
        : GC-MS Mass Spectral Database.
   </description>
   
-  <!--<requirements>
+  <requirements>
       <requirement type="package" version="0.413">perl-list-moreutils</requirement>
       <requirement type="package" version="1.19">perl-soap-lite</requirement>
       <requirement type="package" version="0.95">perl-excel-writer-xlsx</requirement>
       <requirement type="package" version="2.90">perl-json</requirement>
       <requirement type="package" version="2.95">perl-html-template</requirement>
-  </requirements>-->
+  </requirements>
   
   <stdio>
       <exit_code range="1" level="fatal" />
@@ -22,7 +22,7 @@
 	    	-output_tabular "$GolmOutTab" -output_html "$GolmOutWeb" -output_xls "$GolmOutXlsx"
 	    #else:
 	    	-inputMasses "${input_type.mass}"
-	    	-output_tabular "$GolmOutTab2" -output_html "$GolmOutWeb2" -output_xls "$GolmResXlsx2"
+	    	-output_tabular "$GolmOutTab2" -output_html "$GolmOutWeb2" -output_xls "$GolmOutXlsx2"
 	    #end if
 	    -ri "$ri"
 		-riWindow "$riWindow"
@@ -84,13 +84,13 @@
 	    </data>
 	    <data name="GolmOutTab2" label="GOLM.tabular" format="tabular" >
 	    	<filter>input_type['choice'] == "NO"</filter>
-   		</data
-	    <data name="GolmOutWeb2" label="HMDB_WEB.html" format="html">
+   		</data>
+	    <data name="GolmOutWeb2" label="GOLM_WEB.html" format="html">
 	    	<filter>input_type['choice'] == "NO"</filter>
-   		</data
-	    <data name="GolmOutXlsx2" label="HMDB.txt" format="tabular">
+   		</data>
+	    <data name="GolmOutXlsx2" label="GOLM.txt" format="tabular">
 	    	<filter>input_type['choice'] == "NO"</filter>
-   		</data
+   		</data>
 	</outputs>
 	 
 	<tests>
@@ -154,6 +154,8 @@
 	  		<output name="GolmOutWeb" file="output03.html"/>
 	  		<output name="GolmOutTab" file="output03.tabular"/>
 	  	</test>
+	  	
+
 	  </tests>
 	 
 	 <help><![CDATA[

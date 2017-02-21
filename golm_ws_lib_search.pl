@@ -242,7 +242,7 @@ foreach my $spectrum (@$encoded_spectra){
 																										  $default_ri, $default_ri_window, $default_gc_column) ;
 	push (@hits , $limited_hits) ;
 }
-			
+	
 
 ############# -------------- Build outputs -------------- ############# :
 	
