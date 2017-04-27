@@ -1,8 +1,5 @@
 <tool id="golm_ws_lib_search" name="Golm Metabolome Database search spectrum" version="2016-12-05">
-  <description>
-       : GC-MS Mass Spectral Database.
-  </description>
-  
+  <description>GC-MS Mass Spectral Database</description>
   <requirements>
       <requirement type="package" version="0.413">perl-list-moreutils</requirement>
       <requirement type="package" version="1.19">perl-soap-lite</requirement>
@@ -16,36 +13,40 @@
   </stdio>
   
   <command><![CDATA[
-    perl $__tool_directory__/golm_ws_lib_search.pl
+    perl '$__tool_directory__/golm_ws_lib_search.pl'
 		#if str($input_type.choice) == "YES":
 	    	-inputFile "${input_type.masses}"
-	    	-output_tabular "$GolmOutTab" -output_html "$GolmOutWeb" -output_xls "$GolmOutXlsx"
+	    	-output_tabular '$GolmOutTab'
+			-output_html '$GolmOutWeb'
+			-output_xls '$GolmOutXlsx'
 	    #else:
-	    	-inputMasses "${input_type.mass}"
-	    	-output_tabular "$GolmOutTab2" -output_html "$GolmOutWeb2" -output_xls "$GolmOutXlsx2"
+	    	-inputMasses '${input_type.mass}'
+	    	-output_tabular '$GolmOutTab2'
+			-output_html '$GolmOutWeb2'
+			-output_xls '$GolmOutXlsx2'
 	    #end if
-	    -ri "$ri"
-		-riWindow "$riWindow"
-		-gcColumn "$columnType"
-	    -mzRes "$mzRes"
-	    -maxHits "$maxHits"
-	    -maxIons "$maxIons"
-		-JaccardDistanceThreshold "$JaccardDistanceThreshold" 
-		-s12GowerLegendreDistanceThreshold "$s12GowerLegendreDistanceThreshold" 
-		-DotproductDistanceThreshold "$DotproductDistanceThreshold" 
-		-HammingDistanceThreshold "$HammingDistanceThreshold"
-		-EuclideanDistanceThreshold "$EuclideanDistanceThreshold"
-		-relative "$intensity_type"
+	    -ri '$ri'
+		-riWindow '$riWindow'
+		-gcColumn '$columnType'
+	    -mzRes '$mzRes'
+	    -maxHits '$maxHits'
+	    -maxIons '$maxIons'
+		-JaccardDistanceThreshold '$JaccardDistanceThreshold'
+		-s12GowerLegendreDistanceThreshold '$s12GowerLegendreDistanceThreshold'
+		-DotproductDistanceThreshold '$DotproductDistanceThreshold'
+		-HammingDistanceThreshold '$HammingDistanceThreshold'
+		-EuclideanDistanceThreshold '$EuclideanDistanceThreshold'
+		-relative '$intensity_type'
 		
   ]]></command>
   <inputs>
   	<conditional name="input_type">
-      <param name="choice" type="select" label="Would you use a file" help="If 'NO' is selected then one or more mass(es) must be entered manually.">
+      <param name="choice" type="select" label="Choose mass information from a file?" help="If 'NO' is selected then one or more mass(es) must be entered manually.">
         <option value="YES">YES</option>
         <option value="NO">NO</option>
       </param>
       <when value="YES">
-      	<param name="masses" label="File of masses (format: msp)" format="msp,txt" type="data" help=".msp output file from metaMS.runGC function, or any msp file." />
+      	<param name="masses" label="File of masses" format="msp,txt" type="data" help="In msp format from the metaMS.runGC function, or any msp file." />
       </when>
       <when value="NO">
       	<param name="mass" size="30" area="true" type="text" label="Masses and intensities (entered manually)"  help="For a list of masses + intensities write : mz1 int1 mz2 int2 mzx intx..."/>	
